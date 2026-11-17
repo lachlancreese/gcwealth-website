@@ -1,0 +1,147 @@
+<!--
+title: Referral Partners | Accountants & Agents | GC Wealth
+description: Refer clients to GC Wealth with confidence. Written referral agreements, updates at every milestone, and specialist home, commercial and SMSF lending.
+path: /partners
+crumb: Referral partners
+nav: about
+bar: no
+-->
+<section class="page-hero">
+  <div class="wrap">
+    <div>
+      <h1>Refer your clients with confidence</h1>
+      <p class="lede">We work alongside accountants, financial planners, buyer's and real estate agents, solicitors and builders. Your clients get specialist finance help, and you stay informed at every milestone.</p>
+      <div class="btn-row">
+        <a class="btn" href="#refer">Refer a client</a>
+        <a class="btn btn-ghost" href="tel:{{phone_tel}}">Call {{phone}}</a>
+      </div>
+    </div>
+    <div class="talk-card">
+      <h2>What we commit to</h2>
+      <ul class="checks" style="margin:0">
+        <li>A written referral agreement, before any referral</li>
+        <li>Updates at each milestone, with your client's consent</li>
+        <li>Your client's interests first, under the best interests duty</li>
+        <li>One team for home, investment, commercial, SMSF and asset finance</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-navy" aria-labelledby="how-partners">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 id="how-partners">How a referral works</h2>
+      <p>The same steps every time, so you always know where your client is up to.</p>
+    </div>
+    <ol class="steps">
+      <li><h3>Agreement in place</h3><p>We set up a written referral agreement with your business first. It records how we work together and any referral arrangements, which are disclosed to your client as the law requires.</p></li>
+      <li><h3>You refer</h3><p>Use the form below or call us, once your client has agreed to you sharing their details.</p></li>
+      <li><h3>We make contact</h3><p>A broker contacts your client and lets you know the first conversation has happened.</p></li>
+      <li><h3>Milestone updates</h3><p>With your client's consent, we update you when the application is lodged, when it's approved, and at settlement.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="who-partners">
+  <div class="wrap split" style="align-items:start">
+    <div>
+      <h2 id="who-partners">Who we work with</h2>
+      <p>Referral relationships work well when both sides understand each other's world. We regularly work with:</p>
+    </div>
+    <ul class="points" style="margin:0">
+      <li><b>Accountants and financial planners</b>Business owners, self-employed clients, investors and SMSFs. For SMSF lending we take our instructions from the client's planner, accountant or solicitor.</li>
+      <li><b>Buyer's agents and real estate agents</b>Pre-approvals before clients make offers, and finance that keeps contracts on track to settlement.</li>
+      <li><b>Builders and developers</b>Construction and house and land finance, with progress payments set up around your contract.</li>
+      <li><b>Solicitors and conveyancers</b>Clear communication through to settlement, including bridging and complex structures.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="section bg-mist" id="refer" aria-labelledby="refer-title">
+  <div class="wrap contact-grid">
+    <div>
+      <h2 id="refer-title">Refer a client</h2>
+      <p class="lede">Send us your client's details and what they need. We'll take it from there and keep you posted.</p>
+      <p>Not set up as a partner yet? Tick the box on the form, or call us on <a href="tel:{{phone_tel}}">{{phone}}</a>, and we'll organise a referral agreement first.</p>
+    </div>
+    <div class="form-panel">
+      <form class="form" id="referral-form" action="/api/enquiry" method="post" data-ajax data-done="/thanks" data-phone="{{phone}}" novalidate>
+        <input type="hidden" name="type" value="referral">
+        <h3 class="full" style="margin:0">About you</h3>
+        <div class="field">
+          <label for="r-name">Your name</label>
+          <input class="input" id="r-name" name="partner_name" type="text" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="r-business">Business</label>
+          <input class="input" id="r-business" name="partner_business" type="text" autocomplete="organization" required>
+        </div>
+        <div class="field">
+          <label for="r-type">Your profession</label>
+          <select class="input" id="r-type" name="partner_type">
+            <option>Accountant</option>
+            <option>Financial planner</option>
+            <option>Buyer's agent</option>
+            <option>Real estate agent</option>
+            <option>Builder or developer</option>
+            <option>Solicitor or conveyancer</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="r-email">Your email</label>
+          <input class="input" id="r-email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field full">
+          <label for="r-phone">Your phone</label>
+          <input class="input" id="r-phone" name="phone" type="tel" autocomplete="tel" required>
+        </div>
+        <h3 class="full" style="margin:8px 0 0">Your client</h3>
+        <div class="field">
+          <label for="r-client">Client's name</label>
+          <input class="input" id="r-client" name="client_name" type="text" required>
+        </div>
+        <div class="field">
+          <label for="r-client-phone">Client's phone</label>
+          <input class="input" id="r-client-phone" name="client_phone" type="tel" required>
+        </div>
+        <div class="field">
+          <label for="r-client-email">Client's email <span>(optional)</span></label>
+          <input class="input" id="r-client-email" name="client_email" type="email">
+        </div>
+        <div class="field">
+          <label for="r-need">What they need</label>
+          <select class="input" id="r-need" name="goal">
+            <option>Buying a home</option>
+            <option>Investment property</option>
+            <option>Refinance</option>
+            <option>Construction</option>
+            <option>Commercial property</option>
+            <option>Business or asset finance</option>
+            <option>SMSF lending</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="r-notes">Anything we should know? <span>(optional)</span></label>
+          <textarea class="input" id="r-notes" name="message" rows="4"></textarea>
+        </div>
+        <label class="consent full" for="r-consent">
+          <input id="r-consent" name="consent" type="checkbox" value="yes" required>
+          <span>My client has agreed to me sharing their details with {{name}} so a broker can contact them.</span>
+        </label>
+        <label class="consent full" for="r-agreement">
+          <input id="r-agreement" name="wants_agreement" type="checkbox" value="yes">
+          <span>I don't have a referral agreement with {{name}} yet. Please contact me to set one up.</span>
+        </label>
+        <div class="hp" aria-hidden="true"><label>Leave this blank <input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <div class="form-actions full">
+          <button class="btn" type="submit">Send referral</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </div>
+        <p class="collect full">We use these details to contact your client about their finance and to keep you updated with their consent. See our <a href="/privacy">privacy policy</a>.</p>
+      </form>
+    </div>
+  </div>
+</section>

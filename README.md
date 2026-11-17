@@ -9,6 +9,11 @@ Cloudflare runs no build step: the finished pages in `public/` are committed.
 |---|---|
 | `brand.json` | **Every business detail in one place:** name, legal name, ABN, licence line, phone, email, address, hours, lender count, review rating, colours and logo files. Change it here and rebuild. |
 | `pages/` | The text of each page. Edit these, not the HTML in `public/`. Sub-pages sit in folders (`pages/home-loans/refinancing.html` → `/home-loans/refinancing`). |
+| `data/rates.json` | RBA cash rate, recent decisions, next meeting, APRA settings. **Update after each RBA decision and APRA update.** The cash rate page also reads the RBA's table live (`/api/cash-rate`, `src/cash-rate.js`) and shows a newer rate if there is one |
+| `data/team.json` | People shown on the site (profile pages at `/team/<slug>`). Add a person here and a page in `pages/team/` |
+| `data/reviews.json` | Google reviews shown on the site, word for word. Never edit the wording |
+| `public/assets/js/calculators.js` | All six calculators. Tax rates, APRA buffer and Queensland duty rates are at the top (`RULES`) and in the duty functions; update each financial year |
+| `tools/guides/` | The first home buyer guide. Edit the HTML, then `python3 tools/guides/render.py` to rebuild the PDF |
 | `pages/partials/` | Shared sections: `cta.html` (closing "Talk it through" band), `talk.html` (side box on service pages) |
 | `build.py` | Wraps each page in the header, menu, breadcrumbs and footer; adds structured data; writes `public/`, `sitemap.xml` and `robots.txt`. The menu (`NAV`) is at the top. |
 | `public/` | Everything the site serves: built pages, CSS, JS, fonts, images, `_headers` |
@@ -27,6 +32,11 @@ Cloudflare runs no build step: the finished pages in `public/` are committed.
 
 In page text, `{{phone}}`, `{{email}}`, `{{name}}`, `{{lenders}}`, `{{reviews.rating}}` and other `brand.json` keys are filled in automatically.
 To add a page, copy one in `pages/`, change the settings block at the top (title, description, path, crumb), and add it to `NAV` in `build.py` if it belongs in the menu.
+
+### Bylines
+
+Service and calculator pages show "Last updated" automatically. To show "Reviewed by", add `reviewed_by: brooke-juracic` (a slug from
+`data/team.json`) to a page's settings block, but only once that person has actually read and approved the page.
 
 ### Rebranding
 
@@ -99,5 +109,12 @@ Elementor sitemap has a home in `MOVED` (`src/worker.js`).
 | SMSF loans | `pages/smsf-loans.html` | `/smsf-loans` |
 | Business finance hub | `pages/business-finance.html` | `/business-finance` |
 | Commercial property, business loans, asset finance | `pages/business-finance/*.html` | `/business-finance/...` |
-| Privacy, credit guide, complaints (drafts) | `pages/privacy.html` etc. | `/privacy`, `/credit-guide`, `/complaints` |
+| Privacy, credit guide (drafts) | `pages/privacy.html`, `pages/credit-guide.html` | `/privacy`, `/credit-guide` |
+| Our team, Brooke Juracic | `pages/team.html`, `pages/team/brooke-juracic.html` | `/team`, `/team/brooke-juracic` |
+| Referral partners (referral form) | `pages/partners.html` | `/partners` |
+| Loan health check (offer and form) | `pages/loan-health-check.html` | `/loan-health-check` |
+| First home buyer guide (PDF by email) | `pages/first-home-buyer-guide.html` | `/first-home-buyer-guide` |
+| Calculators hub and six calculators | `pages/calculators.html`, `pages/calculators/*.html` | `/calculators/...` |
+| RBA cash rate and lending rules | `pages/rba-cash-rate.html` | `/rba-cash-rate` |
+| Compliments and concerns | `pages/compliments-and-concerns.html` | `/compliments-and-concerns` |
 | Thanks, not found | `pages/thanks.html`, `pages/404.html` | `/thanks` |

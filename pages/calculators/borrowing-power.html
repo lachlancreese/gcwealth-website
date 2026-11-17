@@ -1,0 +1,117 @@
+<!--
+title: Borrowing Power Calculator | How Much Can I Borrow?
+description: Estimate how much you could borrow for a home loan, assessed with APRA's 3% serviceability buffer. Includes the debt-to-income rule explained.
+path: /calculators/borrowing-power
+crumb: Borrowing power
+nav: calculators
+schema: calculator
+disclaimer: yes
+-->
+<!--head--><script src="/assets/js/calculators.js" defer></script><!--/head-->
+<section class="page-hero" style="padding-bottom:32px">
+  <div class="wrap"><div>
+    <h1>Borrowing power calculator</h1>
+    <p class="lede">An estimate of how much you could borrow, worked out the way lenders do: your income after tax, less your expenses and commitments, tested at a rate {{rates.apra_buffer}} percentage points above the loan rate.</p>
+  </div></div>
+</section>
+
+<section class="section-tight" style="padding-top:0">
+  <div class="wrap calc">
+    <form class="calc-form" data-calc="borrowing-power" data-results="results" novalidate>
+      <fieldset class="full">
+        <legend>Who's applying?</legend>
+        <div class="seg">
+          <label><input type="radio" name="applicants" value="1" checked><span>Just me</span></label>
+          <label><input type="radio" name="applicants" value="2"><span>Two of us</span></label>
+        </div>
+      </fieldset>
+      <div class="field">
+        <label for="c-inc1">Your income before tax</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-inc1" name="income1" inputmode="decimal" value="120,000"></div>
+        <p class="hint">A year, including regular overtime.</p>
+      </div>
+      <div class="field" data-second hidden>
+        <label for="c-inc2">Second applicant's income</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-inc2" name="income2" inputmode="decimal" value="0"></div>
+        <p class="hint">A year, before tax.</p>
+      </div>
+      <div class="field">
+        <label for="c-other">Rental or other income <span>(optional)</span></label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-other" name="other" inputmode="decimal" value="0"></div>
+        <p class="hint">A year. We count 80% of it.</p>
+      </div>
+      <div class="field">
+        <label for="c-exp">Living expenses</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-exp" name="expenses" inputmode="decimal" value="3,000"></div>
+        <p class="hint">A month: bills, groceries, transport, childcare and so on.</p>
+      </div>
+      <div class="field">
+        <label for="c-com">Other loan repayments <span>(optional)</span></label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-com" name="commitments" inputmode="decimal" value="0"></div>
+        <p class="hint">A month: car, personal or other home loans.</p>
+      </div>
+      <div class="field">
+        <label for="c-cards">Credit card limits <span>(optional)</span></label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-cards" name="cards" inputmode="decimal" value="0"></div>
+        <p class="hint">The total limit, even if you pay it off.</p>
+      </div>
+      <div class="field">
+        <label for="c-rate">Interest rate for the new loan</label>
+        <div class="input-wrap"><input class="input" id="c-rate" name="rate" inputmode="decimal" placeholder="Enter rate" style="padding-right:40px"><span class="unit post">%</span></div>
+      </div>
+      <div class="field">
+        <label for="c-years">Loan term</label>
+        <div class="input-wrap"><input class="input" id="c-years" name="years" inputmode="numeric" value="30" style="padding-right:64px"><span class="unit post">years</span></div>
+      </div>
+    </form>
+    <aside class="results" id="results" aria-labelledby="results-title">
+      <h2 id="results-title">You could borrow around</h2>
+      <div class="result-main" data-out="main" aria-live="polite"></div>
+      <div class="result-sub" data-out="sub" data-detail></div>
+      <ul class="result-list" data-detail>
+        <li>Assessed at <b data-out="assess"></b></li>
+        <li>Repayments at your rate <b data-out="repay"></b></li>
+        <li>Income after tax <b data-out="net"></b></li>
+        <li>Left over at the assessment rate <b data-out="surplus"></b></li>
+      </ul>
+      <p class="result-note" data-show="dti-note" hidden>This would be about <span data-out="dti"></span> times your income. APRA limits how much lending banks can do at {{rates.apra_dti_multiple}} times income or more, so some banks may lend less. A broker can tell you which lenders fit.</p>
+      <p class="result-note" data-detail>An estimate only. Lenders use the higher of your stated expenses and their own benchmarks, and each has its own policies, so their figures can be higher or lower.</p>
+      <a class="btn btn-light" data-cta href="/get-started">Get a broker to check this</a>
+    </aside>
+  </div>
+</section>
+
+<section class="article" style="padding-top:32px">
+  <div class="wrap">
+    <div class="prose">
+      <!--byline-->
+      <h2>How lenders work out your borrowing power</h2>
+      <p>Lenders look at what's left from your income after tax once your living expenses and existing commitments are paid, then work out the loan that leftover amount could repay. Two rules from APRA, the banking regulator, shape the answer:</p>
+      <ul>
+        <li><strong>The serviceability buffer.</strong> Banks must test whether you could still make repayments at a rate at least {{rates.apra_buffer}} percentage points above the loan's actual rate.</li>
+        <li><strong>The debt-to-income limit.</strong> Since February 2026, no more than {{rates.apra_dti_share}}% of a bank's new owner-occupier lending, and {{rates.apra_dti_share}}% of its new investor lending, can go to borrowers whose debts are {{rates.apra_dti_multiple}} or more times their income.</li>
+      </ul>
+      <p>Non-bank lenders aren't bound by the same limits, and policies on things like overtime, bonuses, rental income and self-employed income vary a lot. That's where comparing lenders makes the biggest difference. <a href="/rba-cash-rate">More on the lending rules</a>.</p>
+      <h2>Assumptions in this calculator</h2>
+      <ul>
+        <li>Income tax uses the 2026–27 resident rates, the 2% Medicare levy and the low income tax offset.</li>
+        <li>80% of rental or other income is counted, and it's taxed with the first applicant's income.</li>
+        <li>Credit cards are counted at 3.8% of the limit each month, a common lender assumption.</li>
+        <li>The new loan is principal and interest over the term you enter, tested at your rate plus {{rates.apra_buffer}} percentage points.</li>
+        <li>HECS-HELP repayments, dependants and lender expense benchmarks aren't modelled separately.</li>
+      </ul>
+      <h2>Questions about borrowing power</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Why is the estimate lower than I expected?</summary>
+          <div><p>Mostly because of the buffer. Lenders test your repayments at a higher rate than you'd actually pay, so the amount is lower than a simple repayment calculation suggests. Credit card limits also count against you, even if you clear them each month.</p></div>
+        </details>
+        <details>
+          <summary>How can I increase my borrowing power?</summary>
+          <div><p>Reducing or closing credit card limits, paying down other debts and keeping expenses steady all help. Lenders also treat some income differently, so the choice of lender matters. A broker can show you where you stand across lenders.</p></div>
+        </details>
+      </div>
+    </div>
+    <!--include:talk-->
+  </div>
+</section>

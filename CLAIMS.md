@@ -20,6 +20,15 @@ where it appears, and the evidence. Update this file whenever a claim changes, a
 | Full transfer duty concession for first home buyers of new homes or vacant land since 1 May 2025; citizenship/residency rule | First home buyers | qld.gov.au and Queensland Revenue Office | Nov 2026 |
 | 5% Deposit Scheme: no income limits or caps on places since 1 Oct 2025; price caps apply; Gold Coast is a regional centre | First home buyers | Housing Australia | Nov 2026 |
 | Pre-approval usually lasts around 90 days, depending on the lender | Pre-approval, FAQs | Previous site; general lender practice | 17 Nov 2026 |
+| Brooke Juracic: co-founder and Managing Director; more than a decade of broking experience (first home buyers to commercial and high-net-worth); MFAA accredited; Credit Representative 491220 | /team, /team/brooke-juracic | Previous site About page; confirmed by Lachlan. **Brooke to review her profile** | 17 Nov 2026 |
+| Google reviews shown on the site | Home, Brooke's profile | Copied word for word from Google on 17 Nov 2026 (data/reviews.json). Excerpts end in an ellipsis and link to the full review. Reviews with unsubstantiated outcome or rate claims are not used | 17 Nov 2026 |
+| RBA cash rate 4.85%, effective 4 Nov 2026; recent decisions; next decision 8 Dec 2026 | /rba-cash-rate, /calculators, health check | RBA cash rate target table; RBA meeting schedule. Page also reads the RBA table live | 17 Nov 2026 |
+| APRA: 3 percentage point serviceability buffer; high debt-to-income limit (20% of new owner-occupier and investor lending at DTI of 6 or more, since Feb 2026) | /rba-cash-rate, borrowing power | APRA media release, 28 May 2026 (settings unchanged) | 17 Nov 2026 |
+| Queensland transfer duty rates and concessions | Stamp duty calculator, first home buyer guide | Queensland Revenue Office rate pages; maths tested against QRO's worked example ($795,000 → $19,890) | 17 Nov 2026 |
+| 2026–27 income tax rates, Medicare levy, LITO | Borrowing power calculator | ATO resident rates 2026–27 | 17 Nov 2026 |
+| Referral process: written agreement first; updates at first contact, lodgement, approval and settlement with client consent | /partners | Approved by Lachlan (17 Nov 2026); written agreements required by NCCP for regulated referrers (Connective) | 17 Nov 2026 |
+| Loan health check: complimentary, no obligation, no documents needed to start | /loan-health-check | Approved by Lachlan (17 Nov 2026); previous site offered a "complimentary loan health check" | 17 Nov 2026 |
 
-No interest rates or repayment figures are advertised anywhere on the site. If any are added (including calculator defaults),
+No interest rates or repayment figures are advertised anywhere on the site. Calculators never pre-fill a rate: visitors enter
+their own (tests/check.py fails if a rate is pre-filled). If any are added (including calculator defaults),
 a comparison rate and Connective's comparison rate warning must appear with equal prominence.

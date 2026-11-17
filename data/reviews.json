@@ -1,0 +1,34 @@
+{
+  "_note": "Real Google reviews, copied word for word on 17 November 2026 (spelling and punctuation as written). Never edit the wording. 'excerpt: true' means only the opening of the review is shown, ending in an ellipsis, with a link to the full review. Reviews that make claims we can't substantiate as advertising (specific outcomes, rates, 'best') are deliberately not shown.",
+  "reviews": {
+    "jaydn-v": {
+      "author": "Jaydn V.",
+      "topic": "First home",
+      "excerpt": false,
+      "text": "Really happy with the help I got from the whole team with buying my first home. Steven Shaw made the whole process easy and helped me every step of the way. Steven was always helpful, friendly, and quick to answer my questions. I’m very thankful for all the teams support and would definitely recommend them to anyone buying a home."
+    },
+    "amy-t": {
+      "author": "Amy T.",
+      "topic": "SMSF lending",
+      "excerpt": false,
+      "text": "Steven assist us with our SMSF lending. We are very satisfied with his professionalism and attention to details. We highly recommend his services to anyone seeking an experienced mortgage broker."
+    },
+    "sevy-z": {
+      "author": "Sevy Z.",
+      "topic": "Settlement",
+      "excerpt": false,
+      "text": "Brooke and the team at GC Wealth have been nothing less than exceptional! With the mortgage documents needing to be resigned while only receiving these ONE DAY prior to booked settlement, somehow Brooke and the team managed to meet settlement with no issues. Thank you for all your hard work! 10/10"
+    },
+    "jaime-lee-a": {
+      "author": "Jaime-Lee A.",
+      "topic": "First home",
+      "excerpt": true,
+      "text": "I recently had the pleasure of working with Brooke as my mortgage broker, and I cannot recommend her highly enough. From the very beginning, she was incredibly quick to respond to my enquiries and was consistently available to answer any questions I had throughout the process …"
+    }
+  },
+  "home": [
+    "jaydn-v",
+    "sevy-z",
+    "amy-t"
+  ]
+}

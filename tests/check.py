@@ -183,14 +183,14 @@ def run_checks():
                     text = pg.evaluate("document.body.innerText")
                     marked = pg.evaluate("document.querySelectorAll('mark.todo').length")
                     indexed = pg.evaluate("!(document.querySelector('meta[name=robots]')||{}).content?.includes('noindex')")
-                    for pattern, label in FLAGGED:
-                        if label == "unconfirmed draft text":
+                    for pattern, flag in FLAGGED:
+                        if flag == "unconfirmed draft text":
                             if marked and indexed:
-                                fail(f"{label}: {path} has {marked} item(s) still to confirm")
+                                fail(f"{flag}: {path} has {marked} item(s) still to confirm")
                             continue
                         for m in re.finditer(pattern, text, re.I):
                             snippet = text[max(0, m.start() - 40):m.end() + 40].replace("\n", " ")
-                            fail(f"wording: {label} on {path}: ...{snippet}...")
+                            fail(f"wording: {flag} on {path}: ...{snippet}...")
                 for t in info["leftover"]:
                     fail(f"{label}: unfilled placeholder {t}")
                 for href in info["links"]:
@@ -216,7 +216,10 @@ def run_checks():
         for old, new in [("/contact-us/", "/contact"), ("/about/", "/about"), ("/refinancing/", "/home-loans/refinancing"),
                          ("/construction-lending-qld/", "/home-loans/construction-loans"), ("/smsf-refinancing/", "/smsf-loans"),
                          ("/why-gold-coast-wealth/", "/about"), ("/tag/smsf/", "/"), ("/privacy-policy/", "/privacy"), ("/complaints-handling-process/", "/compliments-and-concerns"),
-                         ("/get-started/", "/get-started"), ("/home-loans.html", "/home-loans")]:
+                         ("/get-started/", "/get-started"), ("/home-loans.html", "/home-loans"),
+                         ("/calculators/repayment-calculator/", "/calculators/repayments"), ("/calculators/offset-account/", "/calculators/extra-repayments"),
+                         ("/calculators/refinancing-savings/", "/calculators/refinance"), ("/calculators/property-buying-cost/", "/calculators/stamp-duty"),
+                         ("/calculators/savings-goal/", "/calculators/deposit"), ("/borrowing-capacity-gold-coast-wealth/", "/calculators/borrowing-power")]:
             code, loc, _ = status_of(BASE + old, follow=False)
             loc = re.sub(r"^https?://[^/]+", "", loc or "")
             if code != 301 or loc != new:
@@ -228,9 +231,56 @@ def run_checks():
         if "Content-Security-Policy" not in headers:
             fail("security headers missing on /")
 
+        print("Checking calculators")
+        check_calculators(browser)
         print("Checking forms")
         check_forms(browser)
         browser.close()
+
+
+def check_calculators(browser):
+    ctx = browser.new_context(viewport={"width": 1440, "height": 900})
+    pg = ctx.new_page()
+    pg.goto(BASE + "/calculators/stamp-duty")
+    m = pg.evaluate("""() => { const c = window.GCW_CALC; return {
+        qroExample: c.dutyHome(795000) - c.firstHomeDeduction(795000),   // QRO worked example: $19,890
+        firstUnder: Math.max(0, c.dutyHome(695000) - c.firstHomeDeduction(695000)),  // QRO example: $0
+        general600: c.dutyGeneral(600000),       // $20,025
+        home750: c.dutyHome(750000),             // $19,600
+        general750: c.dutyGeneral(750000),       // $26,775
+        tax100k: Math.round(c.incomeTax(100000)),  // $20,520 tax + $2,000 Medicare levy
+        pmt: Math.round(c.pmt(100000, 6, 30) * 100) / 100,  // $599.55
+    }; }""")
+    expected = {"qroExample": 19890, "firstUnder": 0, "general600": 20025, "home750": 19600, "general750": 26775, "tax100k": 22520, "pmt": 599.55}
+    for k, v in expected.items():
+        if abs(m[k] - v) > 0.01:
+            fail(f"calculator maths: {k} is {m[k]}, expected {v}")
+    # No calculator may show a pre-filled interest rate (comparison rate rule).
+    for path in ["/calculators/repayments", "/calculators/borrowing-power", "/calculators/extra-repayments", "/calculators/refinance"]:
+        pg.goto(BASE + path)
+        rates = pg.evaluate("[...document.querySelectorAll('input[name=rate], input[name=current], input[name=newrate]')].map(i => i.value)")
+        if any(rates):
+            fail(f"{path}: an interest rate is pre-filled ({rates})")
+        if "Enter" not in pg.locator(".result-main").inner_text():
+            fail(f"{path}: results should ask for a rate before showing figures")
+    pg.goto(BASE + "/calculators/repayments")
+    pg.fill("#c-rate", "6")
+    pg.wait_for_timeout(200)
+    if pg.locator(".result-main").inner_text().strip() != "$3,597":
+        fail(f"repayments: $600,000 at 6% over 30 years shows {pg.locator('.result-main').inner_text()}, expected $3,597")
+    pg.screenshot(path=str(OUT / "calc-repayments-filled.png"), full_page=True)
+    pg.goto(BASE + "/calculators/borrowing-power")
+    pg.fill("#c-rate", "6")
+    pg.wait_for_timeout(200)
+    if not pg.locator(".result-main").inner_text().startswith("$"):
+        fail("borrowing power: no estimate after entering a rate")
+    href = pg.locator("[data-cta]").get_attribute("href")
+    if "goal=" not in href:
+        fail("borrowing power: call to action doesn't carry the result to Get started")
+    pg.goto(BASE + href)
+    if not pg.locator('input[name="goal"][value="Buy my first home"]').is_checked():
+        fail("get started: goal from the calculator wasn't preselected")
+    ctx.close()
 
 
 def check_forms(browser):
@@ -299,6 +349,49 @@ def check_forms(browser):
     pg.wait_for_selector(".signup .form-status.ok", timeout=15000)
     if len(sent_mail) != 2:
         fail(f"newsletter: expected 2 emails, got {len(sent_mail)}")
+
+    # Loan health check.
+    sent_mail.clear()
+    pg.goto(BASE + "/loan-health-check")
+    pg.fill("#h-lender", "Example Bank")
+    pg.fill("#h-name", "Test Person")
+    pg.fill("#h-phone", "0412 345 678")
+    pg.fill("#h-email", "test@example.com")
+    pg.check("#h-consent")
+    pg.click("text=Request my health check")
+    pg.wait_for_url("**/thanks", timeout=15000)
+    if len(sent_mail) != 2 or "Example Bank" not in sent_mail[0]["html"]:
+        fail("health check: emails missing or incomplete")
+
+    # Referral: partner gets the confirmation, the client is not emailed.
+    sent_mail.clear()
+    pg.goto(BASE + "/partners")
+    pg.fill("#r-name", "Pat Partner")
+    pg.fill("#r-business", "Partner Accounting")
+    pg.fill("#r-email", "partner@example.com")
+    pg.fill("#r-phone", "0412 000 111")
+    pg.fill("#r-client", "Casey Client")
+    pg.fill("#r-client-phone", "0413 222 333")
+    pg.fill("#r-client-email", "client@example.com")
+    pg.check("#r-consent")
+    pg.check("#r-agreement")
+    pg.click("text=Send referral")
+    pg.wait_for_url("**/thanks", timeout=15000)
+    if len(sent_mail) != 2 or sent_mail[1]["to"] != ["partner@example.com"] or "NOT YET IN PLACE" not in sent_mail[0]["html"]:
+        fail("referral: wrong emails (team should be told no agreement exists; only the partner gets a reply)")
+
+    # First home buyer guide: stays on the page with a download link, emails the link.
+    sent_mail.clear()
+    pg.goto(BASE + "/first-home-buyer-guide")
+    pg.fill("#g-name", "Test Person")
+    pg.fill("#g-email", "guide@example.com")
+    pg.click("text=Email me the guide")
+    pg.wait_for_selector("#guide-form .form-status.ok a", timeout=15000)
+    if len(sent_mail) != 2 or ".pdf" not in sent_mail[1]["text"]:
+        fail("guide: emails missing or no link to the PDF")
+    code, _, headers = status_of(BASE + "/assets/guides/gc-wealth-qld-first-home-buyer-guide.pdf")
+    if code != 200:
+        fail(f"guide PDF returns {code}")
 
     # Honeypot: pretend success, send nothing.
     sent_mail.clear()

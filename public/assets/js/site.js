@@ -123,7 +123,14 @@ document.querySelectorAll("form[data-ajax]").forEach((form) => {
       if (!res.ok || !data.ok) throw new Error(data.error || "Your message didn't send.");
       if (form.dataset.done) { window.location.href = form.dataset.done; return; }
       form.reset();
-      if (status) { status.textContent = "Thanks, you're on the list."; status.className = "form-status ok"; }
+      if (status && form.dataset.download) {
+        status.className = "form-status ok";
+        status.textContent = "Done. We've emailed you the guide. ";
+        const a = document.createElement("a");
+        a.href = form.dataset.download;
+        a.textContent = "Download it now";
+        status.appendChild(a);
+      } else if (status) { status.textContent = "Thanks, you're on the list."; status.className = "form-status ok"; }
     } catch (err) {
       if (status) {
         status.textContent = `${err.message} Please try again, or call ${form.dataset.phone || "us"}.`;
@@ -135,3 +142,19 @@ document.querySelectorAll("form[data-ajax]").forEach((form) => {
     }
   });
 });
+
+// Get started can be opened from a calculator with ?goal=...&amount=... to save the visitor retyping.
+(() => {
+  const form = document.getElementById("start-form");
+  if (!form) return;
+  const q = new URLSearchParams(location.search);
+  const goal = q.get("goal"), amount = q.get("amount");
+  if (goal) {
+    const radio = [...form.querySelectorAll('input[name="goal"]')].find((r) => r.value === goal);
+    if (radio) radio.checked = true;
+  }
+  if (amount) {
+    const opt = [...form.querySelectorAll("#s-amount option")].find((o) => o.textContent === amount);
+    if (opt) opt.selected = true;
+  }
+})();

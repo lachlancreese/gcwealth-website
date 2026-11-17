@@ -1,0 +1,89 @@
+<!--
+title: Extra Repayments & Offset Calculator | GC Wealth
+description: See how extra repayments, a lump sum or an offset account balance could change your home loan: interest over the life of the loan and payoff time.
+path: /calculators/extra-repayments
+crumb: Extra repayments and offset
+nav: calculators
+schema: calculator
+disclaimer: yes
+-->
+<!--head--><script src="/assets/js/calculators.js" defer></script><!--/head-->
+<section class="page-hero" style="padding-bottom:32px">
+  <div class="wrap"><div>
+    <h1>Extra repayments and offset calculator</h1>
+    <p class="lede">See how paying a little extra each month, a lump sum, or money sitting in an offset account could change your loan.</p>
+  </div></div>
+</section>
+
+<section class="section-tight" style="padding-top:0">
+  <div class="wrap calc">
+    <form class="calc-form" data-calc="extra-repayments" data-results="results" novalidate>
+      <div class="field full">
+        <label for="c-bal">Loan balance</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-bal" name="balance" inputmode="decimal" value="600,000"></div>
+      </div>
+      <div class="field">
+        <label for="c-rate">Interest rate</label>
+        <div class="input-wrap"><input class="input" id="c-rate" name="rate" inputmode="decimal" placeholder="Enter rate" style="padding-right:40px"><span class="unit post">%</span></div>
+      </div>
+      <div class="field">
+        <label for="c-years">Years remaining</label>
+        <div class="input-wrap"><input class="input" id="c-years" name="years" inputmode="numeric" value="30" style="padding-right:64px"><span class="unit post">years</span></div>
+      </div>
+      <div class="field">
+        <label for="c-extra">Extra each month</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-extra" name="extra" inputmode="decimal" value="200"></div>
+      </div>
+      <div class="field">
+        <label for="c-lump">One-off lump sum <span>(optional)</span></label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-lump" name="lump" inputmode="decimal" value="0"></div>
+      </div>
+      <div class="field full">
+        <label for="c-offset">Offset account balance <span>(optional)</span></label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-offset" name="offset" inputmode="decimal" value="0"></div>
+        <p class="hint">Money in an offset account reduces the balance you're charged interest on.</p>
+      </div>
+    </form>
+    <aside class="results" id="results" aria-labelledby="results-title">
+      <h2 id="results-title">The difference</h2>
+      <div class="result-main" data-out="main" aria-live="polite"></div>
+      <div class="result-sub" data-out="sub" data-detail></div>
+      <ul class="result-list" data-detail>
+        <li>Paid off sooner by <b data-out="sooner"></b></li>
+        <li>New time to pay off <b data-out="payoff"></b></li>
+        <li>Your current repayment <b data-out="repay"></b></li>
+        <li>Total interest as is <b data-out="base-interest"></b></li>
+        <li>Total interest with changes <b data-out="new-interest"></b></li>
+      </ul>
+      <a class="btn btn-light" data-cta href="/get-started">Talk to a broker about this</a>
+    </aside>
+  </div>
+</section>
+
+<section class="article" style="padding-top:32px">
+  <div class="wrap">
+    <div class="prose">
+      <!--byline-->
+      <h2>How this calculator works</h2>
+      <p>We work out your current monthly repayment, then follow the loan month by month: interest is charged on the balance (less any offset balance), and your repayment plus any extra comes off. The lump sum is paid at the start.</p>
+      <h2>Assumptions</h2>
+      <ul>
+        <li>The rate and the offset balance stay the same for the life of the loan.</li>
+        <li>Your required repayment doesn't change when you pay extra. Some lenders recalculate it.</li>
+        <li>Fees, and any limits on extra repayments (common on fixed rates), aren't included.</li>
+      </ul>
+      <h2>Questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Offset or redraw: what's the difference?</summary>
+          <div><p>Both reduce interest. An offset is a separate account linked to the loan, while redraw lets you take back extra repayments you've made. They can be treated differently for tax on investment loans, so check with your accountant.</p></div>
+        </details>
+        <details>
+          <summary>Can I make extra repayments on a fixed rate?</summary>
+          <div><p>Often only up to a limit each year, and some fixed loans don't allow them at all. Splitting a loan into fixed and variable parts is a common way to keep flexibility.</p></div>
+        </details>
+      </div>
+    </div>
+    <!--include:talk-->
+  </div>
+</section>

@@ -1,0 +1,95 @@
+<!--
+title: Home Loan Repayment Calculator | GC Wealth
+description: Work out monthly, fortnightly or weekly home loan repayments, total interest, and what a 0.25% or 1% rate rise would add to your repayments.
+path: /calculators/repayments
+crumb: Repayments
+nav: calculators
+schema: calculator
+disclaimer: yes
+-->
+<!--head--><script src="/assets/js/calculators.js" defer></script><!--/head-->
+<section class="page-hero" style="padding-bottom:32px">
+  <div class="wrap"><div>
+    <h1>Repayment calculator</h1>
+    <p class="lede">Enter your loan amount and interest rate to see your repayments, the total interest, and what a rate rise would add.</p>
+  </div></div>
+</section>
+
+<section class="section-tight" style="padding-top:0">
+  <div class="wrap calc">
+    <form class="calc-form" data-calc="repayments" data-results="results" novalidate>
+      <div class="field full">
+        <label for="c-amount">Loan amount</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-amount" name="amount" inputmode="decimal" value="600,000"></div>
+      </div>
+      <div class="field">
+        <label for="c-rate">Interest rate</label>
+        <div class="input-wrap"><input class="input" id="c-rate" name="rate" inputmode="decimal" placeholder="Enter rate" style="padding-right:40px"><span class="unit post">%</span></div>
+        <p class="hint">From your loan offer or statement.</p>
+      </div>
+      <div class="field">
+        <label for="c-years">Loan term</label>
+        <div class="input-wrap"><input class="input" id="c-years" name="years" inputmode="numeric" value="30" style="padding-right:64px"><span class="unit post">years</span></div>
+      </div>
+      <fieldset class="full">
+        <legend>Repayments</legend>
+        <div class="seg">
+          <label><input type="radio" name="frequency" value="monthly" checked><span>Monthly</span></label>
+          <label><input type="radio" name="frequency" value="fortnightly"><span>Fortnightly</span></label>
+          <label><input type="radio" name="frequency" value="weekly"><span>Weekly</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="full">
+        <legend>Loan type</legend>
+        <div class="seg">
+          <label><input type="radio" name="type" value="pi" checked><span>Principal and interest</span></label>
+          <label><input type="radio" name="type" value="io"><span>Interest only</span></label>
+        </div>
+      </fieldset>
+    </form>
+    <aside class="results" id="results" aria-labelledby="results-title">
+      <h2 id="results-title">Your repayments</h2>
+      <div class="result-main" data-out="main" aria-live="polite"></div>
+      <div class="result-sub" data-out="sub" data-detail></div>
+      <div class="bar" data-detail aria-hidden="true"><span class="a"></span><span class="b"></span></div>
+      <div class="legend" data-detail aria-hidden="true"><span><i style="background:#fff"></i>Principal</span><span><i style="background:var(--sky)"></i>Interest</span></div>
+      <ul class="result-list" data-detail>
+        <li>Total interest <b data-out="interest"></b></li>
+        <li>Total repaid <b data-out="total"></b></li>
+        <li>If your rate rose 0.25% <b data-out="rise1"></b></li>
+        <li>If your rate rose 1% <b data-out="rise2"></b></li>
+      </ul>
+      <p class="result-note" data-show="io-note" hidden>Interest-only periods are usually limited, often to five years or less. After that, repayments rise to cover principal over the remaining term.</p>
+      <a class="btn btn-light" data-cta href="/get-started">Talk to a broker about this</a>
+    </aside>
+  </div>
+</section>
+
+<section class="article" style="padding-top:32px">
+  <div class="wrap">
+    <div class="prose">
+      <!--byline-->
+      <h2>How this calculator works</h2>
+      <p>Principal and interest repayments are worked out so the loan is fully repaid over the term, with interest charged on the balance each period. Interest-only repayments cover the interest alone, so the balance doesn't fall.</p>
+      <p>Fortnightly and weekly figures spread the same loan over 26 or 52 repayments a year. Some lenders instead set fortnightly repayments at half the monthly amount, which repays the loan a little faster.</p>
+      <h2>Assumptions</h2>
+      <ul>
+        <li>The interest rate stays the same for the whole term. In practice variable rates move, and fixed rates end.</li>
+        <li>Fees and charges aren't included.</li>
+        <li>Results are rounded to the nearest dollar.</li>
+      </ul>
+      <h2>Questions about repayments</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Why does the calculator ask me for a rate?</summary>
+          <div><p>Rates differ widely between lenders and borrowers, so the most accurate figure is the one from your own loan offer or statement. If you don't have one, a broker can tell you what rates are available for your situation.</p></div>
+        </details>
+        <details>
+          <summary>How does the RBA cash rate affect my repayments?</summary>
+          <div><p>Lenders set their own rates, but most variable rates move when the cash rate changes. Use the rate rise rows above to see what an increase would mean for you. <a href="/rba-cash-rate">See the current cash rate</a>.</p></div>
+        </details>
+      </div>
+    </div>
+    <!--include:talk-->
+  </div>
+</section>

@@ -1,0 +1,107 @@
+<!--
+title: QLD Stamp Duty Calculator 2026 | Transfer Duty | GC Wealth
+description: Estimate Queensland transfer duty with home, first home, new home and vacant land concessions, plus your other upfront costs. Rates checked November 2026.
+path: /calculators/stamp-duty
+crumb: QLD stamp duty and costs
+nav: calculators
+schema: calculator
+disclaimer: yes
+-->
+<!--head--><script src="/assets/js/calculators.js" defer></script><!--/head-->
+<section class="page-hero" style="padding-bottom:32px">
+  <div class="wrap"><div>
+    <h1>Queensland stamp duty calculator</h1>
+    <p class="lede">Estimate the transfer (stamp) duty on a Queensland purchase, including home and first home concessions, and add up your other upfront costs.</p>
+  </div></div>
+</section>
+
+<section class="section-tight" style="padding-top:0">
+  <div class="wrap calc">
+    <form class="calc-form" data-calc="stamp-duty" data-results="results" novalidate>
+      <div class="field full">
+        <label for="c-price">Purchase price</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-price" name="price" inputmode="decimal" value="750,000"></div>
+      </div>
+      <fieldset class="full">
+        <legend>What's it for?</legend>
+        <div class="seg">
+          <label><input type="radio" name="purpose" value="home" checked><span>A home I'll live in</span></label>
+          <label><input type="radio" name="purpose" value="investment"><span>An investment</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="full" data-home-only>
+        <legend>Is it your first home?</legend>
+        <div class="seg">
+          <label><input type="radio" name="first" value="yes" checked><span>Yes</span></label>
+          <label><input type="radio" name="first" value="no"><span>No</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="full" data-home-only>
+        <legend>What are you buying?</legend>
+        <div class="seg">
+          <label><input type="radio" name="kind" value="established" checked><span>An established home</span></label>
+          <label><input type="radio" name="kind" value="new"><span>A new home</span></label>
+          <label><input type="radio" name="kind" value="land"><span>Land to build on</span></label>
+        </div>
+      </fieldset>
+      <label class="consent full" for="c-res" data-home-only>
+        <input id="c-res" name="resident" type="checkbox" checked>
+        <span>I'm an Australian citizen or permanent resident</span>
+      </label>
+      <p class="full" style="margin:8px 0 0;font-weight:600;color:var(--navy)">Other upfront costs <span class="muted" style="font-weight:400">(enter your quotes)</span></p>
+      <div class="field">
+        <label for="c-legal">Conveyancing or legal</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-legal" name="legal" inputmode="decimal" value="0"></div>
+      </div>
+      <div class="field">
+        <label for="c-insp">Building and pest</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-insp" name="inspections" inputmode="decimal" value="0"></div>
+      </div>
+      <div class="field">
+        <label for="c-lender">Lender fees</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-lender" name="lender" inputmode="decimal" value="0"></div>
+      </div>
+      <div class="field">
+        <label for="c-other">Registration and other</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-other" name="other" inputmode="decimal" value="0"></div>
+      </div>
+    </form>
+    <aside class="results" id="results" aria-labelledby="results-title">
+      <h2 id="results-title">Your upfront costs</h2>
+      <div class="result-main" data-out="main" aria-live="polite"></div>
+      <div class="result-sub" data-out="sub" data-detail></div>
+      <ul class="result-list" data-detail>
+        <li>Calculated using <b data-out="basis" style="max-width:60%"></b></li>
+        <li>Duty at general rates, for comparison <b data-out="general"></b></li>
+        <li>Your other costs <b data-out="others"></b></li>
+        <li>Total upfront <b data-out="total"></b></li>
+      </ul>
+      <p class="result-note" data-show="fhog" hidden>You may also be eligible for Queensland's $30,000 First Home Owner Grant for new homes under $750,000. <a href="/home-loans/first-home-buyers" style="color:#fff">How it works</a>.</p>
+      <a class="btn btn-light" data-cta href="/get-started">Talk to a broker about this</a>
+    </aside>
+  </div>
+</section>
+
+<section class="article" style="padding-top:32px">
+  <div class="wrap">
+    <div class="prose">
+      <!--byline-->
+      <h2>How Queensland transfer duty works</h2>
+      <p>Transfer duty is charged on the dutiable value of a property: the higher of the price and its market value. Each band is charged per $100, or part of $100. If you'll live in the home, the lower home concession rates apply. First home buyers can get more help:</p>
+      <ul>
+        <li><strong>Established homes:</strong> the first home concession removes duty on homes valued up to $700,000, then the concession reduces in steps until it ends at $800,000.</li>
+        <li><strong>New homes and vacant land to build a first home:</strong> since 1 May 2025, eligible first home buyers can claim a full concession that reduces duty to nil, with no price cap.</li>
+        <li><strong>Eligibility:</strong> home concessions require buyers to be Australian citizens, permanent residents or specified foreign retirees, and you'll need to move in within a set time.</li>
+      </ul>
+      <p class="source">Rates and concessions from the <a href="https://qro.qld.gov.au/duties/transfer-duty/calculate/concession-rates/" rel="noopener">Queensland Revenue Office</a>, checked November 2026.</p>
+      <h2>What isn't included</h2>
+      <ul>
+        <li>The additional foreign acquirer duty (an extra 8% for foreign buyers of residential land).</li>
+        <li>Duty on any part of the land that isn't residential.</li>
+        <li>Lenders mortgage insurance, if you're borrowing more than about 80% of the value.</li>
+      </ul>
+      <p>Your conveyancer or solicitor will confirm the duty before settlement. You can also use the <a href="https://www.qro.qld.gov.au/calculators/transfer-duty" rel="noopener">Queensland Revenue Office estimator</a>.</p>
+    </div>
+    <!--include:talk-->
+  </div>
+</section>

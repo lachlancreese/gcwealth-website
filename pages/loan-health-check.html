@@ -1,0 +1,138 @@
+<!--
+title: Complimentary Home Loan Health Check | GC Wealth
+description: Is your home loan still the right fit? A complimentary health check compares it with options from our 70+ lender panel, with switching costs counted.
+path: /loan-health-check
+crumb: Loan health check
+nav: about
+schema: service
+disclaimer: yes
+bar: no
+-->
+<section class="page-hero">
+  <div class="wrap">
+    <div>
+      <h1>Complimentary loan health check</h1>
+      <p class="lede">Find out whether your home loan is still the right fit. We compare it with options from our panel of {{lenders}} lenders, count the costs of any change, and tell you honestly whether switching, restructuring or staying put makes sense.</p>
+      <div class="btn-row">
+        <a class="btn" href="#check">Start my health check</a>
+        <a class="btn btn-ghost" href="tel:{{phone_tel}}">Call {{phone}}</a>
+      </div>
+    </div>
+    <div class="talk-card">
+      <h2>What it takes</h2>
+      <ul class="checks" style="margin:0">
+        <li>Six quick questions about your current loan</li>
+        <li>No documents needed to start</li>
+        <li>A conversation with a broker about your options</li>
+        <li>Complimentary, with no obligation to change anything</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="article" style="padding-top:16px">
+  <div class="wrap">
+    <div class="prose">
+      <!--byline-->
+      <h2>What we check</h2>
+      <ul class="checks">
+        <li><strong>Rate and fees</strong> compared with current options across our panel, including your existing lender</li>
+        <li><strong>Features</strong> such as offset, redraw and the ability to make extra repayments</li>
+        <li><strong>Structure</strong>: fixed or variable, interest-only or principal and interest, and whether home and investment debt are separated</li>
+        <li><strong>The costs of changing</strong>: discharge fees, break costs on fixed loans, and new lender fees</li>
+        <li><strong>Your plans</strong>: renovating, investing, a fixed rate ending, or simply keeping costs down</li>
+      </ul>
+      <p>The RBA cash rate is currently {{rates.cash_rate}}%. If your loan hasn't been reviewed since rates last moved, it's a good time to check. <a href="/rba-cash-rate">See the latest cash rate</a>.</p>
+
+      <h2 id="check">Start your health check</h2>
+      <form class="form" id="health-form" action="/api/enquiry" method="post" data-ajax data-done="/thanks" data-phone="{{phone}}" novalidate style="margin-top:24px">
+        <input type="hidden" name="type" value="health-check">
+        <div class="field">
+          <label for="h-lender">Current lender</label>
+          <input class="input" id="h-lender" name="lender" type="text" required>
+        </div>
+        <div class="field">
+          <label for="h-balance">Roughly how much do you owe?</label>
+          <select class="input" id="h-balance" name="amount">
+            <option>Under $300,000</option>
+            <option>$300,000 to $500,000</option>
+            <option selected>$500,000 to $750,000</option>
+            <option>$750,000 to $1 million</option>
+            <option>$1 million to $2 million</option>
+            <option>Over $2 million</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="h-type">Rate type</label>
+          <select class="input" id="h-type" name="rate_type">
+            <option>Variable</option>
+            <option>Fixed</option>
+            <option>Split (part fixed, part variable)</option>
+            <option>Not sure</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="h-rate">Your current interest rate <span>(optional)</span></label>
+          <div class="input-wrap"><input class="input" id="h-rate" name="current_rate" type="text" inputmode="decimal" style="padding-right:40px"><span class="unit post">%</span></div>
+        </div>
+        <div class="field">
+          <label for="h-purpose">The loan is for</label>
+          <select class="input" id="h-purpose" name="situation">
+            <option>The home I live in</option>
+            <option>An investment property</option>
+            <option>Both</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="h-goal">Main reason for checking</label>
+          <select class="input" id="h-goal" name="goal">
+            <option>Lower my costs</option>
+            <option>Better features (offset, redraw)</option>
+            <option>Release equity</option>
+            <option>Consolidate debts</option>
+            <option>My fixed rate is ending</option>
+            <option>Just checking</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="h-name">Name</label>
+          <input class="input" id="h-name" name="name" type="text" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="h-phone">Mobile</label>
+          <input class="input" id="h-phone" name="phone" type="tel" autocomplete="tel" required>
+        </div>
+        <div class="field">
+          <label for="h-email">Email</label>
+          <input class="input" id="h-email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <label class="consent full" for="h-consent">
+          <input id="h-consent" name="consent" type="checkbox" value="yes" required>
+          <span>I'm happy for {{name}} to contact me about my loan. I've read the <a href="/privacy">privacy policy</a>.</span>
+        </label>
+        <div class="hp" aria-hidden="true"><label>Leave this blank <input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <div class="form-actions full">
+          <button class="btn" type="submit">Request my health check</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+
+      <h2>Questions about the health check</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Will this affect my credit score?</summary>
+          <div><p>No. A health check is a conversation and a comparison. Nothing is lodged with a lender unless you decide to go ahead.</p></div>
+        </details>
+        <details>
+          <summary>What if staying with my lender is the better option?</summary>
+          <div><p>Then we'll tell you. Sometimes the right move is asking your current lender for a better rate, or simply changing the loan's structure.</p></div>
+        </details>
+        <details>
+          <summary>What should I have ready?</summary>
+          <div><p>Nothing to start. When we talk, a recent loan statement helps, along with a rough idea of your income and any other debts.</p></div>
+        </details>
+      </div>
+    </div>
+    <!--include:talk-->
+  </div>
+</section>

@@ -1,0 +1,38 @@
+<!--
+title: Mortgage Calculators | Borrowing Power & More | GC Wealth
+description: Mortgage calculators for Australian borrowers: borrowing power, repayments, extra repayments and offset, refinance, QLD stamp duty and deposit planner.
+path: /calculators
+crumb: Calculators
+nav: calculators
+-->
+<!--head--><script src="/assets/js/cash-rate.js" defer></script><!--/head-->
+<section class="page-hero">
+  <div class="wrap">
+    <div>
+      <h1>Mortgage calculators</h1>
+      <p class="lede">Quick estimates to help you plan. When you're ready, a broker can check the numbers against real lender policies.</p>
+    </div>
+    <div class="talk-card">
+      <h2>RBA cash rate</h2>
+      <p style="margin-bottom:8px"><span class="rate-big" style="font-size:3rem" data-cash-rate>{{rates.cash_rate}}<small>%</small></span></p>
+      <p class="small">Effective <span data-cash-effective>{{rates.effective}}</span>. <span data-next-decision="{{rates.next_decision_date}}">Next decision {{rates.next_decision}}.</span></p>
+      <a class="text-link" href="/rba-cash-rate">Cash rate and lending rules</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:16px" aria-label="Calculators">
+  <div class="wrap">
+    <ul class="calc-list">
+      <li><a href="/calculators/borrowing-power"><h2>Borrowing power</h2><p>Estimate how much you could borrow, assessed the way lenders do, with a buffer on top of the rate.</p></a></li>
+      <li><a href="/calculators/repayments"><h2>Repayments</h2><p>Monthly, fortnightly or weekly repayments, and what a rate rise would add.</p></a></li>
+      <li><a href="/calculators/extra-repayments"><h2>Extra repayments and offset</h2><p>See how extra repayments, a lump sum or an offset balance change your loan.</p></a></li>
+      <li><a href="/calculators/refinance"><h2>Refinance</h2><p>Compare your current loan with a new rate, including how long switching costs take to recover.</p></a></li>
+      <li><a href="/calculators/stamp-duty"><h2>QLD stamp duty and costs</h2><p>Queensland transfer duty with home and first home concessions, plus your other upfront costs.</p></a></li>
+      <li><a href="/calculators/deposit"><h2>Deposit planner</h2><p>How long until you reach a 5%, 10% or 20% deposit at your savings rate.</p></a></li>
+    </ul>
+    <p class="muted small" style="margin-top:32px">Calculators give estimates only, based on the figures you enter and the assumptions on each page. They aren't a quote, a pre-approval or credit assistance.</p>
+  </div>
+</section>
+
+<!--include:cta-->

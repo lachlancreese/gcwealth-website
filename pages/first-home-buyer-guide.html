@@ -1,0 +1,52 @@
+<!--
+title: Queensland First Home Buyer Guide 2026–27 | GC Wealth
+description: A plain-English guide to buying your first home in Queensland: the $30,000 grant, stamp duty concessions, the 5% Deposit Scheme, costs and a document checklist.
+path: /first-home-buyer-guide
+crumb: First home buyer guide
+nav: about
+bar: no
+-->
+<section class="section" style="padding-top:40px">
+  <div class="wrap contact-grid">
+    <div>
+      <h1>Your Queensland first home buyer guide</h1>
+      <p class="lede">Everything a Queensland first home buyer needs in one place, checked against official sources in November 2026.</p>
+      <ul class="checks" style="margin-top:32px">
+        <li>The $30,000 First Home Owner Grant and who it's for</li>
+        <li>Stamp duty concessions, with worked examples at different prices</li>
+        <li>The 5% Deposit Scheme and how to apply</li>
+        <li>The costs people forget, and how lenders assess you</li>
+        <li>A step-by-step plan and a document checklist</li>
+      </ul>
+      <p class="muted">Four pages, as a PDF. Prefer to talk instead? Call <a href="tel:{{phone_tel}}">{{phone}}</a>.</p>
+    </div>
+    <div class="form-panel">
+      <h2 style="font-size:var(--step-2)">Get the guide</h2>
+      <form class="form" id="guide-form" action="/api/enquiry" method="post" data-ajax data-download="/assets/guides/gc-wealth-qld-first-home-buyer-guide.pdf" data-phone="{{phone}}" novalidate>
+        <input type="hidden" name="type" value="guide">
+        <div class="field full">
+          <label for="g-name">Name</label>
+          <input class="input" id="g-name" name="name" type="text" autocomplete="name" required>
+        </div>
+        <div class="field full">
+          <label for="g-email">Email</label>
+          <input class="input" id="g-email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field full">
+          <label for="g-phone">Mobile <span>(optional)</span></label>
+          <input class="input" id="g-phone" name="phone" type="tel" autocomplete="tel">
+        </div>
+        <label class="consent full" for="g-updates">
+          <input id="g-updates" name="updates" type="checkbox" value="yes">
+          <span>Also send me occasional rate updates and first home buyer tips by email. You can unsubscribe at any time.</span>
+        </label>
+        <div class="hp" aria-hidden="true"><label>Leave this blank <input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <div class="form-actions full">
+          <button class="btn" type="submit">Email me the guide</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </div>
+        <p class="collect full">We'll email you the guide and a broker may follow up once to see if you have questions. See our <a href="/privacy">privacy policy</a>.</p>
+      </form>
+    </div>
+  </div>
+</section>

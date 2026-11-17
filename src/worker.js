@@ -1,6 +1,7 @@
 // gcwealth.com.au on Cloudflare Workers.
 // Pages and /api/* run through here first (see run_worker_first in wrangler.jsonc); /assets/* is served directly.
 import { handleEnquiry } from "./enquiry.js";
+import { handleCashRate } from "./cash-rate.js";
 import brand from "../brand.json";
 
 const HOST = new URL(brand.site).hostname;
@@ -23,7 +24,35 @@ const MOVED = {
   "/pre-approval": "/home-loans/pre-approval",
   "/smsf-refinancing": "/smsf-loans",
   "/home-loan-process": "/home-loans",
-  "/borrowing-capacity-gold-coast-wealth": "/home-loans/pre-approval",
+  "/borrowing-capacity-gold-coast-wealth": "/calculators/borrowing-power",
+  "/calculators/borrowing-power": "/calculators/borrowing-power",
+  "/calculators/repayment-calculator": "/calculators/repayments",
+  "/calculators/fortnightly-repayment": "/calculators/repayments",
+  "/calculators/interest-only": "/calculators/repayments",
+  "/calculators/split-loan": "/calculators/repayments",
+  "/calculators/introductory-rate": "/calculators/repayments",
+  "/calculators/comparison-rate": "/calculators/repayments",
+  "/calculators/budget-planner": "/calculators/borrowing-power",
+  "/calculators/income-tax": "/calculators/borrowing-power",
+  "/calculators/income-annualisation": "/calculators/borrowing-power",
+  "/calculators/income-gross-up": "/calculators/borrowing-power",
+  "/calculators/extra-repayments": "/calculators/extra-repayments",
+  "/calculators/offset-account": "/calculators/extra-repayments",
+  "/calculators/lump-sum-repayment": "/calculators/extra-repayments",
+  "/calculators/how-long-to-repay-calculator": "/calculators/extra-repayments",
+  "/calculators/refinancing-savings": "/calculators/refinance",
+  "/calculators/loan-comparison-calculator": "/calculators/refinance",
+  "/calculators/stamp-duty": "/calculators/stamp-duty",
+  "/calculators/property-buying-cost": "/calculators/stamp-duty",
+  "/calculators/property-selling-cost": "/calculators",
+  "/calculators/savings-goal": "/calculators/deposit",
+  "/calculators/saving": "/calculators/deposit",
+  "/calculators/compound-interest": "/calculators/deposit",
+  "/calculators/how-much-to-deposit": "/calculators/deposit",
+  "/calculators/rent-vs-buy": "/calculators/deposit",
+  "/calculators/credit-card": "/calculators",
+  "/calculators/reverse-mortgage": "/calculators",
+  "/calculators/asset-leasing": "/business-finance/asset-finance",
   "/first-home-buyers": "/home-loans/first-home-buyers",
   "/investment-property": "/home-loans/investment-loans",
   "/construction-loans": "/home-loans/construction-loans",
@@ -39,7 +68,7 @@ function redirect(url, status = 301) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     // One address for everything: https://gcwealth.com.au (www and plain http redirect here).
@@ -54,6 +83,8 @@ export default {
       if (request.method !== "POST") return new Response("Method not allowed", { status: 405, headers: { Allow: "POST" } });
       return handleEnquiry(request, env);
     }
+
+    if (url.pathname === "/api/cash-rate") return handleCashRate(request, ctx);
 
     if (request.method === "GET" || request.method === "HEAD") {
       // Tidy addresses: no trailing slash, no ".html", no "/index".

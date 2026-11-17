@@ -1,0 +1,55 @@
+{
+  "_note": "Update after each RBA decision and each APRA macroprudential update. The site also checks the RBA's table live (/api/cash-rate) and shows a newer rate if there is one.",
+  "cash_rate": "4.85",
+  "effective": "4 November 2026",
+  "decided": "3 November 2026",
+  "next_decision": "Tuesday 8 December 2026, 2.30pm (AEDT)",
+  "history": [
+    [
+      "4 Nov 2026",
+      "+0.25",
+      "4.85"
+    ],
+    [
+      "30 Sep 2026",
+      "+0.25",
+      "4.60"
+    ],
+    [
+      "12 Aug 2026",
+      "0.00",
+      "4.35"
+    ],
+    [
+      "17 Jun 2026",
+      "0.00",
+      "4.35"
+    ],
+    [
+      "6 May 2026",
+      "+0.25",
+      "4.35"
+    ],
+    [
+      "18 Mar 2026",
+      "+0.25",
+      "4.10"
+    ],
+    [
+      "4 Feb 2026",
+      "+0.25",
+      "3.85"
+    ],
+    [
+      "10 Dec 2025",
+      "0.00",
+      "3.60"
+    ]
+  ],
+  "apra_buffer": "3",
+  "apra_dti_multiple": "6",
+  "apra_dti_share": "20",
+  "apra_checked": "17 November 2026",
+  "apra_last_update": "28 May 2026",
+  "next_decision_date": "2026-12-08"
+}

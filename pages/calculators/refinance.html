@@ -1,0 +1,74 @@
+<!--
+title: Refinance Calculator | Compare Your Home Loan | GC Wealth
+description: Compare your current home loan with a new rate: the change in monthly repayments, how long switching costs take to recover, and the difference over the term.
+path: /calculators/refinance
+crumb: Refinance
+nav: calculators
+schema: calculator
+disclaimer: yes
+-->
+<!--head--><script src="/assets/js/calculators.js" defer></script><!--/head-->
+<section class="page-hero" style="padding-bottom:32px">
+  <div class="wrap"><div>
+    <h1>Refinance calculator</h1>
+    <p class="lede">Compare your current loan with a new rate, with the cost of switching counted, so you can see whether a change is worth it.</p>
+  </div></div>
+</section>
+
+<section class="section-tight" style="padding-top:0">
+  <div class="wrap calc">
+    <form class="calc-form" data-calc="refinance" data-results="results" novalidate>
+      <div class="field">
+        <label for="c-bal">Loan balance</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-bal" name="balance" inputmode="decimal" value="600,000"></div>
+      </div>
+      <div class="field">
+        <label for="c-years">Years remaining</label>
+        <div class="input-wrap"><input class="input" id="c-years" name="years" inputmode="numeric" value="25" style="padding-right:64px"><span class="unit post">years</span></div>
+      </div>
+      <div class="field">
+        <label for="c-cur">Your current rate</label>
+        <div class="input-wrap"><input class="input" id="c-cur" name="current" inputmode="decimal" placeholder="Enter rate" style="padding-right:40px"><span class="unit post">%</span></div>
+      </div>
+      <div class="field">
+        <label for="c-new">The new rate</label>
+        <div class="input-wrap"><input class="input" id="c-new" name="newrate" inputmode="decimal" placeholder="Enter rate" style="padding-right:40px"><span class="unit post">%</span></div>
+      </div>
+      <div class="field full">
+        <label for="c-costs">Cost of switching</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-costs" name="costs" inputmode="decimal" value="0"></div>
+        <p class="hint">Discharge fee, new lender fees, government registration fees, and break costs if you're on a fixed rate.</p>
+      </div>
+    </form>
+    <aside class="results" id="results" aria-labelledby="results-title">
+      <h2 id="results-title">Your comparison</h2>
+      <div class="result-main" data-out="main" aria-live="polite"></div>
+      <div class="result-sub" data-out="sub" data-detail></div>
+      <ul class="result-list" data-detail>
+        <li>Current repayment <b data-out="now"></b></li>
+        <li>New repayment <b data-out="next"></b></li>
+        <li>Switching costs recovered in <b data-out="breakeven"></b></li>
+        <li>Difference over the term, after costs <b data-out="lifetime"></b></li>
+      </ul>
+      <p class="result-note" data-detail>Before switching, it's worth asking your current lender whether they'll match the new rate.</p>
+      <a class="btn btn-light" data-cta href="/loan-health-check">Get a loan health check</a>
+    </aside>
+  </div>
+</section>
+
+<section class="article" style="padding-top:32px">
+  <div class="wrap">
+    <div class="prose">
+      <!--byline-->
+      <h2>How this calculator works</h2>
+      <p>We work out the monthly principal and interest repayment at each rate over your remaining term, then divide your switching costs by the monthly difference to see how long they'd take to recover.</p>
+      <h2>Assumptions</h2>
+      <ul>
+        <li>Both rates stay the same for the rest of the term, and the loan term doesn't change.</li>
+        <li>Ongoing fees, cashback offers and features such as offset accounts aren't included, though they can matter as much as the rate.</li>
+      </ul>
+      <p>For a fuller picture, our <a href="/loan-health-check">complimentary loan health check</a> compares your loan with options across our panel. Read more about <a href="/home-loans/refinancing">refinancing</a>.</p>
+    </div>
+    <!--include:talk-->
+  </div>
+</section>

@@ -31,6 +31,9 @@ ROOT = pathlib.Path(__file__).parent
 PAGES = ROOT / "pages"
 OUT = ROOT / "public"
 B = json.loads((ROOT / "brand.json").read_text())
+RATES = json.loads((ROOT / "data" / "rates.json").read_text())
+TEAM = {p["slug"]: p for p in json.loads((ROOT / "data" / "team.json").read_text())["people"]}
+REVIEWS = json.loads((ROOT / "data" / "reviews.json").read_text())
 SITE = B["site"]
 ORG_ID = SITE + "/#organization"
 
@@ -52,7 +55,21 @@ NAV = [
         ("Asset and equipment finance", "/business-finance/asset-finance"),
     ]),
     ("smsf", "SMSF loans", "/smsf-loans", []),
-    ("about", "About", "/about", []),
+    ("calculators", "Calculators", "/calculators", [
+        ("Borrowing power", "/calculators/borrowing-power"),
+        ("Repayments", "/calculators/repayments"),
+        ("Extra repayments and offset", "/calculators/extra-repayments"),
+        ("Refinance", "/calculators/refinance"),
+        ("QLD stamp duty and costs", "/calculators/stamp-duty"),
+        ("Deposit planner", "/calculators/deposit"),
+        ("RBA cash rate and lending rules", "/rba-cash-rate"),
+    ]),
+    ("about", "About", "/about", [
+        ("Our team", "/team"),
+        ("Referral partners", "/partners"),
+        ("Loan health check", "/loan-health-check"),
+        ("First home buyer guide", "/first-home-buyer-guide"),
+    ]),
     ("contact", "Contact", "/contact", []),
 ]
 
@@ -79,14 +96,69 @@ def strip_tags(text):
 
 def fill(text):
     """Replace {{key}} and {{key.sub}} with values from brand.json."""
+    ctx = dict(B, rates=RATES)
+
     def get(m):
-        val = B
+        val = ctx
         for part in m.group(1).split("."):
             val = val[part]
         return html.escape(str(val), quote=False)
     text = text.replace("<!--lenders-->", "".join(f"<li>{html.escape(n)}</li>" for n in B["lender_examples"]))
+    text = re.sub(r"<!--reviews:([\w-]+)-->", lambda m: reviews_html(m.group(1)), text)
+    text = text.replace("<!--cash-rate-table-->", cash_rate_table())
+    text = text.replace("<!--team-cards-->", team_cards())
     text = text.replace("<!--featured-->", "".join(f"<li>{html.escape(n)}</li>" for n in B["featured_in"]))
     return re.sub(r"\{\{([\w.]+)\}\}", get, text)
+
+
+def reviews_html(which):
+    """Review cards: 'home' uses the homepage list; a person's slug uses the reviews that name them."""
+    keys = REVIEWS["home"] if which == "home" else TEAM[which]["reviews"]
+    cards = []
+    for k in keys:
+        r = REVIEWS["reviews"][k]
+        stars = '<span class="stars" role="img" aria-label="5 out of 5 stars">' + ICON["star"] * 5 + "</span>"
+        more = f' <a href="{B["reviews"]["url"]}" rel="noopener">Read the full review</a>' if r["excerpt"] else ""
+        cards.append(f"""      <figure class="review">
+        {stars}
+        <blockquote><p>{html.escape(r["text"])}{more}</p></blockquote>
+        <figcaption><b>{html.escape(r["author"])}</b> <span>{html.escape(r["topic"])}, Google review</span></figcaption>
+      </figure>""")
+    return '<div class="reviews">\n' + "\n".join(cards) + "\n    </div>"
+
+
+def cash_rate_table():
+    rows = "".join(f"<tr><td>{d}</td><td>{c}</td><td>{r}%</td></tr>" for d, c, r in RATES["history"])
+    return ('<table class="rate-table" data-cash-rate-table><caption class="visually-hidden">Recent RBA cash rate decisions</caption>'
+            '<thead><tr><th scope="col">Effective date</th><th scope="col">Change (% points)</th><th scope="col">Cash rate target</th></tr></thead>'
+            f"<tbody>{rows}</tbody></table>")
+
+
+def team_cards():
+    cards = []
+    for p in TEAM.values():
+        cards.append(f"""      <li><a class="person-card" href="/team/{p['slug']}">
+        <img src="/assets/img/{p['photo']}-4x5-480.webp" alt="{html.escape(p['name'])}" width="480" height="600" loading="lazy">
+        <span class="person-name">{html.escape(p['name'])}</span>
+        <span class="person-role">{html.escape(p['role'])}</span>
+      </a></li>""")
+    return '<ul class="people">\n' + "\n".join(cards) + "\n    </ul>"
+
+
+def nice_date(iso):
+    d = datetime.date.fromisoformat(iso)
+    return f"{d.day} {d.strftime('%B %Y')}"
+
+
+def byline(meta, updated):
+    """'Reviewed by' only appears once that person has actually reviewed the page (meta 'reviewed_by')."""
+    parts = []
+    who = TEAM.get(meta.get("reviewed_by", ""))
+    if who:
+        parts.append(f'<span class="byline-who"><img src="/assets/img/{who["photo"]}-4x5-480.webp" alt="" width="40" height="50">'
+                     f'Reviewed by <a href="/team/{who["slug"]}">{html.escape(who["name"])}</a>, {html.escape(who["role"])}</span>')
+    parts.append(f"<span>Last updated {nice_date(updated)}</span>")
+    return '<p class="byline">' + "".join(parts) + "</p>"
 
 
 def address_ld():
@@ -158,6 +230,19 @@ def structured_data(meta, body, pages):
             "url": SITE + path,
             "provider": {"@type": "FinancialService", "@id": ORG_ID, "name": B["name"]},
             "areaServed": {"@type": "Country", "name": "Australia"},
+        })
+    if meta.get("person") in TEAM:
+        p = TEAM[meta["person"]]
+        blocks.append({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": p["name"],
+            "jobTitle": p["role"],
+            "image": SITE + f"/assets/img/{p['photo']}-4x5-800.webp",
+            "url": SITE + path,
+            "worksFor": {"@type": "FinancialService", "@id": ORG_ID, "name": B["name"]},
+            "hasCredential": [{"@type": "EducationalOccupationalCredential", "name": c} for c in p["credentials"]],
+            **({"sameAs": [p["linkedin"]]} if p.get("linkedin") else {}),
         })
     if 'class="faq-list"' in body:
         qa = re.findall(r"<summary>(.*?)</summary>\s*<div>(.*?)</div>", body.split('class="faq-list"', 1)[1], re.S)
@@ -243,7 +328,7 @@ def header(active, path):
           <a href="{href}"{cur}>{label}</a>
           <button class="sub-btn" type="button" aria-expanded="false" aria-label="Show {label.lower()} pages">{ICON['chev']}</button>
           <ul class="sub">
-            <li><a href="{href}">All {label.lower()}</a></li>
+            <li><a href="{href}">{"About us" if key == "about" else "All " + label.lower()}</a></li>
 {sub}
           </ul>
         </li>""")
@@ -323,7 +408,8 @@ def footer(show_bar):
       <nav class="footer-cols" aria-label="Footer">
 {col(home[1], home[3])}
 {col(biz[1], biz[3] + [("SMSF loans", "/smsf-loans")])}
-{col("Company", [("About us", "/about"), ("Contact", "/contact"), ("Get started", "/get-started")])}
+{col("Calculators", next(n for n in NAV if n[0] == "calculators")[3])}
+{col("Company", [("About us", "/about"), ("Our team", "/team"), ("Referral partners", "/partners"), ("Loan health check", "/loan-health-check"), ("First home buyer guide", "/first-home-buyer-guide"), ("Contact", "/contact"), ("Get started", "/get-started")])}
         <div>
           <h2>Contact</h2>
           <ul>
@@ -388,6 +474,8 @@ def build():
         extra_head = structured_data(meta, body, pages) + extra_head
         crumbs = breadcrumbs(path, pages) if path != "/" and meta.get("crumbs", "yes") != "no" else ""
         note = DISCLAIMER if meta.get("disclaimer") == "yes" else ""
+        if meta.get("disclaimer") == "yes" or meta.get("reviewed_by"):
+            body = body.replace("<!--byline-->", byline(meta, lastmod(src)))
         out = (head(meta, extra_head) + "\n" + header(meta.get("nav", ""), path) + '\n<main id="main">\n'
                + crumbs + body + note + "\n</main>\n" + footer(meta.get("bar", "yes") != "no"))
         out = re.sub(r'(src|href)="(/assets/(?:js|css)/[\w.-]+\.(?:js|css))"', lambda m: f'{m.group(1)}="{asset(m.group(2))}"', out)

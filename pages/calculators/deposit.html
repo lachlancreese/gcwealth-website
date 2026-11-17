@@ -1,0 +1,78 @@
+<!--
+title: Home Deposit Calculator | How Long to Save? | GC Wealth
+description: How much deposit do you need, and how long will it take to save? Plan for a 5%, 10% or 20% deposit plus upfront costs at your savings rate.
+path: /calculators/deposit
+crumb: Deposit planner
+nav: calculators
+schema: calculator
+disclaimer: yes
+-->
+<!--head--><script src="/assets/js/calculators.js" defer></script><!--/head-->
+<section class="page-hero" style="padding-bottom:32px">
+  <div class="wrap"><div>
+    <h1>Deposit planner</h1>
+    <p class="lede">Work out how much deposit you need, and how long it will take to get there at the rate you're saving.</p>
+  </div></div>
+</section>
+
+<section class="section-tight" style="padding-top:0">
+  <div class="wrap calc">
+    <form class="calc-form" data-calc="deposit" data-results="results" novalidate>
+      <div class="field full">
+        <label for="c-price">Property price you're aiming for</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-price" name="price" inputmode="decimal" value="750,000"></div>
+      </div>
+      <fieldset class="full">
+        <legend>Deposit</legend>
+        <div class="seg">
+          <label><input type="radio" name="share" value="5"><span>5%</span></label>
+          <label><input type="radio" name="share" value="10"><span>10%</span></label>
+          <label><input type="radio" name="share" value="20" checked><span>20%</span></label>
+        </div>
+      </fieldset>
+      <div class="field">
+        <label for="c-saved">Saved so far</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-saved" name="saved" inputmode="decimal" value="40,000"></div>
+      </div>
+      <div class="field">
+        <label for="c-monthly">Saving each month</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-monthly" name="monthly" inputmode="decimal" value="2,000"></div>
+      </div>
+      <div class="field full">
+        <label for="c-costs">Upfront costs <span>(optional)</span></label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-costs" name="costs" inputmode="decimal" value="0"></div>
+        <p class="hint">Stamp duty, legal and inspection costs. <a href="/calculators/stamp-duty">Estimate your Queensland stamp duty</a>.</p>
+      </div>
+    </form>
+    <aside class="results" id="results" aria-labelledby="results-title">
+      <h2 id="results-title">Your plan</h2>
+      <div class="result-main" data-out="main" aria-live="polite"></div>
+      <div class="result-sub" data-out="sub" data-detail></div>
+      <ul class="result-list" data-detail>
+        <li>Deposit <b data-out="deposit"></b></li>
+        <li>Deposit plus costs <b data-out="target"></b></li>
+        <li>Still to save <b data-out="gap"></b></li>
+        <li>Loan you'd need <b data-out="loan"></b></li>
+      </ul>
+      <p class="result-note" data-show="lmi-note" hidden>With less than 20%, you'd usually pay lenders mortgage insurance, unless the 5% Deposit Scheme or a family guarantee applies. <a href="/home-loans/first-home-buyers" style="color:#fff">First home buyer options</a>.</p>
+      <a class="btn btn-light" data-cta href="/get-started">Talk to a broker about this</a>
+    </aside>
+  </div>
+</section>
+
+<section class="article" style="padding-top:32px">
+  <div class="wrap">
+    <div class="prose">
+      <!--byline-->
+      <h2>How much deposit do you need?</h2>
+      <p>Many lenders prefer 20%, because below that you'll usually pay lenders mortgage insurance. A smaller deposit is still possible: with mortgage insurance, through the <a href="/home-loans/first-home-buyers">Australian Government 5% Deposit Scheme</a> for eligible first home buyers, or with a <a href="/home-loans/guarantor-loans">family guarantee</a>.</p>
+      <p>Lenders also look for genuine savings, usually money you've built up over at least a few months, so a steady saving pattern helps your application as well as your deposit.</p>
+      <h2>Assumptions</h2>
+      <ul>
+        <li>You save the same amount every month. Interest on your savings isn't included.</li>
+        <li>Property prices don't change while you save.</li>
+      </ul>
+    </div>
+    <!--include:talk-->
+  </div>
+</section>

@@ -16,7 +16,8 @@ export function validPhone(raw) {
     /^\+(?!61)[1-9]\d{7,14}$/.test(n);
 }
 
-const TYPES = ["contact", "get-started", "newsletter"];
+const TYPES = ["contact", "get-started", "newsletter", "health-check", "referral", "guide"];
+const GUIDE_PATH = "/assets/guides/gc-wealth-qld-first-home-buyer-guide.pdf";
 
 export async function handleEnquiry(request, env) {
   const wantsJson = (request.headers.get("Accept") || "").includes("application/json");
@@ -55,14 +56,32 @@ export async function handleEnquiry(request, env) {
     message: field("message", 4000),
     consent: field("consent", 10),
     page: field("page", 200),
+    lender: field("lender", 120),
+    rate_type: field("rate_type", 60),
+    current_rate: field("current_rate", 20),
+    partner_name: field("partner_name", 120),
+    partner_business: field("partner_business", 160),
+    partner_type: field("partner_type", 60),
+    client_name: field("client_name", 120),
+    client_phone: field("client_phone", 40),
+    client_email: field("client_email", 200),
+    wants_agreement: field("wants_agreement", 10),
+    updates: field("updates", 10),
   };
 
   if (!validEmail(d.email)) return reply(false, 422, "Enter a valid email address.");
-  if (type !== "newsletter") {
+  if (type === "referral") {
+    if (!d.partner_name || !d.client_name) return reply(false, 422, "Please add your name and your client's name.");
+    if (!validPhone(d.phone) || !validPhone(d.client_phone)) return reply(false, 422, "Enter valid phone numbers for you and your client.");
+    if (d.client_email && !validEmail(d.client_email)) return reply(false, 422, "Check your client's email address.");
+    if (d.consent !== "yes") return reply(false, 422, "Please confirm your client has agreed to you sharing their details.");
+  } else if (type === "guide") {
+    if (!d.name) return reply(false, 422, "Please add your name.");
+  } else if (type !== "newsletter") {
     if (!d.name) return reply(false, 422, "Please add your name.");
     if (!validPhone(d.phone)) return reply(false, 422, "Enter a valid phone number.");
   }
-  if (type === "get-started" && d.consent !== "yes") {
+  if ((type === "get-started" || type === "health-check") && d.consent !== "yes") {
     return reply(false, 422, "Please confirm we can contact you about your enquiry.");
   }
 
@@ -86,6 +105,28 @@ export async function handleEnquiry(request, env) {
         ["Prefers", d.contact_by], ["Preferred time", d.best_time], ["Message", d.message], ["Agreed to be contacted", "Yes"],
       ]),
     };
+  } else if (type === "health-check") {
+    team = {
+      subject: `Loan health check: ${d.name}${d.lender ? " (" + d.lender + ")" : ""}`,
+      ...detailsTable("Loan health check request", [
+        ["Current lender", d.lender], ["Roughly owes", d.amount], ["Rate type", d.rate_type], ["Current rate", d.current_rate ? d.current_rate + "%" : ""],
+        ["Loan is for", d.situation], ["Main reason", d.goal], ["Name", d.name], ["Email", d.email], ["Phone", d.phone], ["Agreed to be contacted", "Yes"],
+      ]),
+    };
+  } else if (type === "referral") {
+    team = {
+      subject: `New referral from ${d.partner_name}${d.partner_business ? " (" + d.partner_business + ")" : ""}: ${d.client_name}`,
+      ...detailsTable("Referral", [
+        ["Partner", d.partner_name], ["Business", d.partner_business], ["Profession", d.partner_type], ["Partner email", d.email], ["Partner phone", d.phone],
+        ["Client", d.client_name], ["Client phone", d.client_phone], ["Client email", d.client_email], ["Needs", d.goal], ["Notes", d.message],
+        ["Client consent to share details", "Confirmed by partner"], ["Referral agreement", d.wants_agreement === "yes" ? "NOT YET IN PLACE: set one up before acting on the referral" : "Partner indicated one is in place (check)"],
+      ]),
+    };
+  } else if (type === "guide") {
+    team = {
+      subject: `First home buyer guide requested: ${d.name}`,
+      ...detailsTable("First home buyer guide request", [["Name", d.name], ["Email", d.email], ["Phone", d.phone], ["Wants updates by email", d.updates === "yes" ? "Yes (add to mailing list)" : "No"]]),
+    };
   } else {
     team = {
       subject: `Website message: ${d.name}`,
@@ -108,6 +149,28 @@ export async function handleEnquiry(request, env) {
 export function autoReply(env, type, d) {
   const first = (d.name || "").split(/\s+/)[0];
   let mail;
+  if (type === "guide") {
+    mail = customerEmail({
+      heading: `Your Queensland first home buyer guide`,
+      paragraphs: [
+        `Thanks${first ? ", " + first : ""}. Here's your guide: ${BRAND.site}${GUIDE_PATH}`,
+        "It covers the Queensland grant and stamp duty concessions, the 5% Deposit Scheme, the costs to plan for, and a checklist of documents lenders ask for. Government schemes change, so check the date on the guide.",
+      ],
+      after: [`When you're ready to talk it through, reply to this email or call us on ${BRAND.phone}.`],
+    });
+    return { ...customerSender(env), to: [d.email], subject: "Your Queensland first home buyer guide", html: mail.html, text: mail.text };
+  }
+  if (type === "referral") {
+    mail = customerEmail({
+      heading: `Thanks${d.partner_name ? ", " + d.partner_name.split(/\s+/)[0] : ""}. We've got your referral.`,
+      paragraphs: [
+        `A broker will contact ${d.client_name || "your client"} shortly, and we'll let you know once the first conversation has happened.`,
+        ...(d.wants_agreement === "yes" ? ["We'll also be in touch to set up a referral agreement before we act on the referral."] : []),
+      ],
+      after: [`Questions? Reply to this email or call us on ${BRAND.phone}.`],
+    });
+    return { ...customerSender(env), to: [d.email], subject: "We've got your referral", html: mail.html, text: mail.text };
+  }
   if (type === "newsletter") {
     mail = customerEmail({
       heading: "You're on the list",

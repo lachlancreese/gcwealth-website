@@ -1,0 +1,63 @@
+<!--
+title: RBA Cash Rate Today & Home Lending Rules | GC Wealth
+description: The current RBA cash rate, recent decisions and the next meeting date, plus APRA's serviceability buffer and debt-to-income limit explained.
+path: /rba-cash-rate
+crumb: RBA cash rate and lending rules
+nav: calculators
+disclaimer: yes
+-->
+<!--head--><script src="/assets/js/cash-rate.js" defer></script><!--/head-->
+<section class="page-hero">
+  <div class="wrap rate-hero">
+    <div class="rate-big" data-cash-rate>{{rates.cash_rate}}<small>%</small></div>
+    <div>
+      <h1>RBA cash rate</h1>
+      <p class="lede">The Reserve Bank's cash rate target, effective <span data-cash-effective>{{rates.effective}}</span>. <span data-next-decision="{{rates.next_decision_date}}">The next decision is due {{rates.next_decision}}.</span></p>
+      <div class="btn-row">
+        <a class="btn" href="/calculators/repayments">See what it means for your repayments</a>
+        <a class="btn btn-ghost" href="/loan-health-check">Check my loan</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="article" style="padding-top:16px">
+  <div class="wrap">
+    <div class="prose">
+      <!--byline-->
+      <h2>Recent decisions</h2>
+      <!--cash-rate-table-->
+      <p class="source">Source: <a href="https://www.rba.gov.au/statistics/cash-rate/" rel="noopener">Reserve Bank of Australia</a>. Changes take effect the day after each decision. This page checks the RBA's table and updates automatically.</p>
+
+      <h2>What the cash rate means for your loan</h2>
+      <p>The cash rate is what banks pay to borrow from each other overnight. It isn't the rate on your home loan, but lenders usually move their variable rates when it changes. Fixed rates are priced on where markets expect rates to go, so they can move before or after a decision.</p>
+
+      <h2>How lenders must assess you</h2>
+      <p>APRA, the banking regulator, sets rules that limit how much banks can lend. Its current settings, last confirmed on {{rates.apra_last_update}}:</p>
+      <div class="facts">
+        <div class="fact"><b>{{rates.apra_buffer}} points</b><span>Serviceability buffer: banks test your repayments at a rate at least {{rates.apra_buffer}} percentage points above the loan rate.</span></div>
+        <div class="fact"><b>{{rates.apra_dti_multiple}}× income</b><span>Debt-to-income threshold: loans at {{rates.apra_dti_multiple}} or more times your income are limited.</span></div>
+        <div class="fact"><b>{{rates.apra_dti_share}}%</b><span>The most of each bank's new owner-occupier, and new investor, lending that can be at that level.</span></div>
+      </div>
+      <p>The buffer is why your borrowing power is usually lower than a simple repayment calculation suggests. The debt-to-income limit, which started in February 2026, mainly affects borrowers with large loans relative to income, such as investors with several properties. Non-bank lenders have their own policies.</p>
+      <p class="source">Source: <a href="https://www.apra.gov.au/news-and-publications/apra-maintains-current-macroprudential-policy-settings-highly-uncertain" rel="noopener">APRA</a>, checked {{rates.apra_checked}}.</p>
+
+      <h2>Questions about the cash rate</h2>
+      <div class="faq-list">
+        <details>
+          <summary>How often does the RBA meet?</summary>
+          <div><p>The Reserve Bank's Monetary Policy Board meets eight times a year and announces each decision at 2.30pm (Sydney time) on the second day of the meeting.</p></div>
+        </details>
+        <details>
+          <summary>Will my lender pass on a change?</summary>
+          <div><p>Each lender decides for itself, and the timing varies. Your lender will tell you about any change to your rate and repayments.</p></div>
+        </details>
+        <details>
+          <summary>Should I fix my rate?</summary>
+          <div><p>It depends on your plans and how much certainty you want. Fixing gives predictable repayments but usually limits extra repayments and can mean break costs if you leave early. A broker can compare fixed, variable and split options for you.</p></div>
+        </details>
+      </div>
+    </div>
+    <!--include:talk-->
+  </div>
+</section>

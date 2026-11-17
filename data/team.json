@@ -1,0 +1,31 @@
+{
+  "_note": "One entry per person shown on the site. Only confirmed facts. 'reviews' are keys from reviews.json that name this person.",
+  "people": [
+    {
+      "slug": "brooke-juracic",
+      "name": "Brooke Juracic",
+      "role": "Co-founder and Managing Director",
+      "credit_rep": "491220",
+      "photo": "gc-wealth-broker-portrait",
+      "summary": "Brooke has more than a decade of broking experience, from first home buyers to commercial deals and high-net-worth portfolios.",
+      "bio": [
+        "Brooke co-founded GC Wealth in 2024. She has more than a decade of finance broking experience, working with clients from first home buyers to commercial deals and high-net-worth portfolios.",
+        "She believes finance is about what a transaction makes possible: the home, the business or the next step it leads to."
+      ],
+      "credentials": [
+        "MFAA accredited",
+        "Credit Representative 491220, authorised under Australian Credit Licence 389328"
+      ],
+      "focus": [
+        "First home buyers",
+        "Commercial lending",
+        "High-net-worth portfolios"
+      ],
+      "linkedin": "",
+      "reviews": [
+        "sevy-z",
+        "jaime-lee-a"
+      ]
+    }
+  ]
+}
