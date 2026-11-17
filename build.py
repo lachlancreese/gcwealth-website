@@ -86,6 +86,14 @@ def asset(path):
     return f"{path}?v={digest}"
 
 
+IMG_REF = re.compile(r"/assets/(?:img|guides)/[\w.-]+\.(?:webp|png|jpe?g|svg|pdf)(?![\w?])")
+
+
+def version_images(text):
+    """Images keep a week-long browser cache, so tag each one with its hash: a replaced photo shows straight away."""
+    return IMG_REF.sub(lambda m: asset(m.group(0)) if (OUT / m.group(0).lstrip("/")).exists() else m.group(0), text)
+
+
 def ld(data):
     return '\n<script type="application/ld+json">\n' + json.dumps(data, ensure_ascii=False, indent=1) + "\n</script>"
 
@@ -483,7 +491,7 @@ def build():
         name = "index.html" if path == "/" else path.strip("/") + ".html"
         dest = OUT / name
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(out)
+        dest.write_text(version_images(out))
         if meta.get("index", "yes") != "no":
             urls.append((path, lastmod(src)))
         print("built", name)
