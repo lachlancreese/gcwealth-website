@@ -692,9 +692,22 @@ def check_forms(browser):
     pg.wait_for_selector("#guide-form .form-status.ok a", timeout=15000)
     if len(sent_mail) != 2 or ".pdf" not in sent_mail[1]["text"]:
         fail("guide: emails missing or no link to the PDF")
-    code, _, headers = status_of(BASE + "/assets/guides/gc-wealth-qld-first-home-buyer-guide.pdf")
+    code, _, headers = status_of(BASE + "/assets/guides/gc-wealth-first-home-buyer-guide.pdf")
     if code != 200:
         fail(f"guide PDF returns {code}")
+    # The PDF is rendered from data/stamp-duty.json: it must show each state's current grant and duty help.
+    try:
+        import pypdf
+        text = " ".join(pg_.extract_text() for pg_ in pypdf.PdfReader(str(ROOT / "public/assets/guides/gc-wealth-first-home-buyer-guide.pdf")).pages)
+        text = " ".join(text.split())
+        duty_data = json.loads((ROOT / "data" / "stamp-duty.json").read_text())
+        for code_ in duty_data["order"]:
+            st = duty_data["states"][code_]
+            for want in (st["name"], st["fhog"]["short"]):
+                if want not in text:
+                    fail(f"guide PDF is out of date: '{want}' not found. Run python3 tools/guides/render.py")
+    except ImportError:
+        print("  (pypdf not installed: skipped the guide PDF content check)")
 
     # Honeypot: pretend success, send nothing.
     sent_mail.clear()

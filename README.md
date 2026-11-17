@@ -14,7 +14,7 @@ Cloudflare runs no build step: the finished pages in `public/` are committed.
 | `data/team.json` | People shown on the site (profile pages at `/team/<slug>`). Add a person here and a page in `pages/team/`. Make their photo with `python3 tools/headshot.py photo.jpg firstname-lastname` so it matches the others (same framing, same grey backdrop) |
 | `data/reviews.json` | Google reviews shown on the site, word for word. Never edit the wording |
 | `public/assets/js/calculators.js` | All six calculators. Tax rates, APRA buffer and Queensland duty rates are at the top (`RULES`) and in the duty functions; update each financial year |
-| `tools/guides/` | The first home buyer guide. Edit the HTML, then `python3 tools/guides/render.py` to rebuild the PDF |
+| `tools/guides/` | The first home buyer guide (every state). Edit the HTML, then `python3 tools/guides/render.py` to rebuild the PDF. Grants, duty help and the $650,000 duty examples come from `data/stamp-duty.json` and the calculator script, so re-run it whenever those change |
 | `pages/partials/` | Shared sections: `cta.html` (closing "Talk it through" band), `talk.html` (side box on service pages) |
 | `build.py` | Wraps each page in the header, menu, breadcrumbs and footer; adds structured data; writes `public/`, `sitemap.xml` and `robots.txt`. The menu (`NAV`) is at the top. |
 | `public/` | Everything the site serves: built pages, CSS, JS, fonts, images, `_headers` |

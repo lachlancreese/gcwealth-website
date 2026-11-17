@@ -17,7 +17,7 @@ export function validPhone(raw) {
 }
 
 const TYPES = ["contact", "get-started", "newsletter", "health-check", "referral", "guide"];
-const GUIDE_PATH = "/assets/guides/gc-wealth-qld-first-home-buyer-guide.pdf";
+const GUIDE_PATH = "/assets/guides/gc-wealth-first-home-buyer-guide.pdf";
 
 export async function handleEnquiry(request, env) {
   const wantsJson = (request.headers.get("Accept") || "").includes("application/json");
@@ -152,14 +152,14 @@ export function autoReply(env, type, d) {
   let mail;
   if (type === "guide") {
     mail = customerEmail({
-      heading: `Your Queensland first home buyer guide`,
+      heading: `Your first home buyer guide`,
       paragraphs: [
         `Thanks${first ? ", " + first : ""}. Here's your guide: ${BRAND.site}${GUIDE_PATH}`,
-        "It covers the Queensland grant and stamp duty concessions, the 5% Deposit Scheme, the costs to plan for, and a checklist of documents lenders ask for. Government schemes change, so check the date on the guide.",
+        "It covers the grant and stamp duty help in every state and territory, the 5% Deposit Scheme, the costs to plan for, and a checklist of documents lenders ask for. Government schemes change, so check the date on the guide.",
       ],
       after: [`When you're ready to talk it through, reply to this email or call us on ${BRAND.phone}.`],
     });
-    return { ...customerSender(env), to: [d.email], subject: "Your Queensland first home buyer guide", html: mail.html, text: mail.text };
+    return { ...customerSender(env), to: [d.email], subject: "Your first home buyer guide", html: mail.html, text: mail.text };
   }
   if (type === "referral") {
     mail = customerEmail({
