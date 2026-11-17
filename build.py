@@ -35,10 +35,12 @@ B = json.loads((ROOT / "brand.json").read_text())
 RATES = json.loads((ROOT / "data" / "rates.json").read_text())
 TEAM_DATA = json.loads((ROOT / "data" / "team.json").read_text())
 TEAM = {p["slug"]: p for p in TEAM_DATA["people"]}
+BROKERS = {k: p for k, p in TEAM.items() if p.get("client_facing", True)}  # shown with contact details and Talk to buttons
+BEHIND = [p for p in TEAM.values() if not p.get("client_facing", True)]   # behind the scenes: no contact details
 NEEDS = TEAM_DATA.get("needs", [])
 for _need in NEEDS:
     for _slug in _need["people"]:
-        assert _slug in TEAM, f"team.json need '{_need['key']}' names unknown person '{_slug}'"
+        assert _slug in BROKERS, f"team.json need '{_need['key']}' names '{_slug}', who isn't a client-facing broker"
 REVIEWS = json.loads((ROOT / "data" / "reviews.json").read_text())
 SITE = B["site"]
 ORG_ID = SITE + "/#organization"
@@ -121,8 +123,9 @@ def fill(text):
     text = re.sub(r"<!--reviews:([\w-]+)-->", lambda m: reviews_html(m.group(1)), text)
     text = text.replace("<!--cash-rate-table-->", cash_rate_table())
     text = text.replace("<!--team-cards-->", team_cards())
+    text = text.replace("<!--team-behind-->", behind_cards())
     text = text.replace("<!--team-matcher-->", team_matcher())
-    text = text.replace("<!--broker-names-->", html.escape(json.dumps({k: v["name"] for k, v in TEAM.items()}, ensure_ascii=False)))
+    text = text.replace("<!--broker-names-->", html.escape(json.dumps({k: v["name"] for k, v in BROKERS.items()}, ensure_ascii=False)))
     text = text.replace("<!--featured-->", "".join(f"<li>{html.escape(n)}</li>" for n in B["featured_in"]))
     return re.sub(r"\{\{([\w.]+)\}\}", get, text)
 
@@ -150,9 +153,26 @@ def cash_rate_table():
             f"<tbody>{rows}</tbody></table>")
 
 
+def behind_cards():
+    """People who keep the business running but don't take client enquiries: no profile page, phone or email."""
+    cards = []
+    for p in BEHIND:
+        link = (f'\n        <a class="text-link" href="{html.escape(p["linkedin"])}" rel="noopener">{html.escape(p["name"].split()[0])} on LinkedIn</a>'
+                if p.get("linkedin") else "")
+        cards.append(f"""      <li class="behind-card">
+        <img src="/assets/img/{p['photo']}-4x5-480.webp" alt="{html.escape(p['name'])}" width="480" height="600" loading="lazy">
+        <div>
+          <span class="person-name">{html.escape(p['name'])}</span>
+          <span class="person-role">{html.escape(p['role'])}</span>
+          <p>{html.escape(p.get('summary', ''))}</p>{link}
+        </div>
+      </li>""")
+    return '<ul class="behind">\n' + "\n".join(cards) + "\n    </ul>"
+
+
 def team_cards():
     cards = []
-    for p in TEAM.values():
+    for p in BROKERS.values():
         cards.append(f"""      <li><a class="person-card" href="/team/{p['slug']}">
         <img src="/assets/img/{p['photo']}-4x5-480.webp" alt="{html.escape(p['name'])}" width="480" height="600" loading="lazy">
         <span class="person-name">{html.escape(p['name'])}</span>
@@ -257,6 +277,8 @@ def structured_data(meta, body, pages):
                     "email": B["email"],
                     "taxID": B["abn"],
                     "foundingDate": B["founded"],
+                    "founder": [{"@type": "Person", "name": f["name"], "jobTitle": f["role"], **({"sameAs": [f["linkedin"]]} if f.get("linkedin") else {})}
+                                for f in TEAM.values() if f.get("founder")],
                     "address": address_ld(),
                     "openingHours": B["hours_schema"],
                     "areaServed": {"@type": "Country", "name": "Australia"},

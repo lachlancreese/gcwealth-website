@@ -1,5 +1,5 @@
 {
-  "_note": "One entry per person shown on the site. Only confirmed facts. 'reviews' are keys from reviews.json that name this person.",
+  "_note": "One entry per person shown on the site. Only confirmed facts. 'reviews' are keys from reviews.json that name this person. 'client_facing': false keeps someone out of the broker list, matcher and Get started (shown under Behind the scenes, with no contact details). 'founder': true adds them to the business's founder details for search engines.",
   "people": [
     {
       "slug": "brooke-juracic",
@@ -25,7 +25,8 @@
       "reviews": [
         "sevy-z",
         "jaime-lee-a"
-      ]
+      ],
+      "founder": true
     },
     {
       "slug": "steven-shaw",
@@ -120,6 +121,25 @@
       ],
       "linkedin": "https://au.linkedin.com/in/matthew-klein-05a6531a5",
       "reviews": []
+    },
+    {
+      "slug": "lachlan-creese",
+      "name": "Lachlan Creese",
+      "role": "Co-founder and Director",
+      "client_facing": false,
+      "founder": true,
+      "photo": "lachlan-creese",
+      "summary": "Lachlan co-founded GC Wealth in 2024 and looks after the business side: strategy, financial discipline and the structures that let our brokers focus on their clients. He holds a Bachelor of Property from Bond University, previously worked as a CFO helping Gold Coast businesses scale, and has founded and led ventures across property and finance.",
+      "linkedin": "https://au.linkedin.com/in/lachlancreese"
+    },
+    {
+      "slug": "nikki-maidment",
+      "name": "Nikki Maidment",
+      "role": "Customer Support Specialist",
+      "client_facing": false,
+      "photo": "nikki-maidment",
+      "summary": "Nikki looks after customer support and GC Wealth's social media.",
+      "linkedin": ""
     }
   ],
   "_needs_note": "'needs' drives the 'Who should I talk to?' matcher on /team. 'people' are in order of fit; 'goal' must match a Get started option.",

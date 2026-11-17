@@ -426,6 +426,14 @@ mark.todo { background: #FFF1C2; color: #5C4400; padding: 0 4px; border-radius: 
 .btn.btn-small { min-height: 40px; padding: 8px 18px; font-size: 0.9375rem; }
 @media (max-width: 560px) { .matcher { padding: var(--s4) var(--s3); } .match-card { grid-template-columns: 72px minmax(0, 1fr); } .match-card img { width: 72px; height: 90px; } }
 
+/* Team: behind the scenes (no contact details) */
+.section-intro { max-width: 60ch; color: var(--muted); margin-top: calc(-1 * var(--s1)); }
+.behind { list-style: none; padding: 0; margin: var(--s4) 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--s4); }
+.behind-card { margin: 0; display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: var(--s3); align-items: start; }
+.behind-card img { width: 140px; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius-lg); }
+.behind-card p { margin: var(--s1) 0; }
+@media (max-width: 560px) { .behind-card { grid-template-columns: 100px minmax(0, 1fr); } .behind-card img { width: 100px; } }
+
 /* Team */
 .people { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--s4); }
 .people li { margin: 0; }
