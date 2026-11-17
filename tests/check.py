@@ -259,6 +259,14 @@ def run_checks():
             fail("security headers missing on /")
         if "noindex" not in (headers.get("X-Robots-Tag") or headers.get("x-robots-tag") or ""):
             fail("preview address (not gcwealth.com.au) isn't marked noindex")
+        # Link previews on the preview address must load the share image from the preview, not the old site.
+        import urllib.request as _ur
+        home_html = _ur.urlopen(BASE + "/").read().decode()
+        og = re.search(r'<meta property="og:image" content="([^"]+)"', home_html)
+        if not og or not og.group(1).startswith(BASE + "/assets/img/og-image.jpg"):
+            fail(f"preview og:image points at {og and og.group(1)}, expected this address")
+        elif status_of(og.group(1))[0] != 200:
+            fail("preview og:image doesn't load")
 
         print("Checking calculators")
         check_calculators(browser)

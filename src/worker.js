@@ -74,6 +74,18 @@ export default {
     // Preview addresses (e.g. *.workers.dev before the domain moves) stay out of search results.
     const out = new Response(res.body, res);
     out.headers.set("X-Robots-Tag", "noindex, nofollow");
+    // Link previews (Messages, WhatsApp, LinkedIn) fetch the share image from the address in the page,
+    // which is gcwealth.com.au. Until the domain moves, point it at the preview's own copy.
+    if ((out.headers.get("Content-Type") || "").includes("text/html")) {
+      const origin = new URL(request.url).origin;
+      const local = (el, attr) => {
+        const v = el.getAttribute(attr);
+        if (v && v.startsWith(`https://${HOST}/assets/`)) el.setAttribute(attr, origin + v.slice(`https://${HOST}`.length));
+      };
+      return new HTMLRewriter()
+        .on('meta[property="og:image"], meta[name="twitter:image"]', { element: (el) => local(el, "content") })
+        .transform(out);
+    }
     return out;
   },
 };
