@@ -11,14 +11,19 @@ export function esc(s) {
 export const validEmail = (s) => /^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/.test(s) && s.length <= 200;
 
 export async function sendEmail(env, payload) {
-  // RESEND_URL is only set when testing locally (tests/check.py points it at a stand-in server).
-  const res = await fetch(env.RESEND_URL || "https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) console.error("Resend", res.status, await res.text().catch(() => ""));
-  return res.ok;
+  try {
+    // RESEND_URL is only set when testing locally (tests/check.py points it at a stand-in server).
+    const res = await fetch(env.RESEND_URL || "https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) console.error("Resend", res.status, await res.text().catch(() => ""));
+    return res.ok;
+  } catch (err) {
+    console.error("Resend unreachable", err);
+    return false;
+  }
 }
 
 export const teamAddresses = (env) => String(env.TO_EMAIL).split(",").map((s) => s.trim()).filter(Boolean);

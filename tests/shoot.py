@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Quick screenshots while designing: python3 tests/shoot.py /path [/path ...]  (starts wrangler dev itself)."""
-import os, subprocess, sys, time, socket, pathlib
+import os, signal, subprocess, sys, time, socket, pathlib
 os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", "/opt/pw-browsers")
 from playwright.sync_api import sync_playwright
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PORT = 8798
-dev = subprocess.Popen(["npx", "wrangler", "dev", "--port", str(PORT), "--ip", "127.0.0.1"], cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+dev = subprocess.Popen(["npx", "wrangler", "dev", "--port", str(PORT), "--ip", "127.0.0.1"], cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
 try:
     for _ in range(120):
         with socket.socket() as s:
@@ -25,4 +25,4 @@ try:
             ctx.close()
         b.close()
 finally:
-    dev.terminate()
+    os.killpg(dev.pid, signal.SIGTERM)

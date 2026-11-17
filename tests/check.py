@@ -14,6 +14,7 @@ Screenshots go to tests/out/. Exit code 1 if anything fails.
 Needs: Python 3 with playwright, and `npm install` run once (for wrangler and axe-core).
 """
 import http.server
+import signal
 import json
 import os
 import pathlib
@@ -21,6 +22,7 @@ import re
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import urllib.error
@@ -83,12 +85,18 @@ def wait_for(port, seconds=60):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    with socket.socket() as s:
+        if s.connect_ex(("127.0.0.1", PORT)) == 0:
+            print(f"Port {PORT} is already in use (an old local server?). Stop it and run again.")
+            return 1
     mail = http.server.ThreadingHTTPServer(("127.0.0.1", MAIL_PORT), Mail)
     threading.Thread(target=mail.serve_forever, daemon=True).start()
+    os.environ["WRANGLER_SEND_METRICS"] = "false"
     dev = subprocess.Popen(
         ["npx", "wrangler", "dev", "--port", str(PORT), "--ip", "127.0.0.1",
-         "--var", "RESEND_API_KEY:test", "--var", f"RESEND_URL:http://127.0.0.1:{MAIL_PORT}/emails"],
-        cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+         "--var", "RESEND_API_KEY:test", "--var", f"RESEND_URL:http://127.0.0.1:{MAIL_PORT}/emails",
+         "--persist-to", tempfile.mkdtemp(prefix="gcw-check-")],  # fresh state, so the form limits start at zero
+        cwd=ROOT, stdout=open(OUT / "wrangler.log", "w"), stderr=subprocess.STDOUT, start_new_session=True)
     try:
         if not wait_for(PORT):
             print("Local server didn't start (is `npm install` done?)")
@@ -96,7 +104,8 @@ def main():
         time.sleep(1.5)
         run_checks()
     finally:
-        dev.terminate()
+        os.killpg(dev.pid, signal.SIGTERM)  # wrangler and the workerd process it starts
+        dev.wait(timeout=20)
         mail.shutdown()
     print()
     if failures:
@@ -225,7 +234,15 @@ def check_forms(browser):
         fail("get started: missing consent wasn't flagged")
     pg.check("#s-consent")
     pg.click("text=Send my enquiry")
-    pg.wait_for_url("**/thanks", timeout=15000)
+    try:
+        pg.wait_for_url("**/thanks", timeout=15000)
+    except Exception:
+        status = pg.locator(".step:not([hidden]) .form-status").all_inner_texts()
+        errors = pg.locator(".field-error").all_inner_texts()
+        pg.screenshot(path=str(OUT / "form-get-started-stuck.png"), full_page=True)
+        fail(f"get started: didn't reach /thanks (status {status}, errors {errors})")
+        ctx.close()
+        return
     pg.screenshot(path=str(OUT / "form-thanks-mobile.png"))
     if len(sent_mail) != 2:
         fail(f"get started: expected 2 emails (team + auto-reply), got {len(sent_mail)}")
