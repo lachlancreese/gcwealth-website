@@ -166,3 +166,22 @@ document.querySelectorAll("form[data-ajax]").forEach((form) => {
     if (opt) opt.selected = true;
   }
 })();
+
+// Team page: "Who should I talk to?" shows the brokers who focus on the chosen need.
+(() => {
+  const box = document.querySelector("[data-matcher]");
+  if (!box) return;
+  box.hidden = false;
+  const note = box.querySelector(".match-note");
+  box.addEventListener("change", (e) => {
+    if (e.target.name !== "need") return;
+    let shown;
+    box.querySelectorAll(".match").forEach((m) => { m.hidden = m.dataset.need !== e.target.value; if (!m.hidden) shown = m; });
+    note.hidden = false;
+    // On a phone the results can sit below the options; bring them into view.
+    if (shown && shown.getBoundingClientRect().top > window.innerHeight - 120) {
+      const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      shown.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" });
+    }
+  });
+})();

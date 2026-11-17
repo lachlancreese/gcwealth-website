@@ -254,6 +254,8 @@ def run_checks():
         check_calculators(browser)
         print("Checking forms")
         check_forms(browser)
+        print("Checking team matcher")
+        check_matcher(browser)
         browser.close()
 
 
@@ -299,6 +301,36 @@ def check_calculators(browser):
     pg.goto(BASE + href)
     if not pg.locator('input[name="goal"][value="Buy my first home"]').is_checked():
         fail("get started: goal from the calculator wasn't preselected")
+    ctx.close()
+
+
+def check_matcher(browser):
+    """'Who should I talk to?' on /team shows the right brokers and carries the choice into Get started."""
+    import json as _json
+    data = _json.loads((ROOT / "data" / "team.json").read_text())
+    names = {p["slug"]: p["name"] for p in data["people"]}
+    ctx = browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
+    pg = ctx.new_page()
+    pg.goto(BASE + "/team")
+    if not pg.locator("[data-matcher]").is_visible():
+        fail("team matcher: not shown")
+    for need in data["needs"]:
+        pg.locator("label.chip", has_text=need["label"]).click()
+        pg.wait_for_timeout(150)
+        shown = pg.locator(".match:not([hidden]) .match-card h3").all_inner_texts()
+        want = [names[s] for s in need["people"]]
+        if shown != want:
+            fail(f"team matcher '{need['label']}': shows {shown}, expected {want}")
+    # The last choice's first broker: their button pre-fills Get started with the broker and the goal.
+    need = next(n for n in data["needs"] if n.get("goal"))
+    pg.locator("label.chip", has_text=need["label"]).click()
+    pg.locator(".match:not([hidden]) .match-card .btn").first.click()
+    pg.wait_for_url("**/get-started**")
+    pg.wait_for_timeout(300)
+    if pg.locator('input[name="broker"]').input_value() != names[need["people"][0]]:
+        fail("team matcher: Talk to button didn't pass the broker to Get started")
+    if not pg.locator(f'input[name="goal"][value="{need["goal"]}"]').is_checked():
+        fail("team matcher: Talk to button didn't pre-select the goal on Get started")
     ctx.close()
 
 

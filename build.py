@@ -25,6 +25,7 @@ import html
 import json
 import pathlib
 import re
+import urllib.parse
 import subprocess
 
 ROOT = pathlib.Path(__file__).parent
@@ -32,7 +33,12 @@ PAGES = ROOT / "pages"
 OUT = ROOT / "public"
 B = json.loads((ROOT / "brand.json").read_text())
 RATES = json.loads((ROOT / "data" / "rates.json").read_text())
-TEAM = {p["slug"]: p for p in json.loads((ROOT / "data" / "team.json").read_text())["people"]}
+TEAM_DATA = json.loads((ROOT / "data" / "team.json").read_text())
+TEAM = {p["slug"]: p for p in TEAM_DATA["people"]}
+NEEDS = TEAM_DATA.get("needs", [])
+for _need in NEEDS:
+    for _slug in _need["people"]:
+        assert _slug in TEAM, f"team.json need '{_need['key']}' names unknown person '{_slug}'"
 REVIEWS = json.loads((ROOT / "data" / "reviews.json").read_text())
 SITE = B["site"]
 ORG_ID = SITE + "/#organization"
@@ -115,6 +121,7 @@ def fill(text):
     text = re.sub(r"<!--reviews:([\w-]+)-->", lambda m: reviews_html(m.group(1)), text)
     text = text.replace("<!--cash-rate-table-->", cash_rate_table())
     text = text.replace("<!--team-cards-->", team_cards())
+    text = text.replace("<!--team-matcher-->", team_matcher())
     text = text.replace("<!--broker-names-->", html.escape(json.dumps({k: v["name"] for k, v in TEAM.items()}, ensure_ascii=False)))
     text = text.replace("<!--featured-->", "".join(f"<li>{html.escape(n)}</li>" for n in B["featured_in"]))
     return re.sub(r"\{\{([\w.]+)\}\}", get, text)
@@ -152,6 +159,49 @@ def team_cards():
         <span class="person-role">{html.escape(p['role'])}</span>
       </a></li>""")
     return '<ul class="people">\n' + "\n".join(cards) + "\n    </ul>"
+
+
+def team_matcher():
+    """'Who should I talk to?': pick what you're working on, see the brokers who focus on it.
+    Hidden until the script runs; without it, visitors still have the broker cards below."""
+    esc = html.escape
+    chips = "\n".join(
+        f'        <label class="chip"><input type="radio" name="need" value="{esc(n["key"])}"><span>{esc(n["label"])}</span></label>'
+        for n in NEEDS)
+    groups = []
+    for n in NEEDS:
+        cards = []
+        for slug in n["people"]:
+            p = TEAM[slug]
+            first = esc(p["name"].split()[0])
+            q = f"broker={slug}" + (f"&amp;goal={urllib.parse.quote(n['goal'])}" if n.get("goal") else "")
+            cards.append(f"""          <li class="match-card">
+            <img src="/assets/img/{p['photo']}-4x5-480.webp" alt="" width="96" height="120" loading="lazy">
+            <div>
+              <h3><a href="/team/{slug}">{esc(p['name'])}</a></h3>
+              <p class="person-role">{esc(p['role'])}</p>
+              <p>{esc(p.get('summary', ''))}</p>
+              <div class="btn-row"><a class="btn btn-small" href="/get-started?{q}">Talk to {first}</a><a class="text-link" href="/team/{slug}">View profile</a></div>
+            </div>
+          </li>""")
+        groups.append(f"""      <div class="match" data-need="{esc(n['key'])}" hidden>
+        <h3 class="visually-hidden">Brokers for {esc(n['label'].lower())}</h3>
+        <ul class="match-list">
+{chr(10).join(cards)}
+        </ul>
+      </div>""")
+    return f"""<section class="matcher" data-matcher hidden aria-labelledby="matcher-heading">
+      <h2 id="matcher-heading">Who should I talk to?</h2>
+      <p>Choose what you're working on and we'll point you to the brokers who focus on it.</p>
+      <fieldset class="chips">
+        <legend class="visually-hidden">What are you working on?</legend>
+{chips}
+      </fieldset>
+      <div class="match-results" aria-live="polite">
+{chr(10).join(groups)}
+      </div>
+      <p class="match-note" hidden>Every GC Wealth broker can help with most loans. Not sure? <a href="/get-started">Get started</a> and we'll match you with the right person.</p>
+    </section>"""
 
 
 def nice_date(iso):

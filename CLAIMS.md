@@ -16,6 +16,7 @@ where it appears, and the evidence. Update this file whenever a claim changes, a
 | First conversation is complimentary, no obligation | Home, CTAs, Get started | Previous site ("complimentary loan health check", "obligation free discussion"); confirmed practice | 17 Nov 2026 |
 | We check in / review loans after settlement | Home, Refinancing | Previous site ("monitor clients' finance after settlement") | 17 Nov 2026 |
 | Some SMSF or commercial applications may involve a fee, disclosed upfront | Home FAQ, SMSF | Previous site FAQ | 17 Nov 2026 |
+| Since 10 August 2026 new SMSF LRBAs are limited to business real property; pre-10 August LRBAs and contracts are grandfathered and can be refinanced | /smsf-loans, Home | ATO "Changes to limited recourse borrowing arrangements"; Treasury Laws Amendment (Tax Reform No. 1) Act 2026 | 17 Nov 2026 |
 | QLD First Home Owner Grant $30,000 for new homes under $750,000; continues for contracts from 1 July 2026 | First home buyers | qld.gov.au first home owner grant page | Nov 2026 |
 | Full transfer duty concession for first home buyers of new homes or vacant land since 1 May 2025; citizenship/residency rule | First home buyers | qld.gov.au and Queensland Revenue Office | Nov 2026 |
 | 5% Deposit Scheme: no income limits or caps on places since 1 Oct 2025; price caps apply; Gold Coast is a regional centre | First home buyers | Housing Australia | Nov 2026 |

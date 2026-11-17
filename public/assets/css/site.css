@@ -409,6 +409,23 @@ mark.todo { background: #FFF1C2; color: #5C4400; padding: 0 4px; border-radius: 
 .reviews-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s3); margin-bottom: var(--s5); }
 .reviews-head h2 { margin: 0; }
 
+/* Team: who should I talk to? */
+.matcher { background: var(--mist); border-radius: var(--radius-lg); padding: var(--s6); }
+.matcher h2 { margin-top: 0; }
+.matcher fieldset { border: 0; padding: 0; margin: var(--s3) 0 0; }
+.match-results:empty { display: none; }
+.match-list { list-style: none; padding: 0; margin: var(--s4) 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--s3); }
+.match-card { margin: 0; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: var(--s3); align-items: start; background: #fff; border-radius: var(--radius-lg); padding: var(--s3); }
+.match-card img { width: 96px; height: 120px; object-fit: cover; border-radius: var(--radius); }
+.match-card h3 { margin: 0; font-size: var(--step-1); }
+.match-card h3 a { color: var(--navy); text-decoration: none; }
+.match-card h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.match-card p { margin: 4px 0 0; }
+.match-card .btn-row { margin-top: var(--s2); align-items: center; }
+.match-note { margin: var(--s3) 0 0; color: var(--muted); }
+.btn.btn-small { min-height: 40px; padding: 8px 18px; font-size: 0.9375rem; }
+@media (max-width: 560px) { .matcher { padding: var(--s4) var(--s3); } .match-card { grid-template-columns: 72px minmax(0, 1fr); } .match-card img { width: 72px; height: 90px; } }
+
 /* Team */
 .people { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--s4); }
 .people li { margin: 0; }

@@ -121,5 +121,88 @@
       "linkedin": "https://au.linkedin.com/in/matthew-klein-05a6531a5",
       "reviews": []
     }
+  ],
+  "_needs_note": "'needs' drives the 'Who should I talk to?' matcher on /team. 'people' are in order of fit; 'goal' must match a Get started option.",
+  "needs": [
+    {
+      "key": "first-home",
+      "label": "Buying my first home",
+      "goal": "Buy my first home",
+      "people": [
+        "kirisome-auvaa",
+        "brooke-juracic"
+      ]
+    },
+    {
+      "key": "refinance",
+      "label": "Refinancing or reviewing my loan",
+      "goal": "Refinance",
+      "people": [
+        "kirisome-auvaa",
+        "steven-shaw"
+      ]
+    },
+    {
+      "key": "investing",
+      "label": "Investing in property",
+      "goal": "Buy an investment property",
+      "people": [
+        "steven-shaw",
+        "kirisome-auvaa"
+      ]
+    },
+    {
+      "key": "self-employed",
+      "label": "A home loan while self-employed",
+      "goal": "",
+      "people": [
+        "steven-shaw",
+        "kim-edwards"
+      ]
+    },
+    {
+      "key": "business",
+      "label": "A business loan or cashflow",
+      "goal": "Commercial or business finance",
+      "people": [
+        "kim-edwards",
+        "matthew-klein"
+      ]
+    },
+    {
+      "key": "commercial",
+      "label": "Commercial property",
+      "goal": "Commercial or business finance",
+      "people": [
+        "brooke-juracic",
+        "kim-edwards"
+      ]
+    },
+    {
+      "key": "equipment",
+      "label": "Equipment, vehicles or machinery",
+      "goal": "Vehicle or equipment finance",
+      "people": [
+        "matthew-klein"
+      ]
+    },
+    {
+      "key": "smsf",
+      "label": "Business premises through my SMSF",
+      "goal": "Borrow through my SMSF",
+      "people": [
+        "steven-shaw",
+        "brooke-juracic"
+      ]
+    },
+    {
+      "key": "portfolio",
+      "label": "A larger or more complex portfolio",
+      "goal": "",
+      "people": [
+        "brooke-juracic",
+        "steven-shaw"
+      ]
+    }
   ]
 }
