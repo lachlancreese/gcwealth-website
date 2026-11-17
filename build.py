@@ -337,8 +337,8 @@ def footer(show_bar):
     </div>
     <div class="footer-legal">
       <p><strong>{html.escape(B['name'])}</strong> is a trading name of {html.escape(B['legal_name'])} (ABN {B['abn']}). {B['licence']['line']}</p>
-      <p>The information on this website is general in nature and does not take into account your objectives, financial situation or needs. It is not legal, tax or financial product advice. All loans are subject to the lender's credit assessment and approval; terms, conditions, fees and charges apply.</p>
-      <p class="footer-links"><a href="/privacy">Privacy policy</a> <a href="/credit-guide">Credit guide</a> <a href="/complaints">Complaints</a> {social}</p>
+      <p>{DISCLAIMER_TEXT}</p>
+      <p class="footer-links"><a href="/privacy">Privacy policy</a> <a href="/credit-guide">Credit guide</a> <a href="/compliments-and-concerns">Compliments and concerns</a> {social}</p>
       <p>© <span class="year">2026</span> {html.escape(B['legal_name'])}. Offices in {a['locality']} {a['region']} and {B['second_office']}.</p>
     </div>
   </div>
@@ -349,6 +349,12 @@ def footer(show_bar):
 </html>
 """
 
+
+DISCLAIMER_TEXT = ("This page provides general information only and has been prepared without taking into account your objectives, "
+                   "financial situation or needs. We recommend that you consider whether it is appropriate for your circumstances and your "
+                   "full financial situation will need to be reviewed prior to acceptance of any offer or product. It does not constitute "
+                   "legal, tax or financial advice and you should always seek professional advice in relation to your individual "
+                   "circumstances. Subject to lenders' terms and conditions, fees and charges and eligibility criteria apply.")
 
 DISCLAIMER = """
 <aside class="note wrap-narrow" aria-label="General information">

@@ -38,6 +38,18 @@ os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", "/opt/pw-browsers")
 from playwright.sync_api import sync_playwright  # noqa: E402
 
 failures = []
+
+# Words and phrases Connective and ASIC flag in credit advertising. "best" is only allowed as "best interests".
+FLAGGED = [
+    (r"\bfree\b(?! call)", "free (use 'complimentary')"),
+    (r"(?<!our )\bbest\b(?! interests)", "best (only allowed as 'best interests')"),
+    (r"\bgreat\b", "great"),
+    (r"\bguaranteed\b(?! amount)", "guaranteed"),
+    (r"\bindependent\b(?! (party|legal advice))", "independent"),
+    (r"save you", "save you ..."),
+    (r"massive savings|substantial amounts|lowest rate|expert advice|no-brainer", "claim Connective lists as misleading"),
+    (r"\bTODO\b|<mark class=\"todo\"", "unconfirmed draft text"),
+]
 sent_mail = []
 
 
@@ -118,7 +130,7 @@ def main():
 def page_list():
     sitemap = (ROOT / "public" / "sitemap.xml").read_text()
     paths = [re.sub(r"^https?://[^/]+", "", u) or "/" for u in re.findall(r"<loc>(.*?)</loc>", sitemap)]
-    hidden = ["/thanks", "/privacy", "/credit-guide", "/complaints"]
+    hidden = ["/thanks", "/privacy", "/credit-guide"]
     return paths + [p for p in hidden if p not in paths]
 
 
@@ -167,6 +179,18 @@ def run_checks():
                     fail(f"{label}: scrolls sideways by {info['overflow']}px")
                 for src in info["brokenImgs"]:
                     fail(f"{label}: image didn't load {src}")
+                if device == "desktop":
+                    text = pg.evaluate("document.body.innerText")
+                    marked = pg.evaluate("document.querySelectorAll('mark.todo').length")
+                    indexed = pg.evaluate("!(document.querySelector('meta[name=robots]')||{}).content?.includes('noindex')")
+                    for pattern, label in FLAGGED:
+                        if label == "unconfirmed draft text":
+                            if marked and indexed:
+                                fail(f"{label}: {path} has {marked} item(s) still to confirm")
+                            continue
+                        for m in re.finditer(pattern, text, re.I):
+                            snippet = text[max(0, m.start() - 40):m.end() + 40].replace("\n", " ")
+                            fail(f"wording: {label} on {path}: ...{snippet}...")
                 for t in info["leftover"]:
                     fail(f"{label}: unfilled placeholder {t}")
                 for href in info["links"]:
@@ -191,7 +215,7 @@ def run_checks():
         print("Checking redirects from old addresses")
         for old, new in [("/contact-us/", "/contact"), ("/about/", "/about"), ("/refinancing/", "/home-loans/refinancing"),
                          ("/construction-lending-qld/", "/home-loans/construction-loans"), ("/smsf-refinancing/", "/smsf-loans"),
-                         ("/why-gold-coast-wealth/", "/about"), ("/tag/smsf/", "/"), ("/privacy-policy/", "/privacy"),
+                         ("/why-gold-coast-wealth/", "/about"), ("/tag/smsf/", "/"), ("/privacy-policy/", "/privacy"), ("/complaints-handling-process/", "/compliments-and-concerns"),
                          ("/get-started/", "/get-started"), ("/home-loans.html", "/home-loans")]:
             code, loc, _ = status_of(BASE + old, follow=False)
             loc = re.sub(r"^https?://[^/]+", "", loc or "")
@@ -250,7 +274,7 @@ def check_forms(browser):
         team, auto = sent_mail
         if "Refinance" not in team["html"] or "0412 345 678" not in team["html"] or team.get("reply_to") != "test@example.com":
             fail("get started: team email is missing details")
-        if auto["to"] != ["test@example.com"] or "Credit Representative" not in auto["text"]:
+        if auto["to"] != ["test@example.com"] or "Credit Representative" not in auto["text"] or "Privacy notice" not in auto["text"]:
             fail("get started: auto-reply is wrong")
         (OUT / "email-auto-reply.html").write_text(auto["html"])
         (OUT / "email-team.html").write_text(team["html"])

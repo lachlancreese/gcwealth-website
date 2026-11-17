@@ -47,6 +47,18 @@ export async function overLimit(bucket, key, max, seconds) {
   return false;
 }
 
+// Small print on every email to the public, from Connective's "Advertising requirements" (email signature section).
+const FOOTER = [
+  `${brand.name} is a trading name of ${brand.legal_name} (ABN ${brand.abn}). ${brand.licence.line}`,
+  "Your full financial situation will need to be reviewed prior to acceptance of any offer or product.",
+  "Privacy notice: We collect and use your information to assist with your credit needs, including loan applications and marketing " +
+    "communications (you may opt out at any time). Your information may be shared with our credit licensee (Connective Credit Services " +
+    "Pty Ltd ABN 51 143 651 496), your chosen lenders, and relevant service providers. We do not sell or rent your data. For details on " +
+    `accessing or correcting your information or making a complaint, contact us or visit ${brand.site}/privacy.`,
+  "We will never ask you to transfer money or make payments via email. If you receive such a request, do not respond and contact us " +
+    "directly. Learn more at www.scamwatch.gov.au.",
+];
+
 // The customer email layout: a heading, short paragraphs, the team sign-off and the licence line. All text is escaped.
 export function customerEmail({ heading, paragraphs, after = [] }) {
   const c = brand.colours;
@@ -60,11 +72,12 @@ export function customerEmail({ heading, paragraphs, after = [] }) {
 ${paragraphs.map(p).join("\n")}
 ${after.map(p).join("\n")}
 <p style="margin:24px 0 24px;font:16px/1.5 Arial,Helvetica,sans-serif;color:${c.ink}">The ${esc(brand.name)} team<br><span style="color:#5B6B72;font-size:14px"><a href="tel:${brand.phone_tel}" style="color:#5B6B72">${esc(brand.phone)}</a> · <a href="${brand.site}" style="color:#5B6B72">${esc(brand.site.replace("https://", ""))}</a></span></p>
-<p style="margin:0 0 28px;font:12px/1.5 Arial,Helvetica,sans-serif;color:#5B6B72">${esc(brand.name)} is a trading name of ${esc(brand.legal_name)} (ABN ${esc(brand.abn)}). ${esc(brand.licence.line)}</p>
+${FOOTER.map((t) => `<p style="margin:0 0 10px;font:11px/1.5 Arial,Helvetica,sans-serif;color:#5B6B72">${esc(t)}</p>`).join("\n")}
+<div style="height:18px"></div>
 </td></tr></table>
 </td></tr></table></body></html>`;
   const text = [heading, "", ...paragraphs, ...(after.length ? ["", ...after] : []), "", `The ${brand.name} team`, `${brand.phone} · ${brand.site}`, "",
-    `${brand.name} is a trading name of ${brand.legal_name} (ABN ${brand.abn}). ${brand.licence.line}`].join("\n");
+    ...FOOTER].join("\n");
   return { html, text };
 }
 

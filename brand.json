@@ -11,8 +11,8 @@
   "phone": "0422 740 697",
   "phone_tel": "+61422740697",
   "email": "admin@gcwealth.com.au",
-  "hours_text": "Monday to Friday, 8am to 6pm",
-  "hours_schema": ["Mo-Fr 08:00-18:00"],
+  "hours_text": "Monday to Friday, 8am to 5pm (Queensland time)",
+  "hours_schema": ["Mo-Fr 08:00-17:00"],
 
   "address": {
     "street": "16 Nexus Way",

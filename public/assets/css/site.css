@@ -394,3 +394,6 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .faq-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--s8); align-items: start; }
 @media (max-width: 900px) { .faq-wrap { grid-template-columns: 1fr; gap: var(--s3); } }
 @media (max-width: 560px) { .hero-media { margin-right: calc(-1 * var(--s2)); } }
+.split img.portrait { aspect-ratio: 4 / 5; object-fit: cover; max-width: 480px; justify-self: end; width: 100%; }
+@media (max-width: 900px) { .split img.portrait { justify-self: start; } }
+mark.todo { background: #FFF1C2; color: #5C4400; padding: 0 4px; border-radius: 3px; }

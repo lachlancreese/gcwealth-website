@@ -39,7 +39,23 @@ Then search `pages/` for the old name in any headings you've written by hand.
 - Service pages set `disclaimer: yes` to add the general-information note.
 - Only publish facts that are confirmed. No "lowest rate", "guaranteed approval" or similar claims (ASIC RG 234).
 - Government scheme details on the first home buyers page were checked against official sources in November 2026. Recheck after each state and federal budget.
-- `/privacy`, `/credit-guide` and `/complaints` are drafts (not indexed) until the final text is added in phase 2.
+- `/privacy` (Connective template, items to confirm highlighted) and `/credit-guide` are drafts, kept out of search until confirmed.
+  `/compliments-and-concerns` follows Connective's template and is live.
+- `CLAIMS.md` lists every factual claim on the site and its evidence (RG 234 expects records). Update it when claims change.
+- `npm test` fails on wording Connective and ASIC flag (free, best other than "best interests", guaranteed, save you thousands …)
+  and on any highlighted draft text left on a page that search engines can see.
+- Emails to the public carry the licence line, Connective's short privacy notice and the scam warning (`src/mail.js`).
+
+### Before launch
+
+1. **Connective approval:** send the preview link to compliance@connective.com.au. Connective requires approval before any
+   advertising is published, websites included.
+2. **Credit Representative number:** Connective's guide says a site advertising under the company should show the *corporate*
+   Credit Representative number. The footer currently shows 491220; confirm the right number with Connective.
+3. **Privacy policy:** fill the highlighted items (where information is held, security measures, Privacy Officer, access charges,
+   automated decisions; the last is required from 10 December 2026), then set `index: yes`.
+4. **Credit guide:** add the current Credit Guide (PDF or page).
+5. **Lender names:** keep only lenders GCW brokers are accredited with.
 
 ## Checks before every push
 

@@ -83,7 +83,7 @@ export async function handleEnquiry(request, env) {
       ...detailsTable("Get started enquiry", [
         ["Looking to", d.goal], ["Timeframe", d.timeframe], ["Rough loan amount", d.amount], ["Situation", d.situation],
         ["Name", d.name], ["Email", d.email], ["Phone", d.phone], ["Postcode", d.postcode],
-        ["Prefers", d.contact_by], ["Best time", d.best_time], ["Message", d.message], ["Agreed to be contacted", "Yes"],
+        ["Prefers", d.contact_by], ["Preferred time", d.best_time], ["Message", d.message], ["Agreed to be contacted", "Yes"],
       ]),
     };
   } else {
