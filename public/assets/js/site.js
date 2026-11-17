@@ -185,3 +185,27 @@ document.querySelectorAll("form[data-ajax]").forEach((form) => {
     }
   });
 })();
+
+// Homepage skyline: on a desktop, the layers shift at different depths as the cursor moves.
+(() => {
+  const hero = document.querySelector(".hero");
+  const layers = hero ? [...hero.querySelectorAll(".coast .layer")] : [];
+  if (!layers.length) return;
+  if (!window.matchMedia("(pointer: fine)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let frame = 0, mx = 0, my = 0;
+  const apply = () => {
+    frame = 0;
+    layers.forEach((el) => {
+      const d = parseFloat(el.dataset.depth) || 0;
+      // Towers only move sideways so they stay on the waterline; the sky drifts a little up and down too.
+      el.style.transform = `translate(${(-mx * d * 14).toFixed(2)}px, ${d < 0.5 ? (-my * 6 * (1 - d)).toFixed(2) : 0}px)`;
+    });
+  };
+  hero.addEventListener("pointermove", (e) => {
+    const r = hero.getBoundingClientRect();
+    mx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    my = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    if (!frame) frame = requestAnimationFrame(apply);
+  });
+  hero.addEventListener("pointerleave", () => { mx = 0; my = 0; if (!frame) frame = requestAnimationFrame(apply); });
+})();

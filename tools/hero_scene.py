@@ -68,6 +68,7 @@ def main():
 </defs>""")
     a(f'<rect width="{W}" height="{WATER}" fill="url(#c-sky)"/>')
     sx, sy, sr = SUN
+    a('<g class="layer" data-depth=".2">')
     a(f'<g class="sun-group"><circle class="glow" cx="{sx}" cy="{sy}" r="300" fill="url(#c-glow)"/>'
       f'<circle class="sun" cx="{sx}" cy="{sy}" r="{sr}" fill="url(#c-sun)"/></g>')
 
@@ -75,10 +76,11 @@ def main():
     a('<g class="birds" fill="none" stroke="#0E3242" stroke-width="1.6" stroke-linecap="round" opacity=".55">'
       '<path d="M452 196 q6 -6 12 0 q6 -6 12 0"/><path d="M488 214 q4 -4 8 0 q4 -4 8 0"/></g>')
 
+    a('</g>')
     # Hinterland hills, soft behind the towers.
     hill = "M0 " + f(HORIZON - 26) + " " + " ".join(
         f"L{x} {f(HORIZON - 26 - 14 * math.sin(x / 95) - 8 * math.sin(x / 37 + 1))}" for x in range(0, W + 1, 20)) + f" L{W} {HORIZON} L0 {HORIZON} Z"
-    a(f'<path d="{hill}" fill="#3D7895" opacity=".55"/>')
+    a(f'<g class="layer" data-depth=".35"><path d="{hill}" fill="#3D7895" opacity=".55"/></g>')
 
     # Lower towers in the haze behind the beachfront.
     back = []
@@ -91,7 +93,7 @@ def main():
     # Broadbeach in the distance, far left: Oracle's two rounded towers.
     back.append(f'<path d="M4 {HORIZON} V{HORIZON - 96} Q16 {HORIZON - 116} 28 {HORIZON - 96} V{HORIZON} Z"/>')
     back.append(f'<path d="M30 {HORIZON} V{HORIZON - 78} Q40 {HORIZON - 94} 50 {HORIZON - 78} V{HORIZON} Z"/>')
-    a(f'<g fill="#2A5D75" opacity=".7">{"".join(back)}</g>')
+    a(f'<g class="layer" data-depth=".6"><g fill="#2A5D75" opacity=".7">{"".join(back)}</g></g>')
 
     # Beachfront towers, with lit windows.
     towers, lights = [], []
@@ -149,8 +151,8 @@ def main():
                     style = f"--d:{delay:.2f}s" + (f";--t:{rnd.uniform(3.5, 8):.1f}s" if twinkle else "")
                     lights.append(f'<rect class="{cls}" style="{style}" x="{wx}" y="{wy}" width="3" height="4"'
                                   f'{"" if warm else " fill=\"#DCEBF2\""}/>')
-    a(f'<g fill="url(#c-tower)">{"".join(towers)}</g>')
-    a(f'<g fill="#F7D9A2">{"".join(lights)}</g>')
+    a(f'<g class="layer" data-depth="1"><g fill="url(#c-tower)">{"".join(towers)}</g>')
+    a(f'<g fill="#F7D9A2">{"".join(lights)}</g></g>')
 
     # Beach, then the ocean with the sun's reflection and moving swell.
     a(f'<rect y="{HORIZON}" width="{W}" height="{WATER - HORIZON}" fill="#173E50"/>')
