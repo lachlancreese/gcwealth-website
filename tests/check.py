@@ -268,6 +268,10 @@ def run_checks():
         check_matcher(browser)
         print("Checking broker contact panels")
         check_contact(browser)
+        print("Checking header menus")
+        check_menus(browser)
+        print("Checking first home buyer help by state")
+        check_first_home(browser)
         browser.close()
 
 
@@ -381,7 +385,7 @@ def check_contact(browser):
     desk = browser.new_context(viewport={"width": 1440, "height": 900})
     for p in people:
         first = p["name"].split()[0]
-        own = bool(p.get("phone_tel") and p.get("email"))
+        own = bool(p.get("phone_tel"))
         pg = phone.new_page()
         pg.goto(BASE + f"/team/{p['slug']}")
         box = pg.locator("[data-contact]")
@@ -392,7 +396,7 @@ def check_contact(browser):
         if tel != "tel:" + (p["phone_tel"] if own else brand["phone_tel"]):
             fail(f"{p['slug']}: Call goes to {tel}")
         mail = box.locator("[data-mail]")
-        if not mail.get_attribute("href").startswith("mailto:" + (p["email"] if own else brand["email"]) + "?"):
+        if not mail.get_attribute("href").startswith("mailto:" + (p.get("email") or brand["email"]) + "?"):
             fail(f"{p['slug']}: Email goes to the wrong address")
         sms = box.locator("[data-sms]")
         if own != (sms.count() == 1 and sms.is_visible()):
@@ -428,6 +432,68 @@ def check_contact(browser):
         want = [names[s] for s in needs[m.group(1)]["people"]]
         if shown != want:
             fail(f"{built.relative_to(ROOT)}: lists {shown} as focusing on this, expected {want}")
+
+
+def check_menus(browser):
+    """Desktop dropdowns: a mouse that drifts on the way down, or cuts across the next heading, still reaches the link."""
+    ctx = browser.new_context(viewport={"width": 1440, "height": 900})
+    pg = ctx.new_page()
+    pg.goto(BASE + "/")
+    menus = pg.locator(".has-sub")
+    first, second = menus.nth(0), menus.nth(1)
+    top = first.locator(":scope > a").bounding_box()
+    pg.mouse.move(top["x"] + top["width"] / 2, top["y"] + top["height"] / 2)
+    pg.wait_for_timeout(100)
+    if not first.locator(".sub").is_visible():
+        fail("header menu: doesn't open on hover")
+    # Down through the gap under the heading, briefly outside the menu, then onto the last link.
+    last = first.locator(".sub a").last
+    box = last.bounding_box()
+    pg.mouse.move(top["x"] + top["width"] + 30, top["y"] + top["height"] + 6, steps=4)
+    pg.mouse.move(box["x"] + 20, box["y"] + box["height"] / 2, steps=8)
+    if not last.is_visible():
+        fail("header menu: closed while moving down to a link")
+    # Cutting across the next heading on the way back shouldn't swap menus.
+    nxt = second.locator(":scope > a").bounding_box()
+    pg.mouse.move(nxt["x"] + 10, nxt["y"] + nxt["height"] / 2, steps=3)
+    pg.mouse.move(box["x"] + 20, box["y"] + box["height"] / 2, steps=3)
+    pg.wait_for_timeout(50)
+    if not last.is_visible() or second.locator(".sub").is_visible():
+        fail("header menu: cutting across the next heading swapped the menus")
+    href = last.get_attribute("href")
+    last.click()
+    pg.wait_for_url("**" + href)
+    # Leaving the menu closes it after a moment.
+    pg.goto(BASE + "/")
+    pg.mouse.move(top["x"] + top["width"] / 2, top["y"] + top["height"] / 2)
+    pg.mouse.move(700, 600, steps=3)
+    pg.wait_for_timeout(600)
+    if first.locator(".sub").is_visible():
+        fail("header menu: stays open after the mouse leaves")
+    ctx.close()
+
+
+def check_first_home(browser):
+    """Every state shows a grant and duty summary, and the chips switch between them."""
+    import json as _json
+    duty = _json.loads((ROOT / "data" / "stamp-duty.json").read_text())
+    ctx = browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
+    pg = ctx.new_page()
+    pg.goto(BASE + "/home-loans/first-home-buyers")
+    box = pg.locator("[data-fhb]")
+    for code in duty["order"]:
+        st = duty["states"][code]
+        box.locator("label.chip", has_text=st["short"]).click()
+        shown = box.locator(".fhb-state:not([hidden])")
+        if shown.count() != 1 or shown.get_attribute("data-state") != code:
+            fail(f"first home help: choosing {code} doesn't show {code}")
+            continue
+        text = shown.inner_text()
+        if st["fhog"]["short"] not in text or st["fhb_short"] not in text:
+            fail(f"first home help: {code} is missing its grant or duty summary")
+        if shown.locator(f'a[href="/calculators/stamp-duty/{st["slug"]}"]').count() != 1:
+            fail(f"first home help: {code} doesn't link to its stamp duty calculator")
+    ctx.close()
 
 
 def check_forms(browser):

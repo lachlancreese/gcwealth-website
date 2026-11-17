@@ -97,7 +97,16 @@ strong { font-weight: 600; color: var(--ink); }
 .sub li { margin: 0; }
 .sub a { display: block; padding: 10px 12px; }
 .has-sub.open .sub { display: block; }
-@media (hover: hover) and (min-width: 1081px) { .has-sub:hover .sub, .has-sub:focus-within .sub { display: block; } }
+/* Desktop: site.js opens menus on hover with a short grace period, so a slightly off-line mouse doesn't
+   close them. The invisible strip above each menu covers the gap under its heading. */
+@media (min-width: 1081px) {
+  .sub::before { content: ""; position: absolute; left: -8px; right: -8px; top: -16px; height: 16px; }
+  .has-sub.open .sub { animation: sub-in .14s ease-out; }
+  .has-sub:has(:focus-visible) .sub { display: block; }
+  html:not(.js) .has-sub:hover .sub { display: block; }
+}
+@keyframes sub-in { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .has-sub.open .sub { animation: none; } }
 .nav-phone { display: inline-flex; align-items: center; gap: 8px; color: var(--navy); text-decoration: none; font-weight: 600; white-space: nowrap; }
 .nav-menu-extra { display: none !important; }
 .menu-btn { display: none; align-items: center; gap: 8px; background: none; border: 1px solid var(--line-strong); border-radius: 999px; padding: 10px 16px; font: 600 1rem inherit; font-family: inherit; color: var(--navy); cursor: pointer; min-height: 44px; }
@@ -473,6 +482,23 @@ mark.todo { background: #FFF1C2; color: #5C4400; padding: 0 4px; border-radius: 
 .brokers-for h2 { margin-top: 0; }
 .brokers-for .wrap > p { color: var(--muted); max-width: 60ch; }
 @media (max-width: 560px) { .page-hero .btn-row .btn, .hero .btn-row .btn, .contact-actions .btn { flex: 1 1 auto; } }
+
+/* First home buyers: help by state */
+.fhb-states { margin: var(--s3) 0 var(--s4); }
+.fhb-picker { display: none; border: 0; padding: 0; margin: 0 0 var(--s2); }
+.fhb-states.is-picking .fhb-picker { display: flex; }
+.fhb-picker legend { font-weight: 600; color: var(--navy); margin-bottom: var(--s1); padding: 0; width: 100%; }
+.fhb-picker .chip span { min-height: 40px; padding: 8px 16px; }
+.fhb-state { border: 1px solid var(--line); border-radius: var(--radius-lg); padding: var(--s3); margin-top: var(--s2); background: #fff; }
+.fhb-state h3 { margin: 0 0 var(--s2); }
+.fhb-facts { margin: 0; display: grid; gap: var(--s2); }
+.fhb-facts > div { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: var(--s2); padding-top: var(--s2); border-top: 1px solid var(--line); }
+.fhb-facts dt { font-weight: 600; color: var(--navy); }
+.fhb-facts dd { margin: 0; }
+.fhb-facts dd b { display: block; color: var(--navy); font-size: var(--step-1); }
+.fhb-facts dd p { margin: 4px 0 0; }
+.fhb-links { margin: var(--s3) 0 0; display: grid; gap: 6px; }
+@media (max-width: 640px) { .fhb-facts > div { grid-template-columns: 1fr; gap: 4px; } }
 
 /* Team: who should I talk to? */
 .matcher { background: var(--mist); border-radius: var(--radius-lg); padding: var(--s6); }

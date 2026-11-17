@@ -22,6 +22,28 @@ document.documentElement.classList.add("js");
       b.setAttribute("aria-expanded", String(open));
     });
   });
+  // Desktop hover menus. Opening is instant; closing waits a moment, and moving across to the next
+  // heading waits a beat too, so cutting a corner on the way down to a link doesn't swap or shut the menu.
+  const desk = matchMedia("(hover: hover) and (min-width: 1081px)");
+  const subs = [...document.querySelectorAll(".has-sub")];
+  const setOpen = (li, open) => { li.classList.toggle("open", open); li.querySelector(".sub-btn").setAttribute("aria-expanded", String(open)); };
+  let closeT, switchT;
+  subs.forEach((li) => {
+    li.addEventListener("pointerenter", (e) => {
+      if (e.pointerType !== "mouse" || !desk.matches) return;
+      clearTimeout(closeT); clearTimeout(switchT);
+      const go = () => { subs.forEach((o) => { if (o !== li) setOpen(o, false); }); setOpen(li, true); };
+      if (subs.some((o) => o !== li && o.classList.contains("open"))) switchT = setTimeout(go, 150); else go();
+    });
+    li.addEventListener("pointerleave", (e) => {
+      if (e.pointerType !== "mouse" || !desk.matches) return;
+      clearTimeout(switchT);
+      closeT = setTimeout(() => subs.forEach((o) => setOpen(o, false)), 400);
+    });
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".has-sub")) subs.forEach((o) => { if (o.classList.contains("open")) setOpen(o, false); });
+  });
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     document.querySelectorAll(".has-sub.open").forEach((o) => { o.classList.remove("open"); o.querySelector(".sub-btn").setAttribute("aria-expanded", "false"); });
@@ -232,4 +254,15 @@ document.querySelectorAll("[data-contact]").forEach((box) => {
   };
   box.addEventListener("input", update);
   box.addEventListener("change", update);
+});
+
+// First home buyers: show one state's grant and duty help at a time. Without this, every state shows.
+document.querySelectorAll("[data-fhb]").forEach((box) => {
+  box.classList.add("is-picking");
+  const show = () => {
+    const code = (box.querySelector('input[name="fhb-state"]:checked') || {}).value;
+    box.querySelectorAll(".fhb-state").forEach((s) => { s.hidden = s.dataset.state !== code; });
+  };
+  box.addEventListener("change", show);
+  show();
 });

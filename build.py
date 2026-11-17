@@ -168,6 +168,37 @@ def duty_states(current=None):
     return '<ul class="duty-states">' + "".join(items) + "</ul>"
 
 
+def first_home_states(default="QLD"):
+    """First home buyer help in each state and territory: the grant and the duty concession, from
+    data/stamp-duty.json. Without JavaScript every state shows; with it, the chips show one at a time."""
+    esc = html.escape
+    chips, panels = [], []
+    for code in DUTY["order"]:
+        st = DUTY["states"][code]
+        g = st["fhog"]
+        on = code == default
+        chips.append(f'<label class="chip"><input type="radio" name="fhb-state" value="{code}"{" checked" if on else ""}>'
+                     f'<span>{esc(st["short"])}</span></label>')
+        # The duty text for Queensland also mentions the grant, which has its own row here.
+        duty = " ".join(x for x in re.split(r"(?<=\.)\s+", st["fhb_text"]) if "First Home Owner Grant" not in x)
+        panels.append(f"""        <section class="fhb-state" data-state="{code}" aria-labelledby="fhb-{code}">
+          <h3 id="fhb-{code}">{esc(st["name"])}</h3>
+          <dl class="fhb-facts">
+            <div><dt>First home owner grant</dt><dd><b>{esc(g["short"])}</b><p>{esc(g["text"])}</p></dd></div>
+            <div><dt>Stamp duty</dt><dd><b>{esc(st["fhb_short"])}</b><p>{esc(duty)}</p></dd></div>
+          </dl>
+          <p class="fhb-links"><a class="text-link" href="/calculators/stamp-duty/{st["slug"]}">Work out {esc(st["short"])} stamp duty</a>
+            <span class="small muted">Official sources: <a href="{esc(g["source"])}" rel="noopener">{esc(g["source_name"])}</a> (grant), <a href="{esc(st["source"])}" rel="noopener">{esc(st["office"])}</a> (duty).</span></p>
+        </section>""")
+    return f"""<div class="fhb-states" data-fhb>
+        <fieldset class="chips fhb-picker">
+          <legend>Where are you buying?</legend>
+          {"".join(chips)}
+        </fieldset>
+{chr(10).join(panels)}
+      </div>"""
+
+
 def duty_calc(default):
     """The stamp duty calculator form and results. Rates come from data/stamp-duty.json, embedded for the script."""
     options = "".join(f'<option value="{c}"{" selected" if c == default else ""}>{html.escape(DUTY["states"][c]["name"])}</option>'
@@ -263,6 +294,7 @@ def fill(text):
     text = text.replace("<!--cash-rate-table-->", cash_rate_table())
     text = text.replace("<!--team-cards-->", team_cards())
     text = text.replace("<!--team-behind-->", behind_cards())
+    text = text.replace("<!--first-home-states-->", first_home_states())
     text = re.sub(r"<!--contact:([\w-]+)-->", lambda m: contact_panel(m.group(1)), text)
     text = re.sub(r"<!--brokers-for:([\w-]+)-->", lambda m: brokers_for(m.group(1)), text)
     text = text.replace("<!--team-matcher-->", team_matcher())
@@ -389,18 +421,19 @@ def contact_panel(slug):
     p = BROKERS[slug]
     esc = html.escape
     first = p["name"].split()[0]
-    own = bool(p.get("phone_tel") and p.get("email"))
-    tel = p["phone_tel"] if own else B["phone_tel"]
-    email = p["email"] if own else B["email"]
+    has_phone, has_email = bool(p.get("phone_tel")), bool(p.get("email"))
+    tel = p["phone_tel"] if has_phone else B["phone_tel"]
+    email = p["email"] if has_email else B["email"]
     sms, subject, body = contact_message(first)
     q = urllib.parse.quote
     topics = [n for n in NEEDS if slug in n["people"]]
     chips = "\n".join(
         f'          <label class="chip"><input type="radio" name="cb-topic" value="{esc(_phrase(n["label"]))}" data-label="{esc(n["label"])}"><span>{esc(n["label"])}</span></label>'
         for n in topics) + '\n          <label class="chip"><input type="radio" name="cb-topic" value="my finances" data-label=""><span>Something else</span></label>'
-    text_btn = (f'<a class="btn" data-sms href="sms:{tel}?&amp;body={esc(q(sms))}">Text {esc(first)}</a>' if own else "")
-    call_label = f"Call {esc(first)}" if own else f"Call {esc(B['phone'])}"
-    email_label = f"Email {esc(first)}" if own else "Email our office"
+    text_btn = (f'<a class="btn" data-sms href="sms:{tel}?&amp;body={esc(q(sms))}">Text {esc(first)}</a>' if has_phone else "")
+    call_label = f"Call {esc(first)}" if has_phone else "Call GC Wealth"
+    email_label = f"Email {esc(first)}" if has_email else "Email our office"
+    own = has_phone
     return f"""<section class="contact-broker" data-contact data-first="{esc(first)}" aria-labelledby="cb-title">
         <h2 id="cb-title">Get in touch with {esc(first)}</h2>
         <p>Choose what it's about and we'll start the message for you. It opens in your own messages or email app, so nothing is sent until you press send.</p>
