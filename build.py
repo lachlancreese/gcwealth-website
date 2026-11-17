@@ -263,6 +263,8 @@ def fill(text):
     text = text.replace("<!--cash-rate-table-->", cash_rate_table())
     text = text.replace("<!--team-cards-->", team_cards())
     text = text.replace("<!--team-behind-->", behind_cards())
+    text = re.sub(r"<!--contact:([\w-]+)-->", lambda m: contact_panel(m.group(1)), text)
+    text = re.sub(r"<!--brokers-for:([\w-]+)-->", lambda m: brokers_for(m.group(1)), text)
     text = text.replace("<!--team-matcher-->", team_matcher())
     text = text.replace("<!--broker-names-->", html.escape(json.dumps({k: v["name"] for k, v in BROKERS.items()}, ensure_ascii=False)))
     text = re.sub(r"<!--duty-calc:(\w+)-->", lambda m: duty_calc(m.group(1)), text)
@@ -364,6 +366,90 @@ def team_matcher():
       </div>
       <p class="match-note" hidden>Every GC Wealth broker can help with most loans. Not sure? <a href="/get-started">Get started</a> and we'll match you with the right person.</p>
     </section>"""
+
+
+def _phrase(label):
+    """'Buying my first home' -> 'buying my first home', for 'I'd like to talk about ...'."""
+    return label[0].lower() + label[1:]
+
+
+def contact_message(first, topic="my finances", name=""):
+    """The prefilled text and email a visitor sends a broker. site.js builds the same wording as they choose."""
+    hi = f"Hi {first}, " + (f"it's {name}. " if name else "")
+    sms = f"{hi}I found you on the GC Wealth website and I'd like to talk about {topic}. When's a good time for a quick chat?"
+    subject = "Enquiry from the GC Wealth website"
+    body = (f"Hi {first},\n\nI found you on the GC Wealth website and I'd like to talk about {topic}.\n\n"
+            f"A bit about what I'm after:\n\n\nThe best way and time to reach me:\n\n\nThanks,\n{name}")
+    return sms, subject, body
+
+
+def contact_panel(slug):
+    """Text, call or email a broker, with the message started for them. Opens in the visitor's own app:
+    nothing is sent through the site. Brokers without their own mobile and email use the office."""
+    p = BROKERS[slug]
+    esc = html.escape
+    first = p["name"].split()[0]
+    own = bool(p.get("phone_tel") and p.get("email"))
+    tel = p["phone_tel"] if own else B["phone_tel"]
+    email = p["email"] if own else B["email"]
+    sms, subject, body = contact_message(first)
+    q = urllib.parse.quote
+    topics = [n for n in NEEDS if slug in n["people"]]
+    chips = "\n".join(
+        f'          <label class="chip"><input type="radio" name="cb-topic" value="{esc(_phrase(n["label"]))}" data-label="{esc(n["label"])}"><span>{esc(n["label"])}</span></label>'
+        for n in topics) + '\n          <label class="chip"><input type="radio" name="cb-topic" value="my finances" data-label=""><span>Something else</span></label>'
+    text_btn = (f'<a class="btn" data-sms href="sms:{tel}?&amp;body={esc(q(sms))}">Text {esc(first)}</a>' if own else "")
+    call_label = f"Call {esc(first)}" if own else f"Call {esc(B['phone'])}"
+    email_label = f"Email {esc(first)}" if own else "Email our office"
+    return f"""<section class="contact-broker" data-contact data-first="{esc(first)}" aria-labelledby="cb-title">
+        <h2 id="cb-title">Get in touch with {esc(first)}</h2>
+        <p>Choose what it's about and we'll start the message for you. It opens in your own messages or email app, so nothing is sent until you press send.</p>
+        <div class="field">
+          <label for="cb-name">Your first name <span class="muted">(optional)</span></label>
+          <input class="input" id="cb-name" name="cb-name" autocomplete="given-name" maxlength="40">
+        </div>
+        <fieldset class="chips">
+          <legend>What's it about?</legend>
+{chips}
+        </fieldset>
+        <div class="btn-row contact-actions">
+          {text_btn}
+          <a class="btn{' btn-ghost' if own else ''}" href="tel:{tel}">{call_label}</a>
+          <a class="btn btn-ghost" data-mail href="mailto:{email}?subject={esc(q(subject))}&amp;body={esc(q(body))}">{email_label}</a>
+        </div>
+        <p class="hint">Prefer a form? <a href="/get-started?broker={slug}">Send an enquiry</a> and {esc(first)} will get back to you.</p>
+      </section>"""
+
+
+def brokers_for(key):
+    """'Talk to a broker who focuses on this' for a service page, from the same data as the team matcher."""
+    need = next((n for n in NEEDS if n["key"] == key), None)
+    if not need:
+        return ""
+    esc = html.escape
+    cards = []
+    for slug in need["people"]:
+        p = BROKERS[slug]
+        first = esc(p["name"].split()[0])
+        goal = f"&amp;goal={urllib.parse.quote(need['goal'])}" if need.get("goal") else ""
+        cards.append(f"""        <li class="match-card">
+          <img src="/assets/img/{p['photo']}-4x5-480.webp" alt="" width="96" height="120" loading="lazy">
+          <div>
+            <h3><a href="/team/{slug}">{esc(p['name'])}</a></h3>
+            <p class="person-role">{esc(p['role'])}</p>
+            <p>{esc(p.get('summary', ''))}</p>
+            <div class="btn-row"><a class="btn btn-small" href="/get-started?broker={slug}{goal}">Talk to {first}</a><a class="text-link" href="/team/{slug}">View profile</a></div>
+          </div>
+        </li>""")
+    return f"""<section class="section-tight brokers-for" aria-labelledby="bf-title">
+  <div class="wrap">
+    <h2 id="bf-title">Talk to a broker who focuses on this</h2>
+    <p>Every GC Wealth broker can help with most loans. These are the people who focus on {esc(_phrase(need['label']))}.</p>
+    <ul class="match-list">
+{chr(10).join(cards)}
+    </ul>
+  </div>
+</section>"""
 
 
 def nice_date(iso):

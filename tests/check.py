@@ -13,6 +13,7 @@ Screenshots go to tests/out/. Exit code 1 if anything fails.
 
 Needs: Python 3 with playwright, and `npm install` run once (for wrangler and axe-core).
 """
+import html
 import http.server
 import signal
 import json
@@ -265,6 +266,8 @@ def run_checks():
         check_forms(browser)
         print("Checking team matcher")
         check_matcher(browser)
+        print("Checking broker contact panels")
+        check_contact(browser)
         browser.close()
 
 
@@ -364,6 +367,67 @@ def check_matcher(browser):
     if not pg.locator(f'input[name="goal"][value="{need["goal"]}"]').is_checked():
         fail("team matcher: Talk to button didn't pre-select the goal on Get started")
     ctx.close()
+
+
+def check_contact(browser):
+    """Each broker profile's Text, Call and Email links reach the right person with a started message
+    that follows what the visitor picks. Text shows on phones only. Service pages list the right brokers."""
+    import json as _json
+    from urllib.parse import unquote
+    data = _json.loads((ROOT / "data" / "team.json").read_text())
+    brand = _json.loads((ROOT / "brand.json").read_text())
+    people = [p for p in data["people"] if p.get("client_facing", True)]
+    phone = browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
+    desk = browser.new_context(viewport={"width": 1440, "height": 900})
+    for p in people:
+        first = p["name"].split()[0]
+        own = bool(p.get("phone_tel") and p.get("email"))
+        pg = phone.new_page()
+        pg.goto(BASE + f"/team/{p['slug']}")
+        box = pg.locator("[data-contact]")
+        if not box.is_visible():
+            fail(f"{p['slug']}: contact panel not shown")
+            continue
+        tel = box.locator('a[href^="tel:"]').get_attribute("href")
+        if tel != "tel:" + (p["phone_tel"] if own else brand["phone_tel"]):
+            fail(f"{p['slug']}: Call goes to {tel}")
+        mail = box.locator("[data-mail]")
+        if not mail.get_attribute("href").startswith("mailto:" + (p["email"] if own else brand["email"]) + "?"):
+            fail(f"{p['slug']}: Email goes to the wrong address")
+        sms = box.locator("[data-sms]")
+        if own != (sms.count() == 1 and sms.is_visible()):
+            fail(f"{p['slug']}: Text button {'missing' if own else 'shown without a mobile'} on a phone")
+        need = next(n for n in data["needs"] if p["slug"] in n["people"])
+        box.locator("label.chip", has_text=need["label"]).click()
+        box.locator("#cb-name").fill("Sam")
+        pg.wait_for_timeout(100)
+        topic = need["label"][0].lower() + need["label"][1:]
+        body = unquote(mail.get_attribute("href"))
+        if f"Hi {first}," not in body or topic not in body or "Thanks,\nSam" not in body or need["label"] not in body:
+            fail(f"{p['slug']}: email isn't started with the greeting, topic, subject and name")
+        if own:
+            text = unquote(sms.get_attribute("href"))
+            if not text.startswith(f"sms:{p['phone_tel']}?&body=Hi {first}, it's Sam.") or topic not in text:
+                fail(f"{p['slug']}: text message doesn't follow the choice: {text[:120]}")
+        pg.close()
+        pg = desk.new_page()
+        pg.goto(BASE + f"/team/{p['slug']}")
+        if pg.locator("[data-contact] [data-sms]").count() and pg.locator("[data-contact] [data-sms]").is_visible():
+            fail(f"{p['slug']}: Text button shown on a desktop")
+        pg.close()
+    phone.close()
+    desk.close()
+    names = {p["slug"]: p["name"] for p in data["people"]}
+    needs = {n["key"]: n for n in data["needs"]}
+    for f in sorted((ROOT / "pages").rglob("*.html")):
+        m = re.search(r"<!--brokers-for:([\w-]+)-->", f.read_text())
+        if not m:
+            continue
+        built = ROOT / "public" / f.relative_to(ROOT / "pages")
+        shown = [html.unescape(x) for x in re.findall(r'<h3><a href="/team/[\w-]+">([^<]+)</a></h3>', built.read_text().split('class="section-tight brokers-for"')[1].split("</section>")[0])]
+        want = [names[s] for s in needs[m.group(1)]["people"]]
+        if shown != want:
+            fail(f"{built.relative_to(ROOT)}: lists {shown} as focusing on this, expected {want}")
 
 
 def check_forms(browser):

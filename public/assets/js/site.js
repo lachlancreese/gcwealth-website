@@ -209,3 +209,27 @@ document.querySelectorAll("form[data-ajax]").forEach((form) => {
   });
   hero.addEventListener("pointerleave", () => { mx = 0; my = 0; if (!frame) frame = requestAnimationFrame(apply); });
 })();
+
+// Broker profiles: "Get in touch" starts a text or email for the visitor, worded for what they choose.
+// Nothing is sent through the site: the links open the visitor's own messages or email app.
+document.querySelectorAll("[data-contact]").forEach((box) => {
+  const first = box.dataset.first;
+  const sms = box.querySelector("[data-sms]");
+  const mail = box.querySelector("[data-mail]");
+  const nameInput = box.querySelector("#cb-name");
+  const update = () => {
+    const name = (nameInput.value || "").replace(/[^\p{L}\p{M}' -]/gu, "").trim().slice(0, 40);
+    const picked = box.querySelector('input[name="cb-topic"]:checked');
+    const topic = picked ? picked.value : "my finances";
+    const label = picked ? picked.dataset.label : "";
+    const hi = `Hi ${first}, ` + (name ? `it's ${name}. ` : "");
+    const text = `${hi}I found you on the GC Wealth website and I'd like to talk about ${topic}. When's a good time for a quick chat?`;
+    const subject = "Enquiry from the GC Wealth website" + (label ? `: ${label}` : "");
+    const body = `Hi ${first},\n\nI found you on the GC Wealth website and I'd like to talk about ${topic}.\n\n` +
+      `A bit about what I'm after:\n\n\nThe best way and time to reach me:\n\n\nThanks,\n${name}`;
+    if (sms) sms.href = `${sms.href.split("?")[0]}?&body=${encodeURIComponent(text)}`;
+    if (mail) mail.href = `${mail.href.split("?")[0]}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+  box.addEventListener("input", update);
+  box.addEventListener("change", update);
+});

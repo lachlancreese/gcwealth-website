@@ -24,7 +24,7 @@
 <link rel="preload" href="/assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/figtree-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>:root{--navy:#144154;--blue:#246C8F;--sky:#3D8EB9;--mist:#EAF2F6;--sand:#F4F0E9;--ink:#0F2833;--text:#33454D;}</style>
-<link rel="stylesheet" href="/assets/css/site.css?v=c9a20ecdac">
+<link rel="stylesheet" href="/assets/css/site.css?v=110d89049d">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -175,10 +175,26 @@
         <li><b>Email</b><a href="mailto:matthew@gcwealth.com.au">matthew@gcwealth.com.au</a></li>
         <li><b>LinkedIn</b><a href="https://au.linkedin.com/in/matthew-klein-05a6531a5" rel="noopener">Matthew Klein on LinkedIn</a></li>
       </ul>
-      <div class="btn-row">
-        <a class="btn" href="/get-started?broker=matthew-klein">Talk to Matthew</a>
-        <a class="btn btn-ghost" href="tel:+61452356955">Call Matthew</a>
-      </div>
+      <section class="contact-broker" data-contact data-first="Matthew" aria-labelledby="cb-title">
+        <h2 id="cb-title">Get in touch with Matthew</h2>
+        <p>Choose what it's about and we'll start the message for you. It opens in your own messages or email app, so nothing is sent until you press send.</p>
+        <div class="field">
+          <label for="cb-name">Your first name <span class="muted">(optional)</span></label>
+          <input class="input" id="cb-name" name="cb-name" autocomplete="given-name" maxlength="40">
+        </div>
+        <fieldset class="chips">
+          <legend>What's it about?</legend>
+          <label class="chip"><input type="radio" name="cb-topic" value="a business loan or cashflow" data-label="A business loan or cashflow"><span>A business loan or cashflow</span></label>
+          <label class="chip"><input type="radio" name="cb-topic" value="equipment, vehicles or machinery" data-label="Equipment, vehicles or machinery"><span>Equipment, vehicles or machinery</span></label>
+          <label class="chip"><input type="radio" name="cb-topic" value="my finances" data-label=""><span>Something else</span></label>
+        </fieldset>
+        <div class="btn-row contact-actions">
+          <a class="btn" data-sms href="sms:+61452356955?&amp;body=Hi%20Matthew%2C%20I%20found%20you%20on%20the%20GC%20Wealth%20website%20and%20I%27d%20like%20to%20talk%20about%20my%20finances.%20When%27s%20a%20good%20time%20for%20a%20quick%20chat%3F">Text Matthew</a>
+          <a class="btn btn-ghost" href="tel:+61452356955">Call Matthew</a>
+          <a class="btn btn-ghost" data-mail href="mailto:matthew@gcwealth.com.au?subject=Enquiry%20from%20the%20GC%20Wealth%20website&amp;body=Hi%20Matthew%2C%0A%0AI%20found%20you%20on%20the%20GC%20Wealth%20website%20and%20I%27d%20like%20to%20talk%20about%20my%20finances.%0A%0AA%20bit%20about%20what%20I%27m%20after%3A%0A%0A%0AThe%20best%20way%20and%20time%20to%20reach%20me%3A%0A%0A%0AThanks%2C%0A">Email Matthew</a>
+        </div>
+        <p class="hint">Prefer a form? <a href="/get-started?broker=matthew-klein">Send an enquiry</a> and Matthew will get back to you.</p>
+      </section>
     </div>
   </div>
 </section>
@@ -285,6 +301,6 @@
   <a class="btn" href="/get-started">Get started</a>
 </div>
 
-<script src="/assets/js/site.js?v=e01427f931" defer></script>
+<script src="/assets/js/site.js?v=e44dca8542" defer></script>
 </body>
 </html>

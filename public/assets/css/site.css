@@ -451,6 +451,29 @@ mark.todo { background: #FFF1C2; color: #5C4400; padding: 0 4px; border-radius: 
 .reviews-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s3); margin-bottom: var(--s5); }
 .reviews-head h2 { margin: 0; }
 
+/* Broker profile: get in touch (text, call, email with the message started) */
+.contact-broker { margin-top: var(--s5); padding: var(--s4); background: var(--mist); border-radius: var(--radius-lg); }
+.contact-broker h2 { font-size: var(--step-2); margin: 0 0 var(--s1); }
+.contact-broker > p { margin: 0 0 var(--s3); }
+.contact-broker .field { max-width: 320px; margin-bottom: var(--s3); }
+.contact-broker fieldset { border: 0; padding: 0; margin: 0 0 var(--s3); }
+.contact-broker legend { font-weight: 600; color: var(--navy); margin-bottom: var(--s1); padding: 0; }
+.contact-broker .chip span { min-height: 40px; padding: 8px 14px; font-size: .9375rem; }
+.contact-actions { margin-top: 0; }
+.contact-broker .hint { margin: var(--s2) 0 0; }
+/* Desktops usually can't send texts: hide Text there and lead with Email. */
+@media (hover: hover) and (pointer: fine) {
+  .contact-actions [data-sms] { display: none; }
+  .contact-actions [data-mail] { order: -1; background: var(--blue); color: #fff; }
+  .contact-actions [data-mail]:hover { background: var(--navy); border-color: var(--navy); }
+  .contact-actions [href^="tel:"] { background: transparent; color: var(--blue); }
+  .contact-actions [href^="tel:"]:hover { background: var(--mist); }
+}
+.brokers-for { background: var(--mist); }
+.brokers-for h2 { margin-top: 0; }
+.brokers-for .wrap > p { color: var(--muted); max-width: 60ch; }
+@media (max-width: 560px) { .page-hero .btn-row .btn, .hero .btn-row .btn, .contact-actions .btn { flex: 1 1 auto; } }
+
 /* Team: who should I talk to? */
 .matcher { background: var(--mist); border-radius: var(--radius-lg); padding: var(--s6); }
 .matcher h2 { margin-top: 0; }

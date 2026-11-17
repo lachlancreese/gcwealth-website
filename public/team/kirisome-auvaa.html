@@ -24,7 +24,7 @@
 <link rel="preload" href="/assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/figtree-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>:root{--navy:#144154;--blue:#246C8F;--sky:#3D8EB9;--mist:#EAF2F6;--sand:#F4F0E9;--ink:#0F2833;--text:#33454D;}</style>
-<link rel="stylesheet" href="/assets/css/site.css?v=c9a20ecdac">
+<link rel="stylesheet" href="/assets/css/site.css?v=110d89049d">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -177,10 +177,27 @@
         <li><b>LinkedIn</b><a href="https://au.linkedin.com/in/kirisome-auva-a-79ab14233" rel="noopener">Kirisome Auva'a on LinkedIn</a></li>
         <li><b>Instagram</b><a href="https://www.instagram.com/kirisomeauvaa23/" rel="noopener">@kirisomeauvaa23</a></li>
       </ul>
-      <div class="btn-row">
-        <a class="btn" href="/get-started?broker=kirisome-auvaa">Talk to Kirisome</a>
-        <a class="btn btn-ghost" href="tel:+61483780534">Call Kirisome</a>
-      </div>
+      <section class="contact-broker" data-contact data-first="Kirisome" aria-labelledby="cb-title">
+        <h2 id="cb-title">Get in touch with Kirisome</h2>
+        <p>Choose what it's about and we'll start the message for you. It opens in your own messages or email app, so nothing is sent until you press send.</p>
+        <div class="field">
+          <label for="cb-name">Your first name <span class="muted">(optional)</span></label>
+          <input class="input" id="cb-name" name="cb-name" autocomplete="given-name" maxlength="40">
+        </div>
+        <fieldset class="chips">
+          <legend>What's it about?</legend>
+          <label class="chip"><input type="radio" name="cb-topic" value="buying my first home" data-label="Buying my first home"><span>Buying my first home</span></label>
+          <label class="chip"><input type="radio" name="cb-topic" value="refinancing or reviewing my loan" data-label="Refinancing or reviewing my loan"><span>Refinancing or reviewing my loan</span></label>
+          <label class="chip"><input type="radio" name="cb-topic" value="investing in property" data-label="Investing in property"><span>Investing in property</span></label>
+          <label class="chip"><input type="radio" name="cb-topic" value="my finances" data-label=""><span>Something else</span></label>
+        </fieldset>
+        <div class="btn-row contact-actions">
+          <a class="btn" data-sms href="sms:+61483780534?&amp;body=Hi%20Kirisome%2C%20I%20found%20you%20on%20the%20GC%20Wealth%20website%20and%20I%27d%20like%20to%20talk%20about%20my%20finances.%20When%27s%20a%20good%20time%20for%20a%20quick%20chat%3F">Text Kirisome</a>
+          <a class="btn btn-ghost" href="tel:+61483780534">Call Kirisome</a>
+          <a class="btn btn-ghost" data-mail href="mailto:kirisome@gcwealth.com.au?subject=Enquiry%20from%20the%20GC%20Wealth%20website&amp;body=Hi%20Kirisome%2C%0A%0AI%20found%20you%20on%20the%20GC%20Wealth%20website%20and%20I%27d%20like%20to%20talk%20about%20my%20finances.%0A%0AA%20bit%20about%20what%20I%27m%20after%3A%0A%0A%0AThe%20best%20way%20and%20time%20to%20reach%20me%3A%0A%0A%0AThanks%2C%0A">Email Kirisome</a>
+        </div>
+        <p class="hint">Prefer a form? <a href="/get-started?broker=kirisome-auvaa">Send an enquiry</a> and Kirisome will get back to you.</p>
+      </section>
     </div>
   </div>
 </section>
@@ -287,6 +304,6 @@
   <a class="btn" href="/get-started">Get started</a>
 </div>
 
-<script src="/assets/js/site.js?v=e01427f931" defer></script>
+<script src="/assets/js/site.js?v=e44dca8542" defer></script>
 </body>
 </html>
