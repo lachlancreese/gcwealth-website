@@ -16,13 +16,25 @@ WATER = 448            # where the ocean starts
 SUN = (566, 352, 54)   # x, y, radius: low, sitting in a gap between towers
 OUT = pathlib.Path(__file__).resolve().parent.parent / "pages" / "partials" / "hero-coast.html"
 
-# Towers along the beachfront: (left x, width, height, top style). The tall slim one with a spire is the landmark.
+# Surfers Paradise from the ocean at sunset, south (left) to north (right): (left x, width, height, shape).
+# Landmarks are drawn to scale at about 0.85 px per metre; the low buildings between them are fill.
 TOWERS = [
-    (30, 36, 70, "flat"), (68, 28, 112, "step"), (98, 42, 92, "flat"), (142, 30, 150, "crown"),
-    (174, 46, 120, "flat"), (222, 34, 172, "step"), (258, 42, 132, "flat"), (302, 32, 104, "round"),
-    (336, 38, 156, "flat"), (378, 28, 214, "spire"), (410, 44, 160, "step"), (458, 32, 118, "flat"),
-    (492, 28, 84, "round"), (524, 34, 62, "flat"), (612, 30, 70, "flat"), (644, 44, 168, "crown"),
-    (690, 36, 124, "step"), (728, 42, 96, "flat"), (772, 30, 76, "flat"),
+    (34, 34, 64, "flat"), (72, 26, 96, "flat"),
+    (102, 32, 212, "slant"),       # Infinity, 249 m, sloping top
+    (140, 28, 118, "flat"), (172, 24, 84, "step"),
+    (200, 30, 208, "q1"),          # Q1, 322 m to the spire tip
+    (236, 30, 144, "dome"),        # Hilton Surfers Paradise, Orchid tower
+    (270, 26, 94, "dome"),         # Hilton, Boulevard tower
+    (300, 34, 185, "soul"),        # Soul, 243 m, on the Esplanade
+    (340, 28, 179, "circle"),      # Circle on Cavill, north tower
+    (372, 26, 134, "circle"),      # Circle on Cavill, south tower
+    (404, 30, 102, "flat"), (438, 34, 123, "crown"),  # Peninsula
+    (478, 26, 76, "flat"), (508, 28, 58, "flat"),
+    (602, 34, 155, "wave"),        # Ocean, 182 m
+    (642, 28, 160, "jewel"),       # Jewel, three towers at the north end
+    (676, 28, 148, "jewel"),
+    (710, 28, 136, "jewel"),
+    (744, 26, 70, "flat"), (774, 30, 52, "flat"),
 ]
 
 
@@ -61,7 +73,7 @@ def main():
 
     # Two birds, high and drifting.
     a('<g class="birds" fill="none" stroke="#0E3242" stroke-width="1.6" stroke-linecap="round" opacity=".55">'
-      '<path d="M210 168 q6 -6 12 0 q6 -6 12 0"/><path d="M246 186 q4 -4 8 0 q4 -4 8 0"/></g>')
+      '<path d="M452 196 q6 -6 12 0 q6 -6 12 0"/><path d="M488 214 q4 -4 8 0 q4 -4 8 0"/></g>')
 
     # Hinterland hills, soft behind the towers.
     hill = "M0 " + f(HORIZON - 26) + " " + " ".join(
@@ -70,12 +82,15 @@ def main():
 
     # Lower towers in the haze behind the beachfront.
     back = []
-    x = 10
+    x = 56
     while x < W - 10:
         w = rnd.randint(18, 34)
         h = rnd.randint(30, 80)
         back.append(f'<rect x="{x}" y="{HORIZON - h}" width="{w}" height="{h}"/>')
         x += w + rnd.randint(2, 10)
+    # Broadbeach in the distance, far left: Oracle's two rounded towers.
+    back.append(f'<path d="M4 {HORIZON} V{HORIZON - 96} Q16 {HORIZON - 116} 28 {HORIZON - 96} V{HORIZON} Z"/>')
+    back.append(f'<path d="M30 {HORIZON} V{HORIZON - 78} Q40 {HORIZON - 94} 50 {HORIZON - 78} V{HORIZON} Z"/>')
     a(f'<g fill="#2A5D75" opacity=".7">{"".join(back)}</g>')
 
     # Beachfront towers, with lit windows.
@@ -83,6 +98,7 @@ def main():
     for (x, w, h, top) in TOWERS:
         y = HORIZON - h
         towers.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}"/>')
+        top_gap = 8  # keep window lights below shaped tops
         if top == "step":
             towers.append(f'<rect x="{x + w * .2:.1f}" y="{y - 12}" width="{w * .6:.1f}" height="13"/>')
         elif top == "crown":
@@ -90,16 +106,42 @@ def main():
                           f'<rect x="{x + w * .47:.1f}" y="{y - 34}" width="{w * .06:.1f}" height="17"/>')
         elif top == "round":
             towers.append(f'<path d="M{x} {y + 1} Q{x + w / 2} {y - 22} {x + w} {y + 1} Z"/>')
-        elif top == "spire":
-            towers.append(f'<path d="M{x + 3} {y + 1} L{x + w / 2} {y - 34} L{x + w - 3} {y + 1} Z"/>'
-                          f'<rect x="{x + w / 2 - 1:.1f}" y="{y - 92}" width="2" height="60"/>')
+        elif top == "q1":
+            # Q1: the body narrows into a pointed glass crown, then the spire.
+            towers[-1] = f'<rect x="{x}" y="{y + 40}" width="{w}" height="{h - 40}"/>'
+            towers.append(f'<path d="M{x} {y + 41} L{x + w * .18:.1f} {y + 6} L{x + w / 2:.1f} {y - 18} L{x + w * .82:.1f} {y + 6} L{x + w} {y + 41} Z"/>'
+                          f'<path d="M{x + w / 2 - 1.4:.1f} {y - 16} L{x + w / 2:.1f} {y - 66} L{x + w / 2 + 1.4:.1f} {y - 16} Z"/>')
+            top_gap = 46
+        elif top == "slant":
+            # Infinity: the roof slopes down towards the north.
+            towers[-1] = f'<path d="M{x} {HORIZON} V{y} L{x + w} {y + 26} V{HORIZON} Z"/>'
+            top_gap = 32
+        elif top == "soul":
+            # Soul: a sweeping crown that rises to the north.
+            towers.append(f'<path d="M{x} {y + 1} V{y - 4} Q{x + w * .55:.1f} {y - 8} {x + w} {y - 22} V{y + 1} Z"/>')
+        elif top == "dome":
+            # Hilton: arched lanterns on both towers.
+            towers.append(f'<path d="M{x + 2} {y + 1} Q{x + w / 2} {y - 24} {x + w - 2} {y + 1} Z"/>'
+                          f'<rect x="{x + w / 2 - 1:.1f}" y="{y - 22}" width="2" height="10"/>')
+        elif top == "circle":
+            # Circle on Cavill: rounded tops.
+            towers[-1] = f'<path d="M{x} {HORIZON} V{y + w / 2} A{w / 2} {w / 2} 0 0 1 {x + w} {y + w / 2} V{HORIZON} Z"/>'
+            top_gap = int(w / 2) + 4
+        elif top == "jewel":
+            # Jewel: angled glass tops, alternating direction.
+            up_left = (x // 34) % 2 == 0
+            towers[-1] = (f'<path d="M{x} {HORIZON} V{y if up_left else y + 18} L{x + w} {y + 18 if up_left else y} V{HORIZON} Z"/>')
+            top_gap = 24
+        elif top == "wave":
+            # Ocean: a gently curved roofline.
+            towers.append(f'<path d="M{x} {y + 1} Q{x + w * .3:.1f} {y - 10} {x + w / 2:.1f} {y - 4} T{x + w} {y - 8} V{y + 1} Z"/>')
         cols = max(2, int((w - 6) // 7))
-        rows = int((h - 14) // 9)
+        rows = int((h - top_gap - 6) // 9)
         for r in range(rows):
             for c in range(cols):
                 if rnd.random() < 0.13:
                     wx = x + 4 + c * 7
-                    wy = y + 8 + r * 9
+                    wy = y + top_gap + r * 9
                     warm = rnd.random() < 0.82
                     delay = 0.8 + rnd.random() * 2.6
                     twinkle = rnd.random() < 0.18
