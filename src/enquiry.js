@@ -67,6 +67,7 @@ export async function handleEnquiry(request, env) {
     client_email: field("client_email", 200),
     wants_agreement: field("wants_agreement", 10),
     updates: field("updates", 10),
+    broker: field("broker", 80),
   };
 
   if (!validEmail(d.email)) return reply(false, 422, "Enter a valid email address.");
@@ -98,11 +99,11 @@ export async function handleEnquiry(request, env) {
     };
   } else if (type === "get-started") {
     team = {
-      subject: `New enquiry: ${d.name}${d.goal ? ", " + d.goal.toLowerCase() : ""}${d.timeframe ? " (" + d.timeframe.toLowerCase() + ")" : ""}`,
+      subject: `New enquiry${d.broker ? " for " + d.broker : ""}: ${d.name}${d.goal ? ", " + d.goal.toLowerCase() : ""}${d.timeframe ? " (" + d.timeframe.toLowerCase() + ")" : ""}`,
       ...detailsTable("Get started enquiry", [
         ["Looking to", d.goal], ["Timeframe", d.timeframe], ["Rough loan amount", d.amount], ["Situation", d.situation],
         ["Name", d.name], ["Email", d.email], ["Phone", d.phone], ["Postcode", d.postcode],
-        ["Prefers", d.contact_by], ["Preferred time", d.best_time], ["Message", d.message], ["Agreed to be contacted", "Yes"],
+        ["Prefers", d.contact_by], ["Preferred time", d.best_time], ["Message", d.message], ["Asked for", d.broker], ["Agreed to be contacted", "Yes"],
       ]),
     };
   } else if (type === "health-check") {

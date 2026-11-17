@@ -148,7 +148,13 @@ document.querySelectorAll("form[data-ajax]").forEach((form) => {
   const form = document.getElementById("start-form");
   if (!form) return;
   const q = new URLSearchParams(location.search);
-  const goal = q.get("goal"), amount = q.get("amount");
+  const goal = q.get("goal"), amount = q.get("amount"), broker = q.get("broker");
+  // From a broker's profile: "Talk to Steven" passes ?broker=steven-shaw, which is sent with the enquiry.
+  if (broker && /^[a-z-]{3,60}$/.test(broker)) {
+    form.elements.broker.value = broker.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+    const lede = document.querySelector(".lede");
+    if (lede) lede.textContent = `Three quick steps. Tell us what you're planning and ${form.elements.broker.value.split(" ")[0]} will be in touch to talk it through.`;
+  }
   if (goal) {
     const radio = [...form.querySelectorAll('input[name="goal"]')].find((r) => r.value === goal);
     if (radio) radio.checked = true;

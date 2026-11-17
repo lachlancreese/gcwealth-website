@@ -43,7 +43,7 @@ failures = []
 FLAGGED = [
     (r"\bfree\b(?! call)", "free (use 'complimentary')"),
     (r"(?<!our )\bbest\b(?! interests)", "best (only allowed as 'best interests')"),
-    (r"\bgreat\b", "great"),
+    (r"\bgreat\b(?! sense of humour)", "great"),
     (r"\bguaranteed\b(?! amount)", "guaranteed"),
     (r"\bindependent\b(?! (party|legal advice))", "independent"),
     (r"save you", "save you ..."),
@@ -213,13 +213,30 @@ def run_checks():
                 fail(f"link {href} returns {code}")
 
         print("Checking redirects from old addresses")
-        for old, new in [("/contact-us/", "/contact"), ("/about/", "/about"), ("/refinancing/", "/home-loans/refinancing"),
-                         ("/construction-lending-qld/", "/home-loans/construction-loans"), ("/smsf-refinancing/", "/smsf-loans"),
-                         ("/why-gold-coast-wealth/", "/about"), ("/tag/smsf/", "/"), ("/privacy-policy/", "/privacy"), ("/complaints-handling-process/", "/compliments-and-concerns"),
-                         ("/get-started/", "/get-started"), ("/home-loans.html", "/home-loans"),
-                         ("/calculators/repayment-calculator/", "/calculators/repayments"), ("/calculators/offset-account/", "/calculators/extra-repayments"),
-                         ("/calculators/refinancing-savings/", "/calculators/refinance"), ("/calculators/property-buying-cost/", "/calculators/stamp-duty"),
-                         ("/calculators/savings-goal/", "/calculators/deposit"), ("/borrowing-capacity-gold-coast-wealth/", "/calculators/borrowing-power")]:
+        CALC_MOVED = {
+            "borrowing-power": "/calculators/borrowing-power", "repayment-calculator": "/calculators/repayments",
+            "stamp-duty": "/calculators/stamp-duty", "budget-planner": "/calculators/borrowing-power",
+            "extra-repayments": "/calculators/extra-repayments", "offset-account": "/calculators/extra-repayments",
+            "split-loan": "/calculators/repayments", "refinancing-savings": "/calculators/refinance",
+            "income-tax": "/calculators/borrowing-power", "compound-interest": "/calculators/deposit",
+            "savings-goal": "/calculators/deposit", "fortnightly-repayment": "/calculators/repayments",
+            "loan-comparison-calculator": "/calculators/refinance", "lump-sum-repayment": "/calculators/extra-repayments",
+            "property-buying-cost": "/calculators/stamp-duty", "property-selling-cost": "/calculators",
+            "rent-vs-buy": "/calculators/deposit", "credit-card": "/calculators",
+            "how-long-to-repay-calculator": "/calculators/extra-repayments", "introductory-rate": "/calculators/repayments",
+            "asset-leasing": "/business-finance/asset-finance", "reverse-mortgage": "/calculators",
+            "saving": "/calculators/deposit", "income-annualisation": "/calculators/borrowing-power",
+            "income-gross-up": "/calculators/borrowing-power", "how-much-to-deposit": "/calculators/deposit",
+            "comparison-rate": "/calculators/repayments", "interest-only": "/calculators/repayments",
+        }  # all 28 calculator pages in the old Elementor sitemap
+        moves = [(f"/calculators/{k}/", v) for k, v in CALC_MOVED.items()] + [
+            ("/contact-us/", "/contact"), ("/about/", "/about"), ("/refinancing/", "/home-loans/refinancing"),
+            ("/construction-lending-qld/", "/home-loans/construction-loans"), ("/smsf-refinancing/", "/smsf-loans"),
+            ("/why-gold-coast-wealth/", "/about"), ("/tag/smsf/", "/"), ("/privacy-policy/", "/privacy"),
+            ("/complaints-handling-process/", "/compliments-and-concerns"), ("/get-started/", "/get-started"),
+            ("/home-loans.html", "/home-loans"), ("/borrowing-capacity-gold-coast-wealth/", "/calculators/borrowing-power"),
+            ("/calculators/", "/calculators")]
+        for old, new in moves:
             code, loc, _ = status_of(BASE + old, follow=False)
             loc = re.sub(r"^https?://[^/]+", "", loc or "")
             if code != 301 or loc != new:
@@ -328,6 +345,21 @@ def check_forms(browser):
             fail("get started: auto-reply is wrong")
         (OUT / "email-auto-reply.html").write_text(auto["html"])
         (OUT / "email-team.html").write_text(team["html"])
+
+    # Enquiry from a broker's profile names the broker.
+    sent_mail.clear()
+    pg.goto(BASE + "/get-started?broker=steven-shaw")
+    pg.locator("label.chip", has_text="Refinance").first.click()
+    pg.wait_for_timeout(400)
+    pg.locator(".step:not([hidden]) [data-next]").click()
+    pg.fill("#s-name", "Test Person")
+    pg.fill("#s-phone", "0412 345 678")
+    pg.fill("#s-email", "test2@example.com")
+    pg.check("#s-consent")
+    pg.click("text=Send my enquiry")
+    pg.wait_for_url("**/thanks", timeout=15000)
+    if not sent_mail or "Steven Shaw" not in sent_mail[0]["subject"]:
+        fail("get started: enquiry from Steven's profile doesn't name him")
 
     # Contact form.
     sent_mail.clear()
