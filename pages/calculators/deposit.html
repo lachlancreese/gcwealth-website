@@ -22,6 +22,14 @@ disclaimer: yes
         <label for="c-price">Property price you're aiming for</label>
         <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-price" name="price" inputmode="decimal" value="750,000"></div>
       </div>
+      <!--duty-state-field-->
+      <fieldset>
+        <legend>Your first home?</legend>
+        <div class="seg">
+          <label><input type="radio" name="first" value="yes" checked><span>Yes</span></label>
+          <label><input type="radio" name="first" value="no"><span>No</span></label>
+        </div>
+      </fieldset>
       <fieldset class="full">
         <legend>Deposit</legend>
         <div class="seg">
@@ -39,9 +47,9 @@ disclaimer: yes
         <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-monthly" name="monthly" inputmode="decimal" value="2,000"></div>
       </div>
       <div class="field full">
-        <label for="c-costs">Upfront costs <span>(optional)</span></label>
-        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-costs" name="costs" inputmode="decimal" value="0"></div>
-        <p class="hint">Stamp duty, legal and inspection costs. <a href="/calculators/stamp-duty">Estimate your stamp duty</a>.</p>
+        <label for="c-costs">Other upfront costs <span>(optional)</span></label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-costs" name="costs" inputmode="decimal" value="3,000"></div>
+        <p class="hint">Conveyancing, inspections and lender fees. We add stamp duty for you.</p>
       </div>
     </form>
     <aside class="results" id="results" aria-labelledby="results-title">
@@ -50,10 +58,13 @@ disclaimer: yes
       <div class="result-sub" data-out="sub" data-detail></div>
       <ul class="result-list" data-detail>
         <li>Deposit <b data-out="deposit"></b></li>
+        <li>Stamp duty (estimated) <b data-out="duty"></b></li>
+        <li>Other upfront costs <b data-out="costs"></b></li>
         <li>Deposit plus costs <b data-out="target"></b></li>
         <li>Still to save <b data-out="gap"></b></li>
         <li>Loan you'd need <b data-out="loan"></b></li>
       </ul>
+      <p class="result-note" data-detail>Stamp duty assumes an established home you'll live in, bought by Australian citizens or permanent residents. New homes can attract bigger first home concessions. <a data-out-href="duty-link" href="/calculators/stamp-duty" style="color:#fff">Check stamp duty in full</a>.</p>
       <p class="result-note" data-show="lmi-note" hidden>With less than 20%, you'd usually pay lenders mortgage insurance, unless the 5% Deposit Scheme or a family guarantee applies. <a href="/home-loans/first-home-buyers" style="color:#fff">First home buyer options</a>.</p>
       <a class="btn btn-light" data-cta href="/get-started">Talk to a broker about this</a>
     </aside>

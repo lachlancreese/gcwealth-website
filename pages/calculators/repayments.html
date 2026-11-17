@@ -46,6 +46,11 @@ disclaimer: yes
           <label><input type="radio" name="type" value="io"><span>Interest only</span></label>
         </div>
       </fieldset>
+      <div class="field" data-io hidden>
+        <label for="c-io">Interest-only period</label>
+        <div class="input-wrap"><input class="input" id="c-io" name="ioyears" inputmode="numeric" value="5" style="padding-right:64px"><span class="unit post">years</span></div>
+        <p class="hint">Usually five years or less. Principal and interest repayments follow for the rest of the term.</p>
+      </div>
     </form>
     <aside class="results" id="results" aria-labelledby="results-title">
       <h2 id="results-title">Your repayments</h2>
@@ -59,7 +64,7 @@ disclaimer: yes
         <li>If your rate rose 0.25% <b data-out="rise1"></b></li>
         <li>If your rate rose 1% <b data-out="rise2"></b></li>
       </ul>
-      <p class="result-note" data-show="io-note" hidden>Interest-only periods are usually limited, often to five years or less. After that, repayments rise to cover principal over the remaining term.</p>
+      <p class="result-note" data-show="io-note" hidden>After <span data-out="io-years"></span> of interest only, repayments rise to <b data-out="io-after"></b> to repay the loan over the remaining <span data-out="io-rest"></span>.</p>
       <a class="btn btn-light" data-cta href="/get-started">Talk to a broker about this</a>
     </aside>
   </div>

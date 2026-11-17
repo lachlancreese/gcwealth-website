@@ -7,9 +7,22 @@
     tax: [[190000, 51370, 0.45], [135000, 31020, 0.37], [45000, 4020, 0.30], [18200, 0, 0.15], [0, 0, 0]],
     medicare: 0.02,
     lito: { max: 700, t1: 37500, r1: 0.05, t2: 45000, r2: 0.015 },
+    // HELP (HECS) compulsory repayments 2026-27 (ATO, marginal since 2025-26)
+    help: { t1: 69528, t2: 129717, base2: 9028, t3: 186050, r1: 0.15, r2: 0.17, flat: 0.10 },
     buffer: 3,              // APRA serviceability buffer, percentage points
-    cardRate: 0.038,        // monthly commitment assumed per $1 of credit card limit (a common lender assumption)
+    minAssess: 9.6,         // lowest rate the big four assessed at in Nov 2026 (CBA 6.64% + 3); stops a low rate overstating the result
+    cardRate: 0.04,         // monthly commitment per $1 of credit card limit (ANZ's calculator works out at about 3.97%)
+    homeLoanLoad: 1.4,      // existing home loan repayments are re-tested at a higher rate (ANZ's calculator: about 1.42x)
+    otherLoanLoad: 1.1,     // other loan repayments (ANZ's calculator: about 1.12x)
+    margin: 60,             // a month: CBA counts about $50 a month less income than the ATO rates give
     rentShare: 0.8,         // share of rental or other income counted
+    // Living costs: lenders use the higher of yours and a benchmark for the household (HEM). These are the highest
+    // minimums we measured across CBA, NAB, ANZ and Westpac's calculators in Nov 2026, by gross household income.
+    floor: {
+      single: [[0, 1400], [60000, 1680], [100000, 2140], [150000, 2870], [250000, 3720], [400000, 4600]],
+      couple: [[0, 2400], [100000, 3360], [150000, 4100], [350000, 6270], [500000, 7000]],
+      firstChild: 620, eachChild: 480,
+    },
     dti: 6,                 // APRA high debt-to-income threshold
     fhog: { amount: 30000, cap: 750000 },
   };
@@ -52,6 +65,47 @@
     let lito = income <= L.t1 ? L.max : income <= L.t2 ? L.max - (income - L.t1) * L.r1 : Math.max(0, L.max - (L.t2 - L.t1) * L.r1 - (income - L.t2) * L.r2);
     tax = Math.max(0, tax - lito);
     return tax + income * RULES.medicare;
+  }
+
+  function helpRepay(income) {
+    const H = RULES.help;
+    if (income <= H.t1) return 0;
+    if (income <= H.t2) return (income - H.t1) * H.r1;
+    if (income <= H.t3) return H.base2 + (income - H.t2) * H.r2;
+    return income * H.flat;
+  }
+  function interp(points, x) {
+    if (x <= points[0][0]) return points[0][1];
+    for (let i = 1; i < points.length; i++) {
+      const [x1, y1] = points[i];
+      if (x <= x1) { const [x0, y0] = points[i - 1]; return y0 + ((y1 - y0) * (x - x0)) / (x1 - x0); }
+    }
+    return points[points.length - 1][1];
+  }
+  // The least a lender will assume a household spends each month.
+  function livingFloor(two, deps, grossIncome) {
+    const F = RULES.floor;
+    return interp(two ? F.couple : F.single, grossIncome) + (deps > 0 ? F.firstChild + (deps - 1) * F.eachChild : 0);
+  }
+  // Borrowing power the way the big four's calculators work: income after tax and HELP, less the higher of
+  // stated and benchmark living costs, less commitments, tested at the rate plus the buffer.
+  function borrow(o) {
+    const two = !!o.two, deps = o.deps || 0;
+    const inc1 = o.inc1 || 0, inc2 = two ? o.inc2 || 0 : 0, other = o.other || 0;
+    const rentYear = o.invest ? (o.rentWeek || 0) * 52 : 0;
+    const taxable1 = inc1 + other * RULES.rentShare;
+    const net1 = taxable1 - incomeTax(taxable1) - (o.help1 ? helpRepay(taxable1) : 0);
+    const net2 = inc2 ? inc2 - incomeTax(inc2) - (o.help2 ? helpRepay(inc2) : 0) : 0;
+    const rentCounted = (rentYear * RULES.rentShare) / 12;  // interest deductions usually cover the tax on it
+    const net = (net1 + net2) / 12 + rentCounted - RULES.margin;
+    const gross = inc1 + inc2 + other + rentYear;
+    const floor = livingFloor(two, deps, gross);
+    const living = Math.max(o.expenses || 0, floor);
+    const commitments = (o.homeLoans || 0) * RULES.homeLoanLoad + (o.otherLoans || 0) * RULES.otherLoanLoad + (o.cards || 0) * RULES.cardRate;
+    const surplus = net - living - commitments;
+    const assess = Math.max(o.rate + RULES.buffer, RULES.minAssess);
+    const loan = surplus > 0 ? Math.floor(pv(surplus, assess, o.years || 30) / 1000) * 1000 : 0;
+    return { loan, assess, net, living, floor, usedFloor: floor > (o.expenses || 0), rentCounted, surplus, gross };
   }
 
   // Stamp duty for every state and territory. Rate schedules come from data/stamp-duty.json, which the build
@@ -148,56 +202,70 @@
     repayments(form, panel) {
       const P = num(form.elements.amount), r = num(form.elements.rate), years = num(form.elements.years);
       const freq = val(form, "frequency"), type = val(form, "type");
+      const io = type === "io";
+      form.querySelectorAll("[data-io]").forEach((el) => { el.hidden = !io; });
       if (!(r > 0)) return empty(panel, needRate);
       if (!(P > 0) || !(years > 0)) return empty(panel, "Enter a loan amount and term");
       ready(panel);
       const k = { monthly: 12, fortnightly: 26, weekly: 52 }[freq] || 12;
       const label = { 12: "per month", 26: "per fortnight", 52: "per week" }[k];
-      const pay = (rate) => (type === "io" ? (P * rate) / 100 / k : pmt(P, rate, years, k));
+      // Interest only for a set period, then principal and interest over what's left of the term.
+      const ioYears = io ? Math.min(Math.max(num(form.elements.ioyears) || 0, 0), years - 1) : 0;
+      const rest = years - ioYears;
+      const pay = (rate) => (io && ioYears > 0 ? (P * rate) / 100 / k : pmt(P, rate, years, k));
       const repayment = pay(r);
-      const total = type === "io" ? repayment * k * years : repayment * k * years;
-      const interest = type === "io" ? total : total - P;
+      const after = io && ioYears > 0 ? pmt(P, r, rest, k) : repayment;
+      const total = io && ioYears > 0 ? repayment * k * ioYears + after * k * rest : repayment * k * years;
+      const interest = total - P;
       setOut(panel, "main", money(repayment));
-      setOut(panel, "sub", `${label}, ${type === "io" ? "interest only" : "principal and interest"}`);
+      setOut(panel, "sub", `${label}, ${io && ioYears > 0 ? `interest only for ${plural(ioYears, "year")}` : "principal and interest"}`);
       setOut(panel, "interest", money(interest));
-      setOut(panel, "total", money(type === "io" ? total + P : total));
+      setOut(panel, "total", money(total));
       setOut(panel, "rise1", "+" + money(pay(r + 0.25) - repayment) + " " + label.replace("per ", "a "));
       setOut(panel, "rise2", "+" + money(pay(r + 1) - repayment) + " " + label.replace("per ", "a "));
-      const share = Math.min(100, Math.max(0, (P / (type === "io" ? total + P : total)) * 100));
+      const share = Math.min(100, Math.max(0, (P / total) * 100));
       panel.querySelector(".bar .a").style.width = share + "%";
       panel.querySelector(".bar .b").style.width = 100 - share + "%";
-      show(panel, "io-note", type === "io");
+      show(panel, "io-note", io && ioYears > 0);
+      setOut(panel, "io-years", plural(ioYears, "year"));
+      setOut(panel, "io-after", money(after) + " " + label);
+      setOut(panel, "io-rest", plural(rest, "year"));
       cta(panel, "Buy my next home", band(P));
     },
 
     "borrowing-power"(form, panel) {
-      const two = val(form, "applicants") === "2";
+      const two = val(form, "applicants") === "2", invest = val(form, "purpose") === "invest";
       form.querySelectorAll("[data-second]").forEach((el) => { el.hidden = !two; });
-      const inc1 = num(form.elements.income1) || 0, inc2 = two ? num(form.elements.income2) || 0 : 0;
-      const other = num(form.elements.other) || 0, expenses = num(form.elements.expenses);
-      const commitments = num(form.elements.commitments) || 0, cards = num(form.elements.cards) || 0;
-      const r = num(form.elements.rate), years = num(form.elements.years) || 30;
+      form.querySelectorAll("[data-invest]").forEach((el) => { el.hidden = !invest; });
+      const r = num(form.elements.rate), expenses = num(form.elements.expenses);
+      const o = {
+        two, invest, deps: parseInt(val(form, "deps"), 10) || 0,
+        inc1: num(form.elements.income1) || 0, inc2: num(form.elements.income2) || 0, other: num(form.elements.other) || 0,
+        help1: form.elements.help1.checked, help2: form.elements.help2.checked,
+        rentWeek: num(form.elements.rent) || 0, expenses: expenses || 0,
+        homeLoans: num(form.elements.homeloans) || 0, otherLoans: num(form.elements.commitments) || 0, cards: num(form.elements.cards) || 0,
+        rate: r, years: num(form.elements.years) || 30,
+      };
       if (!(r > 0)) return empty(panel, needRate);
-      if (!(inc1 + inc2 > 0) || !(expenses >= 0) || Number.isNaN(expenses)) return empty(panel, "Enter your income and monthly living expenses");
+      if (!(o.inc1 + (two ? o.inc2 : 0) > 0) || Number.isNaN(expenses)) return empty(panel, "Enter your income and monthly living expenses");
       ready(panel);
-      const counted = other * RULES.rentShare;
-      const net = inc1 + counted - incomeTax(inc1 + counted) + (inc2 ? inc2 - incomeTax(inc2) : 0);
-      const monthlyNet = net / 12;
-      const cardCommit = cards * RULES.cardRate;
-      const surplus = monthlyNet - expenses - commitments - cardCommit;
-      const assess = r + RULES.buffer;
-      const loan = surplus > 0 ? Math.floor(pv(surplus, assess, years) / 1000) * 1000 : 0;
-      const gross = inc1 + inc2 + other;
-      setOut(panel, "main", loan > 0 ? money(loan) : "$0");
-      setOut(panel, "sub", loan > 0 ? "estimated borrowing power" : "Your expenses and commitments use up your income at the assessment rate");
-      setOut(panel, "assess", pct(assess));
-      setOut(panel, "repay", money(pmt(loan, r, years)) + " a month");
-      setOut(panel, "net", money(monthlyNet) + " a month");
-      setOut(panel, "surplus", money(surplus) + " a month");
-      const dti = gross > 0 ? (loan + cards) / gross : 0;
+      const res = borrow(o);
+      setOut(panel, "main", res.loan > 0 ? money(res.loan) : "$0");
+      setOut(panel, "sub", res.loan > 0 ? (invest ? "estimated borrowing power for an investment" : "estimated borrowing power") : "Your expenses and commitments use up your income at the assessment rate");
+      setOut(panel, "assess", pct(res.assess));
+      setOut(panel, "repay", money(pmt(res.loan, r, o.years)) + " a month");
+      setOut(panel, "net", money(res.net) + " a month");
+      setOut(panel, "living", money(res.living) + " a month");
+      setOut(panel, "rent", money(res.rentCounted) + " a month");
+      show(panel, "rent-row", invest);
+      setOut(panel, "surplus", money(res.surplus) + " a month");
+      show(panel, "floor-note", res.usedFloor);
+      setOut(panel, "floor", money(res.floor));
+      show(panel, "invest-note", invest);
+      const dti = res.gross > 0 ? (res.loan + o.cards) / res.gross : 0;
       show(panel, "dti-note", dti >= RULES.dti);
       setOut(panel, "dti", dti.toFixed(1));
-      cta(panel, "Buy my first home", loan > 0 ? band(loan) : "");
+      cta(panel, invest ? "Buy an investment property" : "Buy my first home", res.loan > 0 ? band(res.loan) : "");
     },
 
     "extra-repayments"(form, panel) {
@@ -289,15 +357,23 @@
       const saved = num(form.elements.saved) || 0, monthly = num(form.elements.monthly) || 0, costs = num(form.elements.costs) || 0;
       if (!(price > 0)) return empty(panel, "Enter the property price you're aiming for");
       ready(panel);
-      const deposit = (price * share) / 100, target = deposit + costs, gap = Math.max(0, target - saved);
+      // Stamp duty on an established home to live in, with first home concessions where they apply.
+      const code = form.elements.state ? form.elements.state.value : "";
+      const first = val(form, "first") !== "no";
+      const duty = DUTY && DUTY.states[code] ? dutyFor(code, price, { home: true, first, kind: "established", eligible: true }).duty : 0;
+      const deposit = (price * share) / 100, target = deposit + duty + costs, gap = Math.max(0, target - saved);
       setOut(panel, "main", gap === 0 ? "You're there" : monthly > 0 ? duration(Math.ceil(gap / monthly)) : "Add a monthly amount");
       setOut(panel, "sub", gap === 0 ? "your savings cover this deposit and costs" : "to reach your deposit and costs");
       setOut(panel, "deposit", money(deposit));
+      setOut(panel, "duty", money(duty));
+      setOut(panel, "costs", money(costs));
       setOut(panel, "target", money(target));
       setOut(panel, "gap", money(gap));
       setOut(panel, "loan", money(price - deposit));
+      const link = panel.querySelector('[data-out-href="duty-link"]');
+      if (link && DUTY && DUTY.states[code]) link.href = `/calculators/stamp-duty/${DUTY.states[code].slug}`;
       show(panel, "lmi-note", share < 20);
-      cta(panel, "Buy my first home", band(price - deposit));
+      cta(panel, first ? "Buy my first home" : "Buy my next home", band(price - deposit));
     },
   };
 
@@ -313,5 +389,5 @@
   });
 
   // Exposed for tests (tests/check.py checks the duty and tax maths against published examples).
-  window.GCW_CALC = { duty: (code, v, o) => dutyFor(code, v, o).duty, schedule, firstHomeDeduction, incomeTax, pmt };
+  window.GCW_CALC = { duty: (code, v, o) => dutyFor(code, v, o).duty, schedule, firstHomeDeduction, incomeTax, pmt, helpRepay, livingFloor, borrow };
 })();

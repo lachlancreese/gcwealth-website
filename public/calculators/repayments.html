@@ -24,7 +24,7 @@
 <link rel="preload" href="/assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/figtree-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>:root{--navy:#144154;--blue:#246C8F;--sky:#3D8EB9;--mist:#EAF2F6;--sand:#F4F0E9;--ink:#0F2833;--text:#33454D;}</style>
-<link rel="stylesheet" href="/assets/css/site.css?v=e84a27e1ee">
+<link rel="stylesheet" href="/assets/css/site.css?v=5e43f10a0f">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -92,7 +92,7 @@
  ]
 }
 </script>
-<script src="/assets/js/calculators.js?v=71fc0be62a" defer></script>
+<script src="/assets/js/calculators.js?v=a461f4e7ed" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -205,6 +205,11 @@
           <label><input type="radio" name="type" value="io"><span>Interest only</span></label>
         </div>
       </fieldset>
+      <div class="field" data-io hidden>
+        <label for="c-io">Interest-only period</label>
+        <div class="input-wrap"><input class="input" id="c-io" name="ioyears" inputmode="numeric" value="5" style="padding-right:64px"><span class="unit post">years</span></div>
+        <p class="hint">Usually five years or less. Principal and interest repayments follow for the rest of the term.</p>
+      </div>
     </form>
     <aside class="results" id="results" aria-labelledby="results-title">
       <h2 id="results-title">Your repayments</h2>
@@ -218,7 +223,7 @@
         <li>If your rate rose 0.25% <b data-out="rise1"></b></li>
         <li>If your rate rose 1% <b data-out="rise2"></b></li>
       </ul>
-      <p class="result-note" data-show="io-note" hidden>Interest-only periods are usually limited, often to five years or less. After that, repayments rise to cover principal over the remaining term.</p>
+      <p class="result-note" data-show="io-note" hidden>After <span data-out="io-years"></span> of interest only, repayments rise to <b data-out="io-after"></b> to repay the loan over the remaining <span data-out="io-rest"></span>.</p>
       <a class="btn btn-light" data-cta href="/get-started">Talk to a broker about this</a>
     </aside>
   </div>

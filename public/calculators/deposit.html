@@ -24,7 +24,7 @@
 <link rel="preload" href="/assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/figtree-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>:root{--navy:#144154;--blue:#246C8F;--sky:#3D8EB9;--mist:#EAF2F6;--sand:#F4F0E9;--ink:#0F2833;--text:#33454D;}</style>
-<link rel="stylesheet" href="/assets/css/site.css?v=e84a27e1ee">
+<link rel="stylesheet" href="/assets/css/site.css?v=5e43f10a0f">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -68,7 +68,7 @@
  }
 }
 </script>
-<script src="/assets/js/calculators.js?v=71fc0be62a" defer></script>
+<script src="/assets/js/calculators.js?v=a461f4e7ed" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -157,6 +157,18 @@
         <label for="c-price">Property price you're aiming for</label>
         <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-price" name="price" inputmode="decimal" value="750,000"></div>
       </div>
+      <div class="field">
+        <label for="c-state">Where you're buying</label>
+        <select class="input" id="c-state" name="state"><option value="NSW">New South Wales</option><option value="VIC">Victoria</option><option value="QLD" selected>Queensland</option><option value="WA">Western Australia</option><option value="SA">South Australia</option><option value="TAS">Tasmania</option><option value="ACT">Australian Capital Territory</option><option value="NT">Northern Territory</option></select>
+      </div>
+      <script type="application/json" id="duty-data">{"checked":"17 November 2026","states":{"NSW":{"name":"New South Wales","short":"NSW","slug":"nsw","term":"transfer duty","round":"part","general":[{"to":18000,"base":0,"rate":1.25,"over":0,"min":20},{"to":38000,"base":225,"rate":1.5,"over":18000},{"to":103000,"base":525,"rate":1.75,"over":38000},{"to":387000,"base":1662,"rate":3.5,"over":103000},{"to":1290000,"base":11602,"rate":4.5,"over":387000},{"to":3870000,"base":52237,"rate":5.5,"over":1290000},{"to":null,"base":194137,"rate":7,"over":3870000}],"owner":null,"fhb":"nsw"},"VIC":{"name":"Victoria","short":"VIC","slug":"vic","term":"land transfer duty","round":"exact","general":[{"to":25000,"base":0,"rate":1.4,"over":0},{"to":130000,"base":350,"rate":2.4,"over":25000},{"to":960000,"base":2870,"rate":6,"over":130000},{"to":2000000,"flat":5.5},{"to":null,"base":110000,"rate":6.5,"over":2000000}],"owner":[{"to":25000,"base":0,"rate":1.4,"over":0},{"to":130000,"base":350,"rate":2.4,"over":25000},{"to":440000,"base":2870,"rate":5,"over":130000},{"to":550000,"base":18370,"rate":6,"over":440000}],"owner_max":550000,"fhb":"vic"},"QLD":{"name":"Queensland","short":"QLD","slug":"qld","term":"transfer duty","round":"part","general":[{"to":5000,"base":0,"rate":0,"over":0},{"to":75000,"base":0,"rate":1.5,"over":5000},{"to":540000,"base":1050,"rate":3.5,"over":75000},{"to":1000000,"base":17325,"rate":4.5,"over":540000},{"to":null,"base":38025,"rate":5.75,"over":1000000}],"owner":[{"to":350000,"base":0,"rate":1,"over":0},{"to":540000,"base":3500,"rate":3.5,"over":350000},{"to":1000000,"base":10150,"rate":4.5,"over":540000},{"to":null,"base":30850,"rate":5.75,"over":1000000}],"owner_max":null,"owner_needs_residency":true,"kinds":["established","new","land"],"fhb":"qld","grant":"You may also be eligible for Queensland's $30,000 First Home Owner Grant for new homes under $750,000."},"WA":{"name":"Western Australia","short":"WA","slug":"wa","term":"transfer duty","round":"part","general":[{"to":120000,"base":0,"rate":1.9,"over":0},{"to":150000,"base":2280,"rate":2.85,"over":120000},{"to":360000,"base":3135,"rate":3.8,"over":150000},{"to":725000,"base":11115,"rate":4.75,"over":360000},{"to":null,"base":28453,"rate":5.15,"over":725000}],"owner":null,"fhb":"wa"},"SA":{"name":"South Australia","short":"SA","slug":"sa","term":"stamp duty","round":"part","general":[{"to":12000,"base":0,"rate":1,"over":0},{"to":30000,"base":120,"rate":2,"over":12000},{"to":50000,"base":480,"rate":3,"over":30000},{"to":100000,"base":1080,"rate":3.5,"over":50000},{"to":200000,"base":2830,"rate":4,"over":100000},{"to":250000,"base":6830,"rate":4.25,"over":200000},{"to":300000,"base":8955,"rate":4.75,"over":250000},{"to":500000,"base":11330,"rate":5,"over":300000},{"to":null,"base":21330,"rate":5.5,"over":500000}],"owner":null,"kinds":["established","new"],"fhb":"sa"},"TAS":{"name":"Tasmania","short":"TAS","slug":"tas","term":"property transfer duty","round":"part","general":[{"to":3000,"base":50,"rate":0,"over":0},{"to":25000,"base":50,"rate":1.75,"over":3000},{"to":75000,"base":435,"rate":2.25,"over":25000},{"to":200000,"base":1560,"rate":3.5,"over":75000},{"to":375000,"base":5935,"rate":4,"over":200000},{"to":725000,"base":12935,"rate":4.25,"over":375000},{"to":null,"base":27810,"rate":4.5,"over":725000}],"owner":null,"fhb":"none"},"ACT":{"name":"Australian Capital Territory","short":"ACT","slug":"act","term":"conveyance duty","round":"part","general":[{"to":200000,"base":0,"rate":1.2,"over":0},{"to":300000,"base":2400,"rate":2.2,"over":200000},{"to":500000,"base":4600,"rate":3.4,"over":300000},{"to":750000,"base":11400,"rate":4.32,"over":500000},{"to":1000000,"base":22200,"rate":5.9,"over":750000},{"to":1455000,"base":36950,"rate":6.4,"over":1000000},{"to":null,"flat":4.54}],"owner":[{"to":260000,"base":0,"rate":0.28,"over":0},{"to":300000,"base":728,"rate":2.2,"over":260000},{"to":500000,"base":1608,"rate":3.4,"over":300000},{"to":750000,"base":8408,"rate":4.32,"over":500000},{"to":1000000,"base":19208,"rate":5.9,"over":750000},{"to":1455000,"base":33958,"rate":6.4,"over":1000000},{"to":null,"flat":4.54}],"owner_max":null,"fhb":"act"},"NT":{"name":"Northern Territory","short":"NT","slug":"nt","term":"stamp duty","round":"exact","general":[{"to":525000,"formula":"nt"},{"to":3000000,"flat":4.95},{"to":5000000,"flat":5.75},{"to":null,"flat":5.95}],"owner":null,"fhb":"none"}}}</script>
+      <fieldset>
+        <legend>Your first home?</legend>
+        <div class="seg">
+          <label><input type="radio" name="first" value="yes" checked><span>Yes</span></label>
+          <label><input type="radio" name="first" value="no"><span>No</span></label>
+        </div>
+      </fieldset>
       <fieldset class="full">
         <legend>Deposit</legend>
         <div class="seg">
@@ -174,9 +186,9 @@
         <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-monthly" name="monthly" inputmode="decimal" value="2,000"></div>
       </div>
       <div class="field full">
-        <label for="c-costs">Upfront costs <span>(optional)</span></label>
-        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-costs" name="costs" inputmode="decimal" value="0"></div>
-        <p class="hint">Stamp duty, legal and inspection costs. <a href="/calculators/stamp-duty">Estimate your stamp duty</a>.</p>
+        <label for="c-costs">Other upfront costs <span>(optional)</span></label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-costs" name="costs" inputmode="decimal" value="3,000"></div>
+        <p class="hint">Conveyancing, inspections and lender fees. We add stamp duty for you.</p>
       </div>
     </form>
     <aside class="results" id="results" aria-labelledby="results-title">
@@ -185,10 +197,13 @@
       <div class="result-sub" data-out="sub" data-detail></div>
       <ul class="result-list" data-detail>
         <li>Deposit <b data-out="deposit"></b></li>
+        <li>Stamp duty (estimated) <b data-out="duty"></b></li>
+        <li>Other upfront costs <b data-out="costs"></b></li>
         <li>Deposit plus costs <b data-out="target"></b></li>
         <li>Still to save <b data-out="gap"></b></li>
         <li>Loan you'd need <b data-out="loan"></b></li>
       </ul>
+      <p class="result-note" data-detail>Stamp duty assumes an established home you'll live in, bought by Australian citizens or permanent residents. New homes can attract bigger first home concessions. <a data-out-href="duty-link" href="/calculators/stamp-duty" style="color:#fff">Check stamp duty in full</a>.</p>
       <p class="result-note" data-show="lmi-note" hidden>With less than 20%, you'd usually pay lenders mortgage insurance, unless the 5% Deposit Scheme or a family guarantee applies. <a href="/home-loans/first-home-buyers" style="color:#fff">First home buyer options</a>.</p>
       <a class="btn btn-light" data-cta href="/get-started">Talk to a broker about this</a>
     </aside>

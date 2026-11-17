@@ -199,13 +199,30 @@ def first_home_states(default="QLD"):
       </div>"""
 
 
+def duty_payload():
+    """Rates for the calculators' script, embedded in the page as JSON."""
+    keep = ("name", "short", "term", "round", "general", "owner", "owner_max", "owner_needs_residency", "kinds", "fhb", "grant", "slug")
+    data = {"checked": DUTY["checked"], "states": {c: {k: v for k, v in st.items() if k in keep} for c, st in DUTY["states"].items()}}
+    return json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
+
+
+def duty_state_field(default=None):
+    """A state or territory picker for calculators that estimate stamp duty along the way."""
+    default = default or DUTY["default"]
+    options = "".join(f'<option value="{c}"{" selected" if c == default else ""}>{html.escape(DUTY["states"][c]["name"])}</option>'
+                      for c in DUTY["order"])
+    return f"""<div class="field">
+        <label for="c-state">Where you're buying</label>
+        <select class="input" id="c-state" name="state">{options}</select>
+      </div>
+      <script type="application/json" id="duty-data">{duty_payload()}</script>"""
+
+
 def duty_calc(default):
     """The stamp duty calculator form and results. Rates come from data/stamp-duty.json, embedded for the script."""
     options = "".join(f'<option value="{c}"{" selected" if c == default else ""}>{html.escape(DUTY["states"][c]["name"])}</option>'
                       for c in DUTY["order"])
-    keep = ("name", "short", "term", "round", "general", "owner", "owner_max", "owner_needs_residency", "kinds", "fhb", "grant", "slug")
-    data = {"checked": DUTY["checked"], "states": {c: {k: v for k, v in st.items() if k in keep} for c, st in DUTY["states"].items()}}
-    payload = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
+    payload = duty_payload()
     return f"""<form class="calc-form" data-calc="stamp-duty" data-results="results" novalidate>
       <div class="field full">
         <label for="c-state">State or territory</label>
@@ -295,6 +312,7 @@ def fill(text):
     text = text.replace("<!--team-cards-->", team_cards())
     text = text.replace("<!--team-behind-->", behind_cards())
     text = text.replace("<!--first-home-states-->", first_home_states())
+    text = text.replace("<!--duty-state-field-->", duty_state_field())
     text = re.sub(r"<!--contact:([\w-]+)-->", lambda m: contact_panel(m.group(1)), text)
     text = re.sub(r"<!--brokers-for:([\w-]+)-->", lambda m: brokers_for(m.group(1)), text)
     text = text.replace("<!--team-matcher-->", team_matcher())

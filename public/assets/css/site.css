@@ -343,6 +343,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .chip input:focus-visible + span { outline: 3px solid var(--sky); outline-offset: 2px; }
 .consent { display: flex; gap: 12px; align-items: flex-start; font-size: 0.9375rem; }
 .consent input { width: 20px; height: 20px; margin-top: 3px; flex: none; accent-color: var(--blue); }
+.field .consent { margin-top: 10px; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .form-status { margin: 0; font-weight: 600; }
 .form-status.error { color: #B42318; }

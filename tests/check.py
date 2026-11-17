@@ -306,6 +306,44 @@ def check_calculators(browser):
     for k, v in {"tax100k": 22520, "pmt": 599.55}.items():
         if abs(m[k] - v) > 0.01:
             fail(f"calculator maths: {k} is {m[k]}, expected {v}")
+    # Borrowing power against the big four banks' own calculators (run 17 Nov 2026 with the same inputs and each
+    # bank's rate). Ours must never be higher, and should be within 8% so it isn't uselessly low.
+    # (two, deps, inc1, inc2, expenses a month, rate, invest, rent a week, bank result, bank)
+    bank = [
+        (0, 0, 100000, 0, 3000, 6.64, 0, 0, 400100, "CBA"), (0, 0, 100000, 0, 2000, 6.64, 0, 0, 508500, "CBA"),
+        (0, 0, 100000, 0, 1000, 6.64, 0, 0, 508500, "CBA"), (0, 0, 100000, 0, 2500, 6.64, 0, 0, 458900, "CBA"),
+        (0, 0, 60000, 0, 0, 6.64, 0, 0, 295500, "CBA"), (0, 0, 60000, 0, 2500, 6.64, 0, 0, 193600, "CBA"),
+        (0, 0, 150000, 0, 0, 6.64, 0, 0, 749700, "CBA"), (0, 0, 150000, 0, 5000, 6.64, 0, 0, 487800, "CBA"),
+        (0, 0, 250000, 0, 0, 6.64, 0, 0, 1203600, "CBA"), (0, 0, 250000, 0, 8000, 6.64, 0, 0, 685500, "CBA"),
+        (0, 1, 100000, 0, 0, 6.64, 0, 0, 457200, "CBA"), (0, 2, 100000, 0, 0, 6.64, 0, 0, 396900, "CBA"),
+        (0, 1, 100000, 0, 4000, 6.64, 0, 0, 282600, "CBA"), (1, 0, 100000, 0, 2500, 6.64, 0, 0, 362000, "CBA"),
+        (1, 0, 150000, 0, 0, 6.64, 0, 0, 602500, "CBA"), (1, 0, 250000, 100000, 0, 6.64, 0, 0, 1667800, "CBA"),
+        (1, 0, 250000, 100000, 12000, 6.64, 0, 0, 974200, "CBA"), (1, 1, 120000, 80000, 1000, 6.64, 0, 0, 920400, "CBA"),
+        (1, 1, 120000, 80000, 7000, 6.64, 0, 0, 688800, "CBA"), (1, 1, 120000, 80000, 8000, 6.64, 0, 0, 571300, "CBA"),
+        (0, 0, 100000, 0, 3000, 6.79, 1, 0, 395000, "CBA"), (0, 0, 100000, 0, 3000, 6.79, 1, 500, 621200, "CBA"),
+        (0, 0, 100000, 0, 0, 6.79, 1, 500, 684700, "CBA"), (0, 0, 100000, 0, 3000, 6.79, 1, 1000, 847400, "CBA"),
+        (0, 0, 100000, 0, 3000, 6.94, 0, 0, 395889, "NAB"), (0, 0, 100000, 0, 1000, 6.94, 0, 0, 495186, "NAB"),
+        (0, 0, 100000, 0, 2500, 6.94, 0, 0, 453154, "NAB"), (0, 0, 60000, 0, 1, 6.94, 0, 0, 289071, "NAB"),
+        (0, 0, 150000, 0, 1, 6.94, 0, 0, 725599, "NAB"), (0, 1, 100000, 0, 1, 6.94, 0, 0, 435860, "NAB"),
+        (0, 2, 100000, 0, 1, 6.94, 0, 0, 382489, "NAB"), (1, 1, 120000, 80000, 1, 6.94, 0, 0, 894739, "NAB"),
+        (1, 1, 120000, 80000, 8000, 6.94, 0, 0, 562719, "NAB"), (1, 0, 100000, 1, 1, 6.94, 0, 0, 355470, "NAB"),
+        (1, 0, 150000, 1, 1, 6.94, 0, 0, 585653, "NAB"), (1, 0, 250000, 100000, 1, 6.94, 0, 0, 1612283, "NAB"),
+        (1, 2, 150000, 50000, 1, 6.94, 0, 0, 847037, "NAB"),
+        (0, 0, 100000, 0, 3000, 7.04, 0, 0, 392566, "Westpac"), (0, 0, 100000, 0, 1, 7.04, 0, 0, 500342, "Westpac"),
+        (0, 0, 100000, 0, 2500, 7.04, 0, 0, 449350, "Westpac"), (0, 0, 60000, 0, 1, 7.04, 0, 0, 293914, "Westpac"),
+        (0, 0, 150000, 0, 1, 7.04, 0, 0, 731662, "Westpac"), (0, 0, 150000, 0, 5000, 7.04, 0, 0, 477269, "Westpac"),
+    ]
+    got = pg.evaluate("""(cases) => cases.map(([two, deps, inc1, inc2, expenses, rate, invest, rentWeek]) =>
+        window.GCW_CALC.borrow({ two: !!two, deps, inc1, inc2, expenses, rate, invest: !!invest, rentWeek, years: 30 }).loan)""",
+        [list(c[:8]) for c in bank])
+    for c, ours in zip(bank, got):
+        if ours > c[8]:
+            fail(f"borrowing power is above {c[9]} for {c[:8]}: ours ${ours:,}, {c[9]} ${c[8]:,}")
+        elif ours < c[8] * 0.92:
+            fail(f"borrowing power is more than 8% below {c[9]} for {c[:8]}: ours ${ours:,}, {c[9]} ${c[8]:,}")
+    h = pg.evaluate("[60000, 80000, 150000, 227123].map(x => Math.round(window.GCW_CALC.helpRepay(x) * 100) / 100)")
+    if h != [0, 1570.8, 12476.11, 22712.3]:  # ATO 2026-27 marginal rates; $227,123 matches the ATO example
+        fail(f"HELP repayments: got {h}")
     # The form: pick WA, a first home at $800,000.
     pg.select_option("#c-state", "WA")
     pg.fill("#c-price", "800000")
@@ -329,6 +367,23 @@ def check_calculators(browser):
     if pg.locator(".result-main").inner_text().strip() != "$3,597":
         fail(f"repayments: $600,000 at 6% over 30 years shows {pg.locator('.result-main').inner_text()}, expected $3,597")
     pg.screenshot(path=str(OUT / "calc-repayments-filled.png"), full_page=True)
+    # Interest only for 5 years at 6%, then principal and interest over the remaining 25.
+    pg.locator("label", has_text="Interest only").click()
+    pg.wait_for_timeout(150)
+    if pg.locator(".result-main").inner_text().strip() != "$3,000" or "$3,866" not in pg.locator("[data-show=io-note]").inner_text():
+        fail(f"repayments: interest only shows {pg.locator('.result-main').inner_text()} / {pg.locator('[data-show=io-note]').inner_text()}")
+    # Deposit planner adds stamp duty for the state: a first home in NSW at $750,000 has none, in QLD it does.
+    pg.goto(BASE + "/calculators/deposit")
+    pg.select_option("#c-state", "NSW")
+    pg.wait_for_timeout(150)
+    if pg.locator("[data-out=duty]").inner_text().strip() != "$0":
+        fail(f"deposit: NSW first home duty at $750,000 shows {pg.locator('[data-out=duty]').inner_text()}, expected $0")
+    pg.select_option("#c-state", "QLD")
+    pg.locator("label", has_text="No").first.click()
+    pg.wait_for_timeout(150)
+    want = pg.evaluate("Math.round(window.GCW_CALC.duty('QLD', 750000, {home: true, first: false, kind: 'established', eligible: true}))")
+    if pg.locator("[data-out=duty]").inner_text().strip() != f"${want:,}":
+        fail(f"deposit: QLD duty at $750,000 shows {pg.locator('[data-out=duty]').inner_text()}, expected ${want:,}")
     pg.goto(BASE + "/calculators/borrowing-power")
     pg.fill("#c-rate", "6")
     pg.wait_for_timeout(200)
@@ -337,6 +392,26 @@ def check_calculators(browser):
     href = pg.locator("[data-cta]").get_attribute("href")
     if "goal=" not in href:
         fail("borrowing power: call to action doesn't carry the result to Get started")
+    base = pg.locator(".result-main").inner_text()
+    pg.check("#c-help1")
+    pg.wait_for_timeout(150)
+    dollars = lambda t: int(t.replace("$", "").replace(",", "") or 0)
+    if dollars(pg.locator(".result-main").inner_text()) >= dollars(base):
+        fail("borrowing power: a HELP debt doesn't lower the estimate")
+    pg.uncheck("#c-help1")
+    pg.locator("label", has_text="An investment").click()
+    pg.fill("#c-rent", "600")
+    pg.wait_for_timeout(150)
+    if not pg.locator("#c-rent").is_visible() or not pg.locator("[data-show=invest-note]").is_visible():
+        fail("borrowing power: investment rent field or note not shown")
+    if pg.locator("[data-cta]").get_attribute("href").find("investment") < 0:
+        fail("borrowing power: investment estimate doesn't carry the goal to Get started")
+    pg.locator("label", has_text="A home to live in").click()
+    pg.fill("#c-exp", "500")
+    pg.wait_for_timeout(150)
+    if not pg.locator("[data-show=floor-note]").is_visible():
+        fail("borrowing power: very low living costs don't explain the lender minimum")
+    href = pg.locator("[data-cta]").get_attribute("href")
     pg.goto(BASE + href)
     if not pg.locator('input[name="goal"][value="Buy my first home"]').is_checked():
         fail("get started: goal from the calculator wasn't preselected")
