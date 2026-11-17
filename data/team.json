@@ -53,6 +53,51 @@
         "amy-t",
         "michael-d"
       ]
+    },
+    {
+      "slug": "kirisome-auvaa",
+      "name": "Kirisome Auva'a",
+      "role": "Finance Broker",
+      "credit_rep": "576212",
+      "photo": "kirisome-auvaa",
+      "summary": "Kirisome helps first home buyers understand the process, from borrowing capacity and deposit options to available schemes.",
+      "phone": "0483 780 534",
+      "phone_tel": "+61483780534",
+      "email": "kirisome@gcwealth.com.au",
+      "credentials": [
+        "MFAA accredited",
+        "Credit Representative 576212, authorised under Australian Credit Licence 389328"
+      ],
+      "focus": [
+        "First home buyers",
+        "Refinancing",
+        "Investment loans"
+      ],
+      "linkedin": "https://au.linkedin.com/in/kirisome-auva-a-79ab14233",
+      "reviews": [],
+      "instagram": "https://www.instagram.com/kirisomeauvaa23/"
+    },
+    {
+      "slug": "kim-edwards",
+      "name": "Kim Edwards",
+      "role": "Finance Specialist",
+      "credit_rep": "56632",
+      "photo": "kim-edwards",
+      "summary": "Kim specialises in complex finance for business owners.",
+      "phone": "0432 022 161",
+      "phone_tel": "+61432022161",
+      "email": "kim@gcwealth.com.au",
+      "credentials": [
+        "MFAA accredited",
+        "Credit Representative 56632, authorised under Australian Credit Licence 389328"
+      ],
+      "focus": [
+        "Business owners",
+        "Complex finance",
+        "Business lending"
+      ],
+      "linkedin": "https://au.linkedin.com/in/kim-edwards-3b955267",
+      "reviews": []
     }
   ]
 }

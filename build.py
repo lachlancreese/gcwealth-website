@@ -107,6 +107,7 @@ def fill(text):
     text = re.sub(r"<!--reviews:([\w-]+)-->", lambda m: reviews_html(m.group(1)), text)
     text = text.replace("<!--cash-rate-table-->", cash_rate_table())
     text = text.replace("<!--team-cards-->", team_cards())
+    text = text.replace("<!--broker-names-->", html.escape(json.dumps({k: v["name"] for k, v in TEAM.items()}, ensure_ascii=False)))
     text = text.replace("<!--featured-->", "".join(f"<li>{html.escape(n)}</li>" for n in B["featured_in"]))
     return re.sub(r"\{\{([\w.]+)\}\}", get, text)
 
@@ -242,7 +243,7 @@ def structured_data(meta, body, pages):
             "url": SITE + path,
             "worksFor": {"@type": "FinancialService", "@id": ORG_ID, "name": B["name"]},
             "hasCredential": [{"@type": "EducationalOccupationalCredential", "name": c} for c in p["credentials"]],
-            **({"sameAs": [p["linkedin"]]} if p.get("linkedin") else {}),
+            **({"sameAs": links} if (links := [p[k] for k in ("linkedin", "instagram") if p.get(k)]) else {}),
         })
     if 'class="faq-list"' in body:
         qa = re.findall(r"<summary>(.*?)</summary>\s*<div>(.*?)</div>", body.split('class="faq-list"', 1)[1], re.S)
