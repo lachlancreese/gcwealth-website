@@ -526,7 +526,9 @@ mark.todo { background: #FFF1C2; color: #5C4400; padding: 0 4px; border-radius: 
 @media (max-width: 560px) { .behind-card { grid-template-columns: 100px minmax(0, 1fr); } .behind-card img { width: 100px; } }
 
 /* Team */
-.people { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--s4); }
+.people { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--s4) var(--s3); }
+@media (min-width: 1000px) { .people { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .people { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3) var(--s2); } .people .person-name { font-size: 1.0625rem; } .people .person-role { font-size: 0.875rem; } }
 .people li { margin: 0; }
 .person-card { display: block; text-decoration: none; color: var(--text); }
 .person-card img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius-lg); margin-bottom: var(--s2); }
