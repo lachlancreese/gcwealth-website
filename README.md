@@ -84,6 +84,8 @@ accessibility scan (axe-core). It then checks every internal link, the old-addre
 1. **Cloudflare account:** sign up with admin@gcwealth.com.au (separate from ONIV) and turn on two-factor sign-in.
 2. Workers & Pages → Create → Import a repository → `lachlancreese/gcwealth-website`. Worker name `gcwealth-website`.
    Build command: none. Deploy command: `npx wrangler deploy`.
+   Cloudflare then shows a preview address (`gcwealth-website.<account>.workers.dev`). The whole site works there before the
+   domain moves, and every address other than gcwealth.com.au sends `X-Robots-Tag: noindex` so Google ignores it.
 3. **Email (Resend):** add the domain `gcwealth.com.au` in Resend and add the DNS records it gives you (at Squarespace Domains until the
    DNS move). Create an API key and add it in Cloudflare → `gcwealth-website` → Settings → Variables and secrets as `RESEND_API_KEY`
    (type Secret). Redeploy and send a test enquiry.

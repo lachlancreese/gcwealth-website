@@ -69,6 +69,16 @@ function redirect(url, status = 301) {
 
 export default {
   async fetch(request, env, ctx) {
+    const res = await handle(request, env, ctx);
+    if (new URL(request.url).hostname === HOST) return res;
+    // Preview addresses (e.g. *.workers.dev before the domain moves) stay out of search results.
+    const out = new Response(res.body, res);
+    out.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return out;
+  },
+};
+
+async function handle(request, env, ctx) {
     const url = new URL(request.url);
 
     // One address for everything: https://gcwealth.com.au (www and plain http redirect here).
@@ -103,5 +113,4 @@ export default {
     }
 
     return env.ASSETS.fetch(request);
-  },
-};
+}

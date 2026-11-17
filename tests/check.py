@@ -247,6 +247,8 @@ def run_checks():
         code, _, headers = status_of(BASE + "/")
         if "Content-Security-Policy" not in headers:
             fail("security headers missing on /")
+        if "noindex" not in (headers.get("X-Robots-Tag") or headers.get("x-robots-tag") or ""):
+            fail("preview address (not gcwealth.com.au) isn't marked noindex")
 
         print("Checking calculators")
         check_calculators(browser)
