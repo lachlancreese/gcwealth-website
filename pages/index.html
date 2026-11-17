@@ -5,6 +5,7 @@ path: /
 crumb: Home
 nav:
 -->
+<!--head--><script src="/assets/js/cash-rate.js" defer></script><!--/head-->
 <section class="hero">
   <div class="wrap">
     <div>
@@ -17,7 +18,12 @@ nav:
       <p class="hero-call">Your first conversation is complimentary. Prefer to talk? Call <a href="tel:{{phone_tel}}">{{phone}}</a>.</p>
     </div>
     <div class="hero-media">
-      <img src="/assets/img/gc-wealth-team-800.webp" srcset="/assets/img/gc-wealth-team-480.webp 480w, /assets/img/gc-wealth-team-800.webp 800w, /assets/img/gc-wealth-team-1264.webp 1264w" sizes="(max-width: 900px) 420px, 560px" alt="The GC Wealth team" width="800" height="533" fetchpriority="high">
+      <div class="hero-scene"><!--include:hero-coast--></div>
+      <a class="live-rate" href="/rba-cash-rate">
+        <span class="live-tag"><span class="live-dot" aria-hidden="true"></span>RBA cash rate</span>
+        <b data-cash-rate>{{rates.cash_rate}}<small>%</small></b>
+        <span class="live-sub" data-next-decision="{{rates.next_decision_date}}">Next decision {{rates.next_decision_short}}</span>
+      </a>
     </div>
   </div>
 </section>

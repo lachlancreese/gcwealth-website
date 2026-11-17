@@ -251,7 +251,7 @@ def duty_calc(default):
 
 def fill(text):
     """Replace {{key}} and {{key.sub}} with values from brand.json."""
-    ctx = dict(B, rates=RATES)
+    ctx = dict(B, rates=dict(RATES, next_decision_short=nice_date(RATES["next_decision_date"])))
 
     def get(m):
         val = ctx
