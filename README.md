@@ -112,7 +112,7 @@ Elementor sitemap has a home in `MOVED` (`src/worker.js`).
 | Business finance hub | `pages/business-finance.html` | `/business-finance` |
 | Commercial property, business loans, asset finance | `pages/business-finance/*.html` | `/business-finance/...` |
 | Privacy, credit guide (drafts) | `pages/privacy.html`, `pages/credit-guide.html` | `/privacy`, `/credit-guide` |
-| Our team and profiles | `pages/team.html`, `pages/team/*.html` | `/team`, `/team/brooke-juracic`, `/team/steven-shaw`, `/team/kirisome-auvaa`, `/team/kim-edwards` |
+| Our team and profiles | `pages/team.html`, `pages/team/*.html` | `/team`, `/team/brooke-juracic`, `/team/steven-shaw`, `/team/kirisome-auvaa`, `/team/kim-edwards`, `/team/matthew-klein` |
 | Referral partners (referral form) | `pages/partners.html` | `/partners` |
 | Loan health check (offer and form) | `pages/loan-health-check.html` | `/loan-health-check` |
 | First home buyer guide (PDF by email) | `pages/first-home-buyer-guide.html` | `/first-home-buyer-guide` |

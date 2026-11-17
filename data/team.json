@@ -98,6 +98,28 @@
       ],
       "linkedin": "https://au.linkedin.com/in/kim-edwards-3b955267",
       "reviews": []
+    },
+    {
+      "slug": "matthew-klein",
+      "name": "Matthew Klein",
+      "role": "Commercial Finance",
+      "credit_rep": "561059",
+      "photo": "matthew-klein",
+      "summary": "Matthew is a commercial asset finance broker, helping businesses fund equipment, vehicles and machinery and find suitable cashflow solutions.",
+      "phone": "0452 356 955",
+      "phone_tel": "+61452356955",
+      "email": "matthew@gcwealth.com.au",
+      "credentials": [
+        "MFAA accredited",
+        "Credit Representative 561059, authorised under Australian Credit Licence 389328"
+      ],
+      "focus": [
+        "Equipment and vehicle finance",
+        "Machinery finance",
+        "Cashflow solutions"
+      ],
+      "linkedin": "https://au.linkedin.com/in/matthew-klein-05a6531a5",
+      "reviews": []
     }
   ]
 }
