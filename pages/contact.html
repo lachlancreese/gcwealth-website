@@ -1,0 +1,52 @@
+<!--
+title: Contact Us | Mortgage Broker Southport | GC Wealth
+description: Call 0422 740 697, email us, or visit our office at 16 Nexus Way, Southport. Send us a message and a GC Wealth broker will be in touch.
+path: /contact
+crumb: Contact
+nav: contact
+bar: no
+-->
+<section class="section" style="padding-top:40px">
+  <div class="wrap contact-grid">
+    <div>
+      <h1>Let's talk finance</h1>
+      <p class="lede">Call, email or send us a message. If you're ready to start, <a href="/get-started">tell us what you're planning</a> and we'll take it from there.</p>
+      <ul class="contact-list">
+        <li><b>Phone</b><a href="tel:{{phone_tel}}">{{phone}}</a></li>
+        <li><b>Email</b><a href="mailto:{{email}}">{{email}}</a></li>
+        <li><b>Southport office</b>{{address.street}}, {{address.locality}} {{address.region}} {{address.postcode}}<br><span class="muted">{{address.note}}</span><br><a href="{{address.maps}}" rel="noopener">Get directions</a></li>
+        <li><b>Victorian office</b>{{second_office}}</li>
+        <li><b>Hours</b>{{hours_text}}</li>
+      </ul>
+    </div>
+    <div class="form-panel">
+      <h2 style="font-size:var(--step-2)">Send us a message</h2>
+      <form class="form" id="contact-form" action="/api/enquiry" method="post" data-ajax data-done="/thanks" data-phone="{{phone}}" novalidate>
+        <input type="hidden" name="type" value="contact">
+        <input type="hidden" name="page" value="/contact">
+        <div class="field full">
+          <label for="c-name">Name</label>
+          <input class="input" id="c-name" name="name" type="text" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="c-phone">Phone</label>
+          <input class="input" id="c-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required>
+        </div>
+        <div class="field">
+          <label for="c-email">Email</label>
+          <input class="input" id="c-email" name="email" type="email" autocomplete="email" inputmode="email" required>
+        </div>
+        <div class="field full">
+          <label for="c-message">How can we help? <span>(optional)</span></label>
+          <textarea class="input" id="c-message" name="message" rows="5"></textarea>
+        </div>
+        <div class="hp" aria-hidden="true"><label>Leave this blank <input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <p class="collect full">We use your details to respond to your message. See our <a href="/privacy">privacy policy</a>.</p>
+        <div class="form-actions full">
+          <button class="btn" type="submit">Send message</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

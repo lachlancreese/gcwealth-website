@@ -1,0 +1,142 @@
+<!--
+title: Get Started | Talk to a Mortgage Broker | GC Wealth
+description: Tell us what you're planning in three quick steps and a GC Wealth broker will be in touch. Free first conversation, no obligation.
+path: /get-started
+crumb: Get started
+nav:
+bar: no
+-->
+<section class="section" style="padding-top:40px">
+  <div class="wrap contact-grid">
+    <div>
+      <h1>Your finance strategy starts here</h1>
+      <p class="lede">Three quick steps. Tell us what you're planning and a broker will be in touch to talk it through.</p>
+      <ul class="checks" style="margin-top:32px">
+        <li>The first conversation is free, with no obligation</li>
+        <li>No documents needed yet. Rough figures are fine</li>
+        <li>{{lenders}} lenders compared for you</li>
+      </ul>
+      <p class="muted" style="margin-top:32px">Rather talk now? Call <a href="tel:{{phone_tel}}">{{phone}}</a>, {{hours_text}}.</p>
+    </div>
+
+    <div class="form-panel">
+      <ol class="stepper" aria-label="Progress">
+        <li class="current" aria-current="step">Your goal</li>
+        <li>Details</li>
+        <li>Contact</li>
+      </ol>
+      <form class="form" id="start-form" action="/api/enquiry" method="post" data-ajax data-done="/thanks" data-phone="{{phone}}" novalidate>
+        <input type="hidden" name="type" value="get-started">
+
+        <div class="step full">
+          <fieldset>
+            <legend><h2>What are you looking to do?</h2></legend>
+            <div class="chips" style="margin-top:16px">
+              <label class="chip"><input type="radio" name="goal" value="Buy my first home" checked><span>Buy my first home</span></label>
+              <label class="chip"><input type="radio" name="goal" value="Buy my next home"><span>Buy my next home</span></label>
+              <label class="chip"><input type="radio" name="goal" value="Buy an investment property"><span>Buy an investment property</span></label>
+              <label class="chip"><input type="radio" name="goal" value="Refinance"><span>Refinance</span></label>
+              <label class="chip"><input type="radio" name="goal" value="Build a home"><span>Build a home</span></label>
+              <label class="chip"><input type="radio" name="goal" value="Commercial or business finance"><span>Commercial or business finance</span></label>
+              <label class="chip"><input type="radio" name="goal" value="Borrow through my SMSF"><span>Borrow through my SMSF</span></label>
+              <label class="chip"><input type="radio" name="goal" value="Vehicle or equipment finance"><span>Vehicle or equipment finance</span></label>
+              <label class="chip"><input type="radio" name="goal" value="Something else"><span>Something else</span></label>
+            </div>
+          </fieldset>
+          <div class="step-nav"><button class="btn" type="button" data-next>Next</button></div>
+        </div>
+
+        <div class="step full">
+          <h2>A bit more detail</h2>
+          <div class="field">
+            <label for="s-when">When are you hoping to do this?</label>
+            <select class="input" id="s-when" name="timeframe">
+              <option>As soon as possible</option>
+              <option>In the next 3 months</option>
+              <option>In 3 to 6 months</option>
+              <option>In 6 months or more</option>
+              <option>Just exploring</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="s-amount">Roughly how much would you like to borrow? <span>(optional)</span></label>
+            <select class="input" id="s-amount" name="amount">
+              <option value="">Not sure yet</option>
+              <option>Under $500,000</option>
+              <option>$500,000 to $750,000</option>
+              <option>$750,000 to $1 million</option>
+              <option>$1 million to $2 million</option>
+              <option>Over $2 million</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="s-situation">Your work situation <span>(optional)</span></label>
+            <select class="input" id="s-situation" name="situation">
+              <option value="">Prefer to discuss</option>
+              <option>Employed (PAYG)</option>
+              <option>Self-employed or contractor</option>
+              <option>Business owner</option>
+              <option>Retired</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="step-nav"><button class="btn" type="button" data-next>Next</button><button class="btn-back" type="button" data-back>Back</button></div>
+        </div>
+
+        <div class="step full">
+          <h2>How can we reach you?</h2>
+          <div class="form" style="gap:24px">
+            <div class="field full">
+              <label for="s-name">Name</label>
+              <input class="input" id="s-name" name="name" type="text" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="s-phone">Mobile</label>
+              <input class="input" id="s-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required>
+            </div>
+            <div class="field">
+              <label for="s-email">Email</label>
+              <input class="input" id="s-email" name="email" type="email" autocomplete="email" inputmode="email" required>
+            </div>
+            <div class="field">
+              <label for="s-postcode">Postcode <span>(optional)</span></label>
+              <input class="input" id="s-postcode" name="postcode" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="4">
+            </div>
+            <div class="field">
+              <label for="s-best">Best time to call <span>(optional)</span></label>
+              <select class="input" id="s-best" name="best_time">
+                <option value="">Any time</option>
+                <option>Morning</option>
+                <option>Middle of the day</option>
+                <option>Afternoon</option>
+              </select>
+            </div>
+            <fieldset class="full">
+              <legend>How would you like us to contact you?</legend>
+              <div class="chips">
+                <label class="chip"><input type="radio" name="contact_by" value="Phone call" checked><span>Phone call</span></label>
+                <label class="chip"><input type="radio" name="contact_by" value="Email"><span>Email</span></label>
+                <label class="chip"><input type="radio" name="contact_by" value="Text message"><span>Text message</span></label>
+              </div>
+            </fieldset>
+            <div class="field full">
+              <label for="s-message">Anything else we should know? <span>(optional)</span></label>
+              <textarea class="input" id="s-message" name="message" rows="4"></textarea>
+            </div>
+            <label class="consent full" for="s-consent">
+              <input id="s-consent" name="consent" type="checkbox" value="yes" required>
+              <span>I'm happy for {{name}} to contact me about this enquiry. I've read the <a href="/privacy">privacy policy</a>.</span>
+            </label>
+          </div>
+          <div class="hp" aria-hidden="true"><label>Leave this blank <input name="website" tabindex="-1" autocomplete="off"></label></div>
+          <div class="form-actions">
+            <button class="btn" type="submit">Send my enquiry</button>
+            <button class="btn-back step-nav" type="button" data-back>Back</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+          </div>
+          <p class="collect">We collect these details to respond to your enquiry and, if you go ahead, to arrange your finance. We don't sell your information. See our <a href="/privacy">privacy policy</a> and <a href="/credit-guide">credit guide</a>.</p>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

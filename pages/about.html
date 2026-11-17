@@ -1,0 +1,95 @@
+<!--
+title: About Us | Boutique Finance Brokers | GC Wealth
+description: GC Wealth is a boutique mortgage and finance broking firm founded on the Gold Coast in 2024, with MFAA-accredited brokers and 70+ lenders.
+path: /about
+crumb: About
+nav: about
+-->
+<section class="page-hero">
+  <div class="wrap">
+    <div>
+      <h1>Boutique finance broking, built on purpose</h1>
+      <p class="lede">GC Wealth started on the Gold Coast in {{founded}} to give people finance help that's strategic, specialist and genuinely on their side.</p>
+      <div class="btn-row">
+        <a class="btn" href="/get-started">Get started</a>
+        <a class="btn btn-ghost" href="/contact">Contact us</a>
+      </div>
+    </div>
+    <div class="talk-card">
+      <h2>At a glance</h2>
+      <ul class="checks" style="margin:0">
+        <li>Founded in {{founded}}, based in Southport</li>
+        <li>{{lenders}} lenders on our panel</li>
+        <li>Every broker is MFAA accredited</li>
+        <li>Clients across Australia, with an office in {{second_office}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <img src="/assets/img/gc-wealth-team-1264.webp" srcset="/assets/img/gc-wealth-team-800.webp 800w, /assets/img/gc-wealth-team-1264.webp 1264w" sizes="(max-width: 1248px) 100vw, 1152px" alt="The GC Wealth team" width="1264" height="842" style="border-radius:var(--radius-lg);width:100%">
+  </div>
+</section>
+
+<section class="section" aria-labelledby="story-title">
+  <div class="wrap split" style="align-items:start">
+    <div>
+      <h2 id="story-title">Our story</h2>
+    </div>
+    <div class="prose">
+      <p>GC Wealth began in {{founded}} with a simple idea: most people don't need a loan processed, they need a plan. The right loan depends on what you're buying, what comes after it, and how your income and family will change over time.</p>
+      <p>From that starting point we've grown into a specialist team covering residential lending, investment finance, construction, commercial property, SMSF lending and asset finance. Clients come to us for a first home, a portfolio, a business premises or a piece of equipment, and many come back for the next step.</p>
+      <p>We're not here to process loans. We're here to build financial futures, and to be honest with you about what's realistic along the way.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-mist" aria-labelledby="diff-title">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 id="diff-title">What makes us different</h2>
+    </div>
+    <ul class="needs" style="column-gap:64px">
+      <li><div style="padding:24px 0"><h3>More lenders, better options</h3><p class="muted" style="margin:0">We compare {{lenders}} lenders on our panel, from the major banks to specialist lenders, rather than one bank's products.</p></div></li>
+      <li><div style="padding:24px 0"><h3>Qualified and accountable</h3><p class="muted" style="margin:0">Every GC Wealth broker is accredited with the MFAA, and we're required by law to act in your best interests.</p></div></li>
+      <li><div style="padding:24px 0"><h3>Boutique service, national reach</h3><p class="muted" style="margin:0">You deal with the same broker throughout. We're based in Southport, with an office in {{second_office}}, and help clients Australia-wide.</p></div></li>
+      <li><div style="padding:24px 0"><h3>We work for you</h3><p class="muted" style="margin:0">We'll tell you if waiting, saving a little more or staying with your current lender is the better move.</p></div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section-tight" aria-labelledby="reviews-title">
+  <div class="wrap">
+    <div class="review-band">
+      <div class="review-score" aria-hidden="true">{{reviews.rating}}</div>
+      <div>
+        <h2 id="reviews-title" style="font-size:var(--step-2);margin-bottom:4px">Rated {{reviews.rating}} out of 5 from {{reviews.count}} Google reviews</h2>
+        <p class="muted small">Rating as at {{reviews.checked}}.</p>
+      </div>
+      <a class="btn btn-ghost" href="{{reviews.url}}" rel="noopener">Read our reviews</a>
+    </div>
+    <p class="muted" style="margin:32px 0 8px">As featured in</p>
+    <ul class="names quiet">
+      <!--featured-->
+    </ul>
+  </div>
+</section>
+
+<section class="section bg-shell" aria-labelledby="where-title">
+  <div class="wrap split" style="align-items:start">
+    <div>
+      <h2 id="where-title">Where to find us</h2>
+      <p>Our main office is in the Gold Coast Health &amp; Knowledge Precinct in Southport. We also have an office in {{second_office}}, and we meet clients anywhere in Australia by phone or video.</p>
+    </div>
+    <ul class="contact-list" style="margin:0">
+      <li><b>Southport office</b>{{address.street}}, {{address.locality}} {{address.region}} {{address.postcode}}<br><a href="{{address.maps}}" rel="noopener">Get directions</a></li>
+      <li><b>Victorian office</b>{{second_office}}</li>
+      <li><b>Hours</b>{{hours_text}}</li>
+      <li><b>Phone</b><a href="tel:{{phone_tel}}">{{phone}}</a></li>
+    </ul>
+  </div>
+</section>
+
+<!--include:cta-->

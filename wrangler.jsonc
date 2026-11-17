@@ -1,0 +1,19 @@
+{
+  // Cloudflare Workers config for gcwealth.com.au
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "gcwealth-website",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-11-14",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "html_handling": "drop-trailing-slash",
+    "run_worker_first": ["/*", "!/assets/*"]
+  },
+  "vars": {
+    "TO_EMAIL": "admin@gcwealth.com.au",
+    "FROM_EMAIL": "GC Wealth website <enquiries@gcwealth.com.au>"
+  },
+  "observability": { "enabled": true }
+}

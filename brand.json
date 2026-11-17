@@ -1,0 +1,71 @@
+{
+  "_note": "Every business detail the site and its emails use. Change the brand here, swap the logo files named below, run python3 build.py, and push.",
+
+  "name": "GC Wealth",
+  "legal_name": "Gold Coast Wealth Pty Ltd",
+  "abn": "55 677 524 551",
+  "tagline": "Strategically financed wealth",
+  "founded": "2024",
+
+  "site": "https://gcwealth.com.au",
+  "phone": "0422 740 697",
+  "phone_tel": "+61422740697",
+  "email": "admin@gcwealth.com.au",
+  "hours_text": "Monday to Friday, 8am to 6pm",
+  "hours_schema": ["Mo-Fr 08:00-18:00"],
+
+  "address": {
+    "street": "16 Nexus Way",
+    "locality": "Southport",
+    "region": "QLD",
+    "postcode": "4215",
+    "country": "AU",
+    "note": "Gold Coast Health & Knowledge Precinct",
+    "maps": "https://www.google.com/maps/search/?api=1&query=Gold+Coast+Wealth+16+Nexus+Way+Southport+QLD+4215"
+  },
+  "second_office": "Hampton, VIC",
+
+  "licence": {
+    "credit_rep": "491220",
+    "acl": "389328",
+    "line": "Credit Representative 491220 is authorised under Australian Credit Licence 389328."
+  },
+
+  "lenders": "70+",
+  "lender_examples": ["CBA", "Westpac", "ANZ", "NAB", "ING", "Suncorp", "BOQ", "St.George", "Bankwest", "AMP Bank", "ubank", "Pepper Money", "Resimac", "Firstmac", "MyState"],
+  "featured_in": ["COHORT", "Gold Coast Bulletin", "realestate.com.au", "The Australian", "ABC News", "The Mercury"],
+
+  "reviews": {
+    "rating": "5.0",
+    "count": 17,
+    "source": "Google",
+    "checked": "17 November 2026",
+    "url": "https://www.google.com/maps/search/?api=1&query=Gold+Coast+Wealth+16+Nexus+Way+Southport+QLD+4215"
+  },
+
+  "social": {
+    "facebook": "https://www.facebook.com/p/Gold-Coast-Wealth-61572508755719/",
+    "instagram": "https://www.instagram.com/gc.wealth/",
+    "linkedin": "https://www.linkedin.com/company/gcwealth/"
+  },
+
+  "colours": {
+    "navy": "#144154",
+    "blue": "#246C8F",
+    "sky": "#3D8EB9",
+    "mist": "#EAF2F6",
+    "sand": "#F4F0E9",
+    "ink": "#0F2833",
+    "text": "#33454D"
+  },
+
+  "logo": {
+    "colour": "/assets/img/gc-wealth-logo.svg",
+    "white": "/assets/img/gc-wealth-logo-white.svg",
+    "png": "/assets/img/gc-wealth-logo-512.png",
+    "width": 1057,
+    "height": 608
+  },
+
+  "analytics_token": ""
+}

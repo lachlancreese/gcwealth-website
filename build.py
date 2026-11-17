@@ -1,0 +1,403 @@
+#!/usr/bin/env python3
+"""Build the GC Wealth site: wraps each pages/**/*.html in the shared layout and writes public/.
+
+Business details (name, phone, licence line, colours, logo) live in brand.json. Menus live in NAV below.
+Run:  python3 build.py   (Python 3, no packages needed)
+
+Each page file starts with a settings block:
+    <!--
+    title: Page title | GC Wealth       (under ~60 characters)
+    description: One sentence for Google. (under ~155 characters)
+    path: /home-loans/refinancing
+    crumb: Refinancing                  (short name for breadcrumbs and menus)
+    nav: home-loans                     (menu item to highlight; blank for none)
+    schema: service                     (optional: adds Service structured data)
+    disclaimer: yes                     (optional: general-information note at the end)
+    bar: yes                            (mobile call / get started bar; "no" to hide)
+    index: yes                          (list in sitemap; "no" keeps it out of search)
+    -->
+In page text, {{phone}}, {{email}}, {{name}}, {{lenders}} and other brand.json keys are filled in.
+Shared sections: <!--include:cta--> inserts pages/partials/cta.html.
+"""
+import datetime
+import hashlib
+import html
+import json
+import pathlib
+import re
+import subprocess
+
+ROOT = pathlib.Path(__file__).parent
+PAGES = ROOT / "pages"
+OUT = ROOT / "public"
+B = json.loads((ROOT / "brand.json").read_text())
+SITE = B["site"]
+ORG_ID = SITE + "/#organization"
+
+# Main menu: (key, label, href, children). Children appear in the dropdown and the footer.
+NAV = [
+    ("home-loans", "Home loans", "/home-loans", [
+        ("First home buyers", "/home-loans/first-home-buyers"),
+        ("Refinancing", "/home-loans/refinancing"),
+        ("Investment loans", "/home-loans/investment-loans"),
+        ("Construction loans", "/home-loans/construction-loans"),
+        ("Self-employed loans", "/home-loans/self-employed"),
+        ("Guarantor loans", "/home-loans/guarantor-loans"),
+        ("Bridging loans", "/home-loans/bridging-loans"),
+        ("Pre-approval", "/home-loans/pre-approval"),
+    ]),
+    ("business", "Business finance", "/business-finance", [
+        ("Commercial property loans", "/business-finance/commercial-property"),
+        ("Business loans", "/business-finance/business-loans"),
+        ("Asset and equipment finance", "/business-finance/asset-finance"),
+    ]),
+    ("smsf", "SMSF loans", "/smsf-loans", []),
+    ("about", "About", "/about", []),
+    ("contact", "Contact", "/contact", []),
+]
+
+ICON = {
+    "phone": '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>',
+    "chev": '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+    "star": '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>',
+}
+
+
+def asset(path):
+    """Add a content hash so browsers fetch a fresh copy whenever the file changes."""
+    digest = hashlib.sha256((OUT / path.lstrip("/")).read_bytes()).hexdigest()[:10]
+    return f"{path}?v={digest}"
+
+
+def ld(data):
+    return '\n<script type="application/ld+json">\n' + json.dumps(data, ensure_ascii=False, indent=1) + "\n</script>"
+
+
+def strip_tags(text):
+    return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", text)).split())
+
+
+def fill(text):
+    """Replace {{key}} and {{key.sub}} with values from brand.json."""
+    def get(m):
+        val = B
+        for part in m.group(1).split("."):
+            val = val[part]
+        return html.escape(str(val), quote=False)
+    text = text.replace("<!--lenders-->", "".join(f"<li>{html.escape(n)}</li>" for n in B["lender_examples"]))
+    text = text.replace("<!--featured-->", "".join(f"<li>{html.escape(n)}</li>" for n in B["featured_in"]))
+    return re.sub(r"\{\{([\w.]+)\}\}", get, text)
+
+
+def address_ld():
+    a = B["address"]
+    return {"@type": "PostalAddress", "streetAddress": a["street"], "addressLocality": a["locality"],
+            "addressRegion": a["region"], "postalCode": a["postcode"], "addressCountry": a["country"]}
+
+
+def crumbs_for(path, pages):
+    """[(label, href)] from Home down to this page, using each parent's crumb name."""
+    trail = [("Home", "/")]
+    parts = path.strip("/").split("/")
+    for i in range(1, len(parts) + 1):
+        href = "/" + "/".join(parts[:i])
+        meta = pages.get(href)
+        trail.append(((meta or {}).get("crumb") or parts[i - 1].replace("-", " ").capitalize(), href))
+    return trail
+
+
+def structured_data(meta, body, pages):
+    path = meta["path"]
+    blocks = []
+    if path == "/":
+        blocks.append({
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": ["FinancialService", "LocalBusiness"],
+                    "@id": ORG_ID,
+                    "name": B["name"],
+                    "legalName": B["legal_name"],
+                    "url": SITE + "/",
+                    "logo": SITE + B["logo"]["png"],
+                    "image": SITE + "/assets/img/og-image.jpg",
+                    "description": meta["description"],
+                    "telephone": B["phone_tel"],
+                    "email": B["email"],
+                    "taxID": B["abn"],
+                    "foundingDate": B["founded"],
+                    "address": address_ld(),
+                    "openingHours": B["hours_schema"],
+                    "areaServed": {"@type": "Country", "name": "Australia"},
+                    "sameAs": list(B["social"].values()),
+                },
+                {
+                    "@type": "WebSite",
+                    "@id": SITE + "/#website",
+                    "url": SITE + "/",
+                    "name": B["name"],
+                    "inLanguage": "en-AU",
+                    "publisher": {"@id": ORG_ID},
+                },
+            ],
+        })
+    elif meta.get("index", "yes") != "no":
+        trail = crumbs_for(path, pages)
+        blocks.append({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": label, "item": SITE + href}
+                                for i, (label, href) in enumerate(trail)],
+        })
+    if meta.get("schema") == "service":
+        blocks.append({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": meta.get("crumb") or meta["title"].split("|")[0].strip(),
+            "description": meta["description"],
+            "url": SITE + path,
+            "provider": {"@type": "FinancialService", "@id": ORG_ID, "name": B["name"]},
+            "areaServed": {"@type": "Country", "name": "Australia"},
+        })
+    if 'class="faq-list"' in body:
+        qa = re.findall(r"<summary>(.*?)</summary>\s*<div>(.*?)</div>", body.split('class="faq-list"', 1)[1], re.S)
+        blocks.append({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [{"@type": "Question", "name": strip_tags(q),
+                            "acceptedAnswer": {"@type": "Answer", "text": strip_tags(a)}} for q, a in qa],
+        })
+    return "".join(ld(b) for b in blocks)
+
+
+def lastmod(src):
+    """Date the page source last changed: today if it has uncommitted edits, else its last commit."""
+    today = datetime.date.today().isoformat()
+    try:
+        dirty = subprocess.run(["git", "status", "--porcelain", str(src)], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        if dirty:
+            return today
+        out = subprocess.run(["git", "log", "-1", "--format=%cs", "--", str(src)], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        return out or today
+    except OSError:
+        return today
+
+
+def brand_css():
+    c = B["colours"]
+    return ":root{" + "".join(f"--{k}:{v};" for k, v in c.items()) + "}"
+
+
+def head(meta, extra_head):
+    title = html.escape(meta["title"])
+    desc = html.escape(meta["description"])
+    url = SITE + meta["path"]
+    noindex = meta.get("index", "yes") == "no"
+    robots = '\n<meta name="robots" content="noindex">' if noindex else '\n<meta name="robots" content="max-image-preview:large">'
+    canonical = "" if noindex else f'\n<link rel="canonical" href="{url}">'
+    beacon = ""
+    if B.get("analytics_token"):
+        beacon = ('\n<script defer src="https://static.cloudflareinsights.com/beacon.min.js" '
+                  f'data-cf-beacon=\'{{"token": "{B["analytics_token"]}"}}\'></script>')
+    return f"""<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{title}</title>
+<meta name="description" content="{desc}">{canonical}{robots}
+<meta name="theme-color" content="{B['colours']['navy']}">
+<link rel="icon" href="{B['logo']['colour']}" type="image/svg+xml">
+<link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{html.escape(B['name'])}">
+<meta property="og:locale" content="en_AU">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{desc}">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{SITE}/assets/img/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/figtree-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>{brand_css()}</style>
+<link rel="stylesheet" href="{asset('/assets/css/site.css')}">{extra_head}{beacon}
+</head>"""
+
+
+def logo(kind="colour", height=52):
+    w = round(B["logo"]["width"] * height / B["logo"]["height"])
+    return f'<img src="{B["logo"][kind]}" alt="{html.escape(B["name"])}" width="{w}" height="{height}">'
+
+
+def header(active, path):
+    items = []
+    for key, label, href, children in NAV:
+        cur = ' aria-current="page"' if href == path else (' aria-current="true"' if key == active else "")
+        if children:
+            sub = "\n".join(f'            <li><a href="{h}"{" aria-current=\"page\"" if h == path else ""}>{l}</a></li>'
+                            for l, h in children)
+            items.append(f"""<li class="has-sub">
+          <a href="{href}"{cur}>{label}</a>
+          <button class="sub-btn" type="button" aria-expanded="false" aria-label="Show {label.lower()} pages">{ICON['chev']}</button>
+          <ul class="sub">
+            <li><a href="{href}">All {label.lower()}</a></li>
+{sub}
+          </ul>
+        </li>""")
+        else:
+            items.append(f'<li><a href="{href}"{cur}>{label}</a></li>')
+    nav_items = "\n        ".join(items)
+    return f"""<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header" id="top">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="{html.escape(B['name'])} home">{logo('colour', 52)}</a>
+    <nav class="nav" aria-label="Main">
+      <ul class="nav-links" id="nav-links">
+        {nav_items}
+        <li class="nav-menu-extra"><a class="btn" href="/get-started">Get started</a></li>
+        <li class="nav-menu-extra"><a href="tel:{B['phone_tel']}">{ICON['phone']} {B['phone']}</a></li>
+      </ul>
+      <a class="nav-phone" href="tel:{B['phone_tel']}">{ICON['phone']}<span>{B['phone']}</span></a>
+      <a class="btn nav-cta" href="/get-started">Get started</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav-links">
+        <span class="menu-icon" aria-hidden="true"></span><span class="menu-label">Menu</span>
+      </button>
+    </nav>
+  </div>
+</header>
+"""
+
+
+def breadcrumbs(path, pages):
+    trail = crumbs_for(path, pages)
+    parts = []
+    for i, (label, href) in enumerate(trail):
+        if i == len(trail) - 1:
+            parts.append(f'<li aria-current="page">{html.escape(label)}</li>')
+        else:
+            parts.append(f'<li><a href="{href}">{html.escape(label)}</a></li>')
+    return f'<nav class="crumbs wrap" aria-label="Breadcrumb"><ol>{"".join(parts)}</ol></nav>\n'
+
+
+def footer(show_bar):
+    def col(title, links):
+        lis = "\n".join(f'            <li><a href="{h}">{l}</a></li>' for l, h in links)
+        return f"""        <div>
+          <h2>{title}</h2>
+          <ul>
+{lis}
+          </ul>
+        </div>"""
+    home = next(n for n in NAV if n[0] == "home-loans")
+    biz = next(n for n in NAV if n[0] == "business")
+    a = B["address"]
+    social = " ".join(f'<a href="{u}" rel="noopener">{n.capitalize() if n != "linkedin" else "LinkedIn"}</a>'
+                      for n, u in B["social"].items())
+    bar = f"""
+<div class="action-bar" role="region" aria-label="Quick actions">
+  <a class="action-call" href="tel:{B['phone_tel']}">{ICON['phone']}Call</a>
+  <a class="btn" href="/get-started">Get started</a>
+</div>""" if show_bar else ""
+    return f"""
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        {logo('white', 64)}
+        <p>Boutique mortgage and finance broking from {a['locality']} on the Gold Coast, for clients across Australia.</p>
+        <form class="signup" action="/api/enquiry" method="post" data-ajax>
+          <input type="hidden" name="type" value="newsletter">
+          <label for="nl-email">Rate updates and finance tips by email</label>
+          <div class="signup-row">
+            <input class="input" id="nl-email" name="email" type="email" autocomplete="email" placeholder="Your email" required>
+            <button class="btn btn-light" type="submit">Sign up</button>
+          </div>
+          <div class="hp" aria-hidden="true"><label>Leave blank <input name="website" tabindex="-1" autocomplete="off"></label></div>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+      <nav class="footer-cols" aria-label="Footer">
+{col(home[1], home[3])}
+{col(biz[1], biz[3] + [("SMSF loans", "/smsf-loans")])}
+{col("Company", [("About us", "/about"), ("Contact", "/contact"), ("Get started", "/get-started")])}
+        <div>
+          <h2>Contact</h2>
+          <ul>
+            <li><a href="tel:{B['phone_tel']}">{B['phone']}</a></li>
+            <li><a href="mailto:{B['email']}">{B['email']}</a></li>
+            <li><a href="{a['maps']}" rel="noopener">{a['street']}, {a['locality']} {a['region']} {a['postcode']}</a></li>
+            <li>{B['hours_text']}</li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    <div class="footer-legal">
+      <p><strong>{html.escape(B['name'])}</strong> is a trading name of {html.escape(B['legal_name'])} (ABN {B['abn']}). {B['licence']['line']}</p>
+      <p>The information on this website is general in nature and does not take into account your objectives, financial situation or needs. It is not legal, tax or financial product advice. All loans are subject to the lender's credit assessment and approval; terms, conditions, fees and charges apply.</p>
+      <p class="footer-links"><a href="/privacy">Privacy policy</a> <a href="/credit-guide">Credit guide</a> <a href="/complaints">Complaints</a> {social}</p>
+      <p>© <span class="year">2026</span> {html.escape(B['legal_name'])}. Offices in {a['locality']} {a['region']} and {B['second_office']}.</p>
+    </div>
+  </div>
+</footer>{bar}
+
+<script src="{asset('/assets/js/site.js')}" defer></script>
+</body>
+</html>
+"""
+
+
+DISCLAIMER = """
+<aside class="note wrap-narrow" aria-label="General information">
+  <p><strong>General information only.</strong> This page explains how this type of finance generally works. It doesn't consider your objectives, financial situation or needs, and it isn't tax, legal or financial product advice. Lending criteria, fees and government schemes change; any loan is subject to the lender's assessment and approval.</p>
+</aside>"""
+
+
+def parse(text):
+    m = re.match(r"\s*<!--(.*?)-->\s*", text, re.S)
+    meta = {}
+    for line in m.group(1).strip().splitlines():
+        k, _, v = line.partition(":")
+        meta[k.strip()] = v.strip()
+    body = text[m.end():]
+    body = re.sub(r"<!--include:([\w-]+)-->", lambda im: (PAGES / "partials" / f"{im.group(1)}.html").read_text().strip(), body)
+    extra = ""
+    hm = re.search(r"<!--head-->(.*?)<!--/head-->", body, re.S)
+    if hm:
+        extra = "\n" + hm.group(1).strip()
+        body = body[:hm.start()] + body[hm.end():]
+    return meta, fill(body.strip()), extra
+
+
+def build():
+    sources = sorted(p for p in PAGES.rglob("*.html") if "partials" not in p.parts)
+    parsed = [(src, *parse(src.read_text())) for src in sources]
+    pages = {meta["path"]: meta for _, meta, _, _ in parsed}
+    urls = []
+    for src, meta, body, extra_head in parsed:
+        path = meta["path"]
+        extra_head = structured_data(meta, body, pages) + extra_head
+        crumbs = breadcrumbs(path, pages) if path != "/" and meta.get("crumbs", "yes") != "no" else ""
+        note = DISCLAIMER if meta.get("disclaimer") == "yes" else ""
+        out = (head(meta, extra_head) + "\n" + header(meta.get("nav", ""), path) + '\n<main id="main">\n'
+               + crumbs + body + note + "\n</main>\n" + footer(meta.get("bar", "yes") != "no"))
+        out = re.sub(r'(src|href)="(/assets/(?:js|css)/[\w.-]+\.(?:js|css))"', lambda m: f'{m.group(1)}="{asset(m.group(2))}"', out)
+        name = "index.html" if path == "/" else path.strip("/") + ".html"
+        dest = OUT / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(out)
+        if meta.get("index", "yes") != "no":
+            urls.append((path, lastmod(src)))
+        print("built", name)
+    sitemap = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    sitemap += [f"  <url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>" for u, d in sorted(urls, key=lambda x: (x[0] != "/", x[0]))]
+    sitemap.append("</urlset>")
+    (OUT / "sitemap.xml").write_text("\n".join(sitemap) + "\n")
+    (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: {SITE}/sitemap.xml\n")
+
+
+if __name__ == "__main__":
+    build()
