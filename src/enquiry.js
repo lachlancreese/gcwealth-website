@@ -118,7 +118,7 @@ export function autoReply(env, type, d) {
     mail = customerEmail({
       heading: `Thanks${first ? ", " + first : ""}. We've got your enquiry.`,
       paragraphs: [
-        `A broker will be in touch shortly${d.contact_by ? ", by " + d.contact_by.toLowerCase() : ""}.`,
+        `A broker will be in touch shortly${{ "Phone call": " by phone", "Email": " by email", "Text message": " by text" }[d.contact_by] || ""}.`,
         "To make the first conversation quicker, it helps to have a rough idea of your income, your regular expenses, any debts, and the property or purchase you have in mind. There's no need to send documents yet.",
       ],
       after: [`If anything changes, reply to this email or call us on ${BRAND.phone}.`],
