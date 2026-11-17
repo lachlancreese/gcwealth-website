@@ -138,10 +138,12 @@ def run_checks():
     axe = (ROOT / "node_modules" / "axe-core" / "axe.min.js").read_text()
     seen_links = set()
     pages = page_list()
-    print(f"Checking {len(pages)} pages on desktop and mobile")
+    print(f"Checking {len(pages)} pages on desktop, laptop, tablet and mobile")
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
         for device, viewport, mobile in [("desktop", {"width": 1440, "height": 900}, False),
+                                         ("laptop", {"width": 1024, "height": 768}, False),
+                                         ("tablet", {"width": 768, "height": 1024}, True),
                                          ("mobile", {"width": 390, "height": 844}, True)]:
             ctx = browser.new_context(viewport=viewport, is_mobile=mobile, has_touch=mobile, device_scale_factor=2 if mobile else 1)
             for path in pages:
@@ -164,6 +166,7 @@ def run_checks():
                     title: document.title,
                     desc: (document.querySelector('meta[name=description]')||{}).content || '',
                     overflow: document.documentElement.scrollWidth - window.innerWidth,
+                    header: (document.querySelector('.site-header')||{}).offsetHeight || 0,
                     brokenImgs: [...document.images].filter(i => i.complete && i.naturalWidth === 0 && i.loading !== 'lazy').map(i => i.src),
                     links: [...document.querySelectorAll('a[href]')].map(a => a.getAttribute('href')),
                     leftover: (document.body.innerHTML.match(/\\{\\{[\\w.]+\\}\\}/g) || []),
@@ -177,6 +180,8 @@ def run_checks():
                         fail(f"{label}: description is {len(info['desc'])} characters")
                 if info["overflow"] > 1:
                     fail(f"{label}: scrolls sideways by {info['overflow']}px")
+                if info["header"] > 96:
+                    fail(f"{label}: header is {info['header']}px tall (menu wrapping?)")
                 for src in info["brokenImgs"]:
                     fail(f"{label}: image didn't load {src}")
                 if device == "desktop":
@@ -196,6 +201,10 @@ def run_checks():
                 for href in info["links"]:
                     if href.startswith("/") and not href.startswith("//"):
                         seen_links.add(href.split("#")[0])
+                if device in ("laptop", "tablet"):
+                    pg.screenshot(path=str(OUT / ((path.strip("/").replace("/", "_") or "home") + f"-{device}.png")), full_page=True)
+                    pg.close()
+                    continue  # accessibility rules are checked at desktop and mobile sizes
                 pg.evaluate(axe + "\n;0")  # evaluate, not a script tag, so the page's security policy still applies to everything else
                 result = pg.evaluate("""async () => (await axe.run(document, {resultTypes: ['violations']})).violations
                     .map(v => ({id: v.id, impact: v.impact, help: v.help, nodes: v.nodes.slice(0, 3).map(n => n.target.join(' '))}))""")
@@ -263,19 +272,42 @@ def check_calculators(browser):
     ctx = browser.new_context(viewport={"width": 1440, "height": 900})
     pg = ctx.new_page()
     pg.goto(BASE + "/calculators/stamp-duty")
+    # Stamp duty in every state, against worked examples published from each revenue office's 2026-27 schedules.
+    inv = {"home": False, "first": False, "kind": "established", "eligible": True}
+    oo = {"home": True, "first": False, "kind": "established", "eligible": True}
+    fhb = {"home": True, "first": True, "kind": "established", "eligible": True}
+    fhb_new = {"home": True, "first": True, "kind": "new", "eligible": True}
+    duty_cases = [
+        ("QLD", 750000, inv, 26775), ("QLD", 600000, inv, 20025), ("QLD", 750000, oo, 19600),
+        ("QLD", 795000, fhb, 19890), ("QLD", 695000, fhb, 0), ("QLD", 1500000, fhb_new, 0),
+        ("NSW", 750000, inv, 27937), ("NSW", 1000000, oo, 39187), ("NSW", 900000, fhb, 19594), ("NSW", 800000, fhb, 0),
+        ("VIC", 750000, inv, 40070), ("VIC", 700000, fhb, 24713), ("VIC", 600000, fhb, 0),
+        ("WA", 750000, inv, 29741), ("WA", 800000, fhb, 32300), ("WA", 600000, fhb, 0),
+        ("SA", 750000, inv, 35080), ("SA", 600000, fhb, 26830), ("SA", 750000, fhb_new, 0),
+        ("TAS", 750000, inv, 28935), ("TAS", 500000, fhb, 18248),
+        ("ACT", 750000, inv, 22200), ("ACT", 1000000, inv, 36950), ("ACT", 750000, oo, 19208), ("ACT", 1000000, oo, 33958), ("ACT", 900000, fhb, 0),
+        ("NT", 750000, inv, 37125), ("NT", 500000, fhb, 23929),
+    ]
+    for code, value, opts, want in duty_cases:
+        got = pg.evaluate("([c, v, o]) => Math.round(window.GCW_CALC.duty(c, v, o))", [code, value, opts])
+        if got != want:
+            fail(f"stamp duty {code} ${value:,} {opts}: got ${got:,}, expected ${want:,}")
     m = pg.evaluate("""() => { const c = window.GCW_CALC; return {
-        qroExample: c.dutyHome(795000) - c.firstHomeDeduction(795000),   // QRO worked example: $19,890
-        firstUnder: Math.max(0, c.dutyHome(695000) - c.firstHomeDeduction(695000)),  // QRO example: $0
-        general600: c.dutyGeneral(600000),       // $20,025
-        home750: c.dutyHome(750000),             // $19,600
-        general750: c.dutyGeneral(750000),       // $26,775
         tax100k: Math.round(c.incomeTax(100000)),  // $20,520 tax + $2,000 Medicare levy
         pmt: Math.round(c.pmt(100000, 6, 30) * 100) / 100,  // $599.55
     }; }""")
-    expected = {"qroExample": 19890, "firstUnder": 0, "general600": 20025, "home750": 19600, "general750": 26775, "tax100k": 22520, "pmt": 599.55}
-    for k, v in expected.items():
+    for k, v in {"tax100k": 22520, "pmt": 599.55}.items():
         if abs(m[k] - v) > 0.01:
             fail(f"calculator maths: {k} is {m[k]}, expected {v}")
+    # The form: pick WA, a first home at $800,000.
+    pg.select_option("#c-state", "WA")
+    pg.fill("#c-price", "800000")
+    pg.wait_for_timeout(200)
+    if pg.locator(".result-main").inner_text().strip() != "$32,300":
+        fail(f"stamp duty form: WA first home at $800,000 shows {pg.locator('.result-main').inner_text()}, expected $32,300")
+    pg.goto(BASE + "/calculators/stamp-duty/act")
+    if pg.locator("#c-state").input_value() != "ACT":
+        fail("stamp duty: the ACT page doesn't start on the ACT")
     # No calculator may show a pre-filled interest rate (comparison rate rule).
     for path in ["/calculators/repayments", "/calculators/borrowing-power", "/calculators/extra-repayments", "/calculators/refinance"]:
         pg.goto(BASE + path)

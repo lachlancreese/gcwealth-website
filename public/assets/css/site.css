@@ -176,13 +176,16 @@ strong { font-weight: 600; color: var(--ink); }
 .stars { color: #C98A1B; display: inline-flex; gap: 2px; vertical-align: -2px; margin-left: 6px; }
 
 /* Index of needs: a list, not a card grid */
-.needs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--s8); }
+.needs-groups { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s4) var(--s8); align-items: start; }
+.needs-title { font-size: var(--step-0); text-transform: none; color: var(--muted); font-weight: 600; margin: 0 0 var(--s1); }
+.needs-more { margin: var(--s3) 0 0; padding: var(--s3); background: var(--mist); border-radius: var(--radius); }
+.needs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; }
 .needs li { margin: 0; border-top: 1px solid var(--line-strong); }
 .needs a { display: grid; grid-template-columns: 1fr auto; gap: 4px var(--s2); padding: var(--s3) 0; text-decoration: none; color: var(--text); }
-.needs h3 { margin: 0; font-size: var(--step-1); color: var(--navy); }
+.needs h3, .needs h4 { margin: 0; font-size: var(--step-1); color: var(--navy); }
 .needs p { grid-column: 1; margin: 0; color: var(--muted); }
 .needs .go { grid-row: 1 / span 2; grid-column: 2; align-self: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line-strong); display: grid; place-items: center; color: var(--blue); transition: background-color .15s, color .15s; }
-.needs a:hover h3 { color: var(--blue); }
+.needs a:hover h3, .needs a:hover h4 { color: var(--blue); }
 .needs a:hover .go { background: var(--blue); color: #fff; border-color: var(--blue); }
 
 /* Process steps (a real sequence, so numbered) */
@@ -364,7 +367,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   .proof li:nth-child(3) { border-left: 0; padding-left: 0; }
   .proof li:nth-child(n+3) { border-top: 1px solid var(--line); }
   .steps { grid-template-columns: 1fr 1fr; }
-  .needs, .hub-list { grid-template-columns: 1fr; }
+  .needs, .hub-list, .needs-groups { grid-template-columns: 1fr; }
   .cta-band .btn-row { justify-content: flex-start; }
   .review-band { grid-template-columns: 1fr; gap: var(--s2); padding: var(--s4); }
   .footer-cols { grid-template-columns: 1fr 1fr; }
@@ -460,6 +463,17 @@ mark.todo { background: #FFF1C2; color: #5C4400; padding: 0 4px; border-radius: 
 .rate-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .rate-table th, .rate-table td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--line); }
 .rate-table th { color: var(--navy); font-weight: 600; font-size: 0.9375rem; }
+.table-wrap { overflow-x: auto; margin: var(--s3) 0; -webkit-overflow-scrolling: touch; }
+.duty-table caption { text-align: left; font-weight: 600; color: var(--navy); padding-bottom: var(--s1); }
+.duty-table caption span { display: block; font-weight: 400; color: var(--muted); font-size: 0.9375rem; }
+.duty-table td:first-child { white-space: nowrap; }
+.duty-states { list-style: none; padding: 0; margin: var(--s3) 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--s2); }
+.duty-states li { margin: 0; }
+.duty-states a { display: block; height: 100%; padding: var(--s2) var(--s3); border: 1px solid var(--line-strong); border-radius: var(--radius); text-decoration: none; color: var(--text); }
+.duty-states a:hover { border-color: var(--blue); }
+.duty-states b { display: block; color: var(--navy); }
+.duty-states a:hover b { color: var(--blue); text-decoration: underline; text-underline-offset: 4px; }
+.duty-states span { display: block; color: var(--muted); font-size: 0.9375rem; margin-top: 4px; }
 .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s3); margin: var(--s4) 0; }
 .fact { border-top: 2px solid var(--navy); padding-top: var(--s2); }
 .fact b { display: block; font-size: var(--step-3); color: var(--navy); line-height: 1.1; margin-bottom: 4px; }
@@ -469,6 +483,11 @@ mark.todo { background: #FFF1C2; color: #5C4400; padding: 0 4px; border-radius: 
 .calc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s6); align-items: start; }
 .calc-form { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: var(--s4); }
 .calc-form .full { grid-column: 1 / -1; }
+.more-costs { border-top: 1px solid var(--line); padding-top: var(--s2); }
+.more-costs summary { cursor: pointer; font-weight: 600; color: var(--navy); min-height: 44px; display: flex; align-items: center; gap: 8px; }
+.more-costs summary .muted { font-weight: 400; }
+.more-costs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-top: var(--s2); }
+@media (max-width: 560px) { .more-costs-grid { grid-template-columns: 1fr; } }
 .calc-form .hint { font-size: 0.875rem; color: var(--muted); margin: 6px 0 0; }
 .input-wrap { position: relative; }
 .input-wrap .unit { position: absolute; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 1rem; }
@@ -497,6 +516,11 @@ mark.todo { background: #FFF1C2; color: #5C4400; padding: 0 4px; border-radius: 
 .seg span { display: inline-block; padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 500; color: var(--navy); }
 .seg input:checked + span { background: var(--navy); color: #fff; }
 .seg input:focus-visible + span { outline: 3px solid var(--sky); outline-offset: 1px; }
+/* Three or more options don't fit across a phone: stack them instead of wrapping into an odd shape. */
+@media (max-width: 560px) {
+  .seg:has(> label:nth-of-type(3):not([hidden])) { display: flex; flex-direction: column; border-radius: 16px; width: 100%; }
+  .seg:has(> label:nth-of-type(3):not([hidden])) span { display: block; border-radius: 12px; }
+}
 .calc-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s3); }
 .calc-list li { margin: 0; }
 .calc-list a { display: block; height: 100%; padding: var(--s4); border: 1px solid var(--line); border-radius: var(--radius-lg); text-decoration: none; color: var(--text); background: #fff; }

@@ -1,0 +1,183 @@
+{
+  "_note": "Transfer (stamp) duty for residential purchases in each state and territory, 2026-27. One source of truth: build.py renders the rate tables and state pages from this file, and the calculator reads it from the page. Bracket: 'to' = top of the band (null = no limit); duty = base + rate x (value - over) / 100, or 'flat' = % of the whole value. 'round': 'part' = each rate applies per $100 or part of $100; 'exact' = straight percentage. Check every state each July (NSW indexes thresholds every 1 July) and after state budgets. Record changes in CLAIMS.md.",
+  "checked": "17 November 2026",
+  "default": "QLD",
+  "order": ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"],
+  "states": {
+    "NSW": {
+      "name": "New South Wales", "short": "NSW", "slug": "nsw", "term": "transfer duty", "round": "part", "unit": "per100",
+      "office": "Revenue NSW", "source": "https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/transfer-duty",
+      "general": [
+        {"to": 18000, "base": 0, "rate": 1.25, "over": 0, "min": 20},
+        {"to": 38000, "base": 225, "rate": 1.5, "over": 18000},
+        {"to": 103000, "base": 525, "rate": 1.75, "over": 38000},
+        {"to": 387000, "base": 1662, "rate": 3.5, "over": 103000},
+        {"to": 1290000, "base": 11602, "rate": 4.5, "over": 387000},
+        {"to": 3870000, "base": 52237, "rate": 5.5, "over": 1290000},
+        {"to": null, "base": 194137, "rate": 7, "over": 3870000}
+      ],
+      "general_note": "Thresholds apply to contracts from 1 July 2026 to 30 June 2027. The top band is premium property duty on residential land.",
+      "owner": null,
+      "fhb": "nsw",
+      "fhb_short": "No duty up to $800,000; reduced up to $1 million",
+      "fhb_text": "Under the First Home Buyers Assistance Scheme, eligible first home buyers pay no transfer duty on a new or existing home valued up to $800,000, and a reduced amount up to $1,000,000. For vacant land to build a first home, there's no duty up to $350,000 and a reduced amount up to $450,000. You need to move in within 12 months and live there for at least 12 months.",
+      "surcharge": "Surcharge purchaser duty for foreign buyers (an extra 9% of the value)"
+    },
+    "VIC": {
+      "name": "Victoria", "short": "VIC", "slug": "vic", "term": "land transfer duty", "round": "exact", "unit": "pct",
+      "office": "State Revenue Office Victoria", "source": "https://www.sro.vic.gov.au/land-transfer-duty",
+      "general": [
+        {"to": 25000, "base": 0, "rate": 1.4, "over": 0},
+        {"to": 130000, "base": 350, "rate": 2.4, "over": 25000},
+        {"to": 960000, "base": 2870, "rate": 6, "over": 130000},
+        {"to": 2000000, "flat": 5.5},
+        {"to": null, "base": 110000, "rate": 6.5, "over": 2000000}
+      ],
+      "general_note": "General rates for contracts from 1 July 2021, which also apply to investment properties.",
+      "owner": [
+        {"to": 25000, "base": 0, "rate": 1.4, "over": 0},
+        {"to": 130000, "base": 350, "rate": 2.4, "over": 25000},
+        {"to": 440000, "base": 2870, "rate": 5, "over": 130000},
+        {"to": 550000, "base": 18370, "rate": 6, "over": 440000}
+      ],
+      "owner_max": 550000,
+      "owner_title": "Principal place of residence rates (homes valued up to $550,000)",
+      "fhb": "vic",
+      "fhb_short": "No duty up to $600,000; reduced up to $750,000",
+      "fhb_text": "Eligible first home buyers pay no duty on a home valued up to $600,000, and a reduced amount up to $750,000. Separately, if you'll live in the home, the principal place of residence concession lowers the rates on homes valued up to $550,000.",
+      "surcharge": "Foreign purchaser additional duty (an extra 8% of the value)"
+    },
+    "QLD": {
+      "name": "Queensland", "short": "QLD", "slug": "qld", "term": "transfer duty", "round": "part", "unit": "per100",
+      "office": "Queensland Revenue Office", "source": "https://qro.qld.gov.au/duties/transfer-duty/calculate/concession-rates/",
+      "general": [
+        {"to": 5000, "base": 0, "rate": 0, "over": 0},
+        {"to": 75000, "base": 0, "rate": 1.5, "over": 5000},
+        {"to": 540000, "base": 1050, "rate": 3.5, "over": 75000},
+        {"to": 1000000, "base": 17325, "rate": 4.5, "over": 540000},
+        {"to": null, "base": 38025, "rate": 5.75, "over": 1000000}
+      ],
+      "general_note": "General rates, which apply to investment properties.",
+      "owner": [
+        {"to": 350000, "base": 0, "rate": 1, "over": 0},
+        {"to": 540000, "base": 3500, "rate": 3.5, "over": 350000},
+        {"to": 1000000, "base": 10150, "rate": 4.5, "over": 540000},
+        {"to": null, "base": 30850, "rate": 5.75, "over": 1000000}
+      ],
+      "owner_max": null,
+      "owner_title": "Home concession rates (a home you'll live in)",
+      "owner_needs_residency": true,
+      "kinds": ["established", "new", "land"],
+      "fhb": "qld",
+      "fhb_short": "No duty on a new home; established homes up to $700,000",
+      "fhb_text": "First home buyers of an established home can claim a concession that removes duty on homes valued up to $700,000, reducing in steps until it ends at $800,000. Since 1 May 2025, first home buyers of a new home, or vacant land to build one, can claim a full concession with no price cap. From 1 August 2026, home concessions are generally only available to Australian citizens, permanent residents and specified foreign retirees. The $30,000 First Home Owner Grant continues for eligible new homes valued under $750,000.",
+      "surcharge": "Additional foreign acquirer duty (an extra 8% of the value)",
+      "grant": "You may also be eligible for Queensland's $30,000 First Home Owner Grant for new homes under $750,000."
+    },
+    "WA": {
+      "name": "Western Australia", "short": "WA", "slug": "wa", "term": "transfer duty", "round": "part", "unit": "per100",
+      "office": "RevenueWA", "source": "https://www.wa.gov.au/organisation/department-of-treasury-and-finance/transfer-duty-assessment",
+      "general": [
+        {"to": 120000, "base": 0, "rate": 1.9, "over": 0},
+        {"to": 150000, "base": 2280, "rate": 2.85, "over": 120000},
+        {"to": 360000, "base": 3135, "rate": 3.8, "over": 150000},
+        {"to": 725000, "base": 11115, "rate": 4.75, "over": 360000},
+        {"to": null, "base": 28453, "rate": 5.15, "over": 725000}
+      ],
+      "general_note": "WA uses the same general rates for home buyers and investors.",
+      "owner": null,
+      "fhb": "wa",
+      "fhb_short": "No duty up to $600,000; reduced up to $800,000",
+      "fhb_text": "For transactions from 7 May 2026, eligible first home buyers pay no duty on a home valued up to $600,000, and a concessional rate ($16.15 per $100 above $600,000) up to $800,000. For vacant land to build a first home, there's no duty up to $450,000, with a concession up to $550,000.",
+      "surcharge": "Foreign transfer duty (an extra 7% of the value)"
+    },
+    "SA": {
+      "name": "South Australia", "short": "SA", "slug": "sa", "term": "stamp duty", "round": "part", "unit": "per100",
+      "office": "RevenueSA", "source": "https://www.revenuesa.sa.gov.au/",
+      "general": [
+        {"to": 12000, "base": 0, "rate": 1, "over": 0},
+        {"to": 30000, "base": 120, "rate": 2, "over": 12000},
+        {"to": 50000, "base": 480, "rate": 3, "over": 30000},
+        {"to": 100000, "base": 1080, "rate": 3.5, "over": 50000},
+        {"to": 200000, "base": 2830, "rate": 4, "over": 100000},
+        {"to": 250000, "base": 6830, "rate": 4.25, "over": 200000},
+        {"to": 300000, "base": 8955, "rate": 4.75, "over": 250000},
+        {"to": 500000, "base": 11330, "rate": 5, "over": 300000},
+        {"to": null, "base": 21330, "rate": 5.5, "over": 500000}
+      ],
+      "general_note": "SA uses the same rates for home buyers and investors.",
+      "owner": null,
+      "kinds": ["established", "new"],
+      "fhb": "sa",
+      "fhb_short": "No duty on a new home; none on established homes",
+      "fhb_text": "For contracts from 6 June 2024, eligible first home buyers pay no stamp duty on a new home, an off-the-plan apartment or vacant land to build a home, with no price cap. There's no first home buyer concession on an established home.",
+      "surcharge": "The foreign ownership surcharge (an extra 7% of the value)"
+    },
+    "TAS": {
+      "name": "Tasmania", "short": "TAS", "slug": "tas", "term": "property transfer duty", "round": "part", "unit": "per100",
+      "office": "State Revenue Office Tasmania", "source": "https://www.sro.tas.gov.au/property-transfer-duties",
+      "general": [
+        {"to": 3000, "base": 50, "rate": 0, "over": 0},
+        {"to": 25000, "base": 50, "rate": 1.75, "over": 3000},
+        {"to": 75000, "base": 435, "rate": 2.25, "over": 25000},
+        {"to": 200000, "base": 1560, "rate": 3.5, "over": 75000},
+        {"to": 375000, "base": 5935, "rate": 4, "over": 200000},
+        {"to": 725000, "base": 12935, "rate": 4.25, "over": 375000},
+        {"to": null, "base": 27810, "rate": 4.5, "over": 725000}
+      ],
+      "general_note": "Tasmania uses the same rates for every buyer.",
+      "owner": null,
+      "fhb": "none",
+      "fhb_short": "No concession (the established-home exemption ended 30 June 2026)",
+      "fhb_text": "Tasmania's duty exemption for first home buyers of established homes ended for transfers settling after 30 June 2026, so first home buyers now pay the standard rates.",
+      "surcharge": "The foreign investor duty surcharge (an extra 8% of the value)"
+    },
+    "ACT": {
+      "name": "Australian Capital Territory", "short": "ACT", "slug": "act", "term": "conveyance duty", "round": "part", "unit": "per100",
+      "office": "ACT Revenue Office", "source": "https://www.revenue.act.gov.au/duties/conveyance-duty",
+      "general": [
+        {"to": 200000, "base": 0, "rate": 1.2, "over": 0},
+        {"to": 300000, "base": 2400, "rate": 2.2, "over": 200000},
+        {"to": 500000, "base": 4600, "rate": 3.4, "over": 300000},
+        {"to": 750000, "base": 11400, "rate": 4.32, "over": 500000},
+        {"to": 1000000, "base": 22200, "rate": 5.9, "over": 750000},
+        {"to": 1455000, "base": 36950, "rate": 6.4, "over": 1000000},
+        {"to": null, "flat": 4.54}
+      ],
+      "general_note": "Rates for buyers who won't live in the property (investors).",
+      "owner": [
+        {"to": 260000, "base": 0, "rate": 0.28, "over": 0},
+        {"to": 300000, "base": 728, "rate": 2.2, "over": 260000},
+        {"to": 500000, "base": 1608, "rate": 3.4, "over": 300000},
+        {"to": 750000, "base": 8408, "rate": 4.32, "over": 500000},
+        {"to": 1000000, "base": 19208, "rate": 5.9, "over": 750000},
+        {"to": 1455000, "base": 33958, "rate": 6.4, "over": 1000000},
+        {"to": null, "flat": 4.54}
+      ],
+      "owner_max": null,
+      "owner_title": "Owner-occupier rates",
+      "fhb": "act",
+      "fhb_short": "No duty if you haven't owned property in five years",
+      "fhb_text": "From 1 July 2026, the Home Buyer Concession Scheme removes duty for eligible buyers, with no income test or price cap. You and your partner can't have owned property in the last five years, and you need to live in the home. It covers new homes, established homes and vacant residential land. Owner-occupiers who aren't eligible pay the lower owner-occupier rates.",
+      "surcharge": null,
+      "surcharge_none": "The ACT doesn't add a foreign purchaser surcharge to conveyance duty."
+    },
+    "NT": {
+      "name": "Northern Territory", "short": "NT", "slug": "nt", "term": "stamp duty", "round": "exact", "unit": "pct",
+      "office": "Territory Revenue Office", "source": "https://nt.gov.au/employ/money-and-taxes/taxes-royalties-and-grants/stamp-duty",
+      "general": [
+        {"to": 525000, "formula": "nt"},
+        {"to": 3000000, "flat": 4.95},
+        {"to": 5000000, "flat": 5.75},
+        {"to": null, "flat": 5.95}
+      ],
+      "general_note": "The NT uses the same rates for every buyer.",
+      "owner": null,
+      "fhb": "none",
+      "fhb_short": "No duty concession; grants and a house and land exemption",
+      "fhb_text": "The Northern Territory has no general first home buyer duty concession. A stamp duty exemption applies to eligible house and land packages for contracts signed between 1 July 2022 and 30 June 2027, and first home buyers may be eligible for grants. Check the Territory Revenue Office for current eligibility.",
+      "surcharge": null,
+      "surcharge_none": "The NT doesn't charge a foreign purchaser surcharge on stamp duty."
+    }
+  }
+}

@@ -54,25 +54,67 @@
     return tax + income * RULES.medicare;
   }
 
-  // Queensland transfer duty (Queensland Revenue Office rates; each rate applies per $100 or part of $100).
-  const per100 = (over) => Math.ceil(Math.max(0, over) / 100);
-  function dutyGeneral(v) {
-    if (v <= 5000) return 0;
-    if (v <= 75000) return per100(v - 5000) * 1.5;
-    if (v <= 540000) return 1050 + per100(v - 75000) * 3.5;
-    if (v <= 1000000) return 17325 + per100(v - 540000) * 4.5;
-    return 38025 + per100(v - 1000000) * 5.75;
+  // Stamp duty for every state and territory. Rate schedules come from data/stamp-duty.json, which the build
+  // embeds in the page; first home buyer rules are below. Both are checked against published examples in tests/check.py.
+  const DUTY = (() => {
+    const el = document.getElementById("duty-data");
+    try { return el ? JSON.parse(el.textContent) : null; } catch (e) { return null; }
+  })();
+  function schedule(brackets, v, round) {
+    for (const b of brackets) {
+      if (b.to !== null && v > b.to) continue;
+      if (b.formula === "nt") { const k = v / 1000; return 0.06571441 * k * k + 15 * k; }  // NT, up to $525,000
+      if (b.flat != null) return (v * b.flat) / 100;
+      const excess = Math.max(0, v - b.over);
+      const units = round === "part" ? Math.ceil(excess / 100) : excess / 100;  // "per $100 or part of $100"
+      return Math.max(b.min || 0, b.base + units * b.rate);
+    }
+    return 0;
   }
-  function dutyHome(v) {
-    if (v <= 350000) return per100(v) * 1;
-    if (v <= 540000) return 3500 + per100(v - 350000) * 3.5;
-    if (v <= 1000000) return 10150 + per100(v - 540000) * 4.5;
-    return 30850 + per100(v - 1000000) * 5.75;
-  }
+  // Queensland first home concession on an established home: full to $700,000, then reducing in steps to nil at $800,000.
   function firstHomeDeduction(v) {
     if (v < 710000) return 17350;
     if (v >= 800000) return 0;
-    return 17350 - (Math.floor((v - 700000) / 10000)) * 1735;
+    return 17350 - Math.floor((v - 700000) / 10000) * 1735;
+  }
+  function dutyFor(code, v, o) {
+    const S = DUTY.states[code];
+    const general = schedule(S.general, v, S.round);
+    const r = (duty, basis) => ({ duty, basis, general });
+    if (!o.home) return r(general, "Standard rates (investment)");
+    const ownerOk = !!S.owner && (S.owner_max == null || v <= S.owner_max) && (!S.owner_needs_residency || o.eligible);
+    const owner = ownerOk ? schedule(S.owner, v, S.round) : general;
+    const ownerBasis = !ownerOk ? "Standard rates" : code === "VIC" ? "Principal place of residence rates" : code === "QLD" ? "Home concession rates" : "Owner-occupier rates";
+    if (code === "QLD" && o.kind === "land" && !(o.first && o.eligible)) return r(general, "Standard rates (the home concession doesn't apply to vacant land unless it's for your first home)");
+    if (!o.first) return r(owner, ownerBasis);
+    if (!o.eligible) return r(owner, "Standard rates (first home concessions need Australian citizenship or permanent residency)");
+    const per100 = (x) => (S.round === "part" ? Math.ceil(Math.max(0, x) / 100) : Math.max(0, x) / 100);
+    switch (S.fhb) {
+      case "nsw":  // First Home Buyers Assistance Scheme: nil to $800,000, rising in a straight line to full duty at $1,000,000
+        if (v <= 800000) return r(0, "First Home Buyers Assistance Scheme: no duty up to $800,000");
+        if (v < 1000000) return r((per100(v - 800000) * schedule(S.general, 1000000, S.round)) / 2000, "First Home Buyers Assistance Scheme concession");
+        break;
+      case "vic":  // nil to $600,000, then the saving reduces in a straight line to nil at $750,000
+        if (v <= 600000) return r(0, "First home buyer exemption: no duty up to $600,000");
+        if (v <= 750000) return r(owner - (owner * (750000 - v)) / 150000, "First home buyer concession");
+        break;
+      case "qld":
+        if (o.kind === "new") return r(0, "First home (new home) concession: duty reduced to nil");
+        if (o.kind === "land") return r(0, "First home vacant land concession: duty reduced to nil");
+        return r(Math.max(0, owner - firstHomeDeduction(v)), "First home concession (established home)");
+      case "wa":   // first home owner rate from 7 May 2026: nil to $600,000, then $16.15 per $100 above $600,000 to $800,000
+        if (v <= 600000) return r(0, "First home owner rate: no duty up to $600,000");
+        if (v <= 800000) return r(Math.min(general, per100(v - 600000) * 16.15), "First home owner rate of duty");
+        break;
+      case "sa":   // relief for new homes only, no price cap
+        if (o.kind === "new") return r(0, "First home buyer relief on a new home: no duty");
+        return r(owner, "Standard rates (first home relief is for new homes only)");
+      case "act":  // Home Buyer Concession Scheme from 1 July 2026: no duty, no income test or price cap
+        return r(0, "Home Buyer Concession Scheme: no duty");
+      default:
+        return r(owner, `Standard rates (no first home buyer duty concession in ${S.name})`);
+    }
+    return r(owner, ownerBasis + " (above the first home buyer limit)");
   }
 
   function setOut(panel, key, text) {
@@ -205,40 +247,40 @@
     },
 
     "stamp-duty"(form, panel) {
+      if (!DUTY) return empty(panel, "The calculator couldn't load. Please refresh the page.");
+      const code = val(form, "state") || "QLD", S = DUTY.states[code];
       const v = num(form.elements.price);
       const home = val(form, "purpose") === "home";
       const first = home && val(form, "first") === "yes";
+      const kinds = S.kinds || [];
+      const landLabel = form.querySelector('[data-kind="land"]');
+      if (landLabel) landLabel.hidden = !kinds.includes("land");
+      if (!kinds.includes(val(form, "kind"))) form.elements.kind[0].checked = true;
       const kind = val(form, "kind");
       const eligible = form.elements.resident.checked;
       form.querySelectorAll("[data-home-only]").forEach((el) => { el.hidden = !home; });
-      form.querySelectorAll("[data-first-only]").forEach((el) => { el.hidden = !first; });
+      form.querySelectorAll("[data-kind-only]").forEach((el) => { el.hidden = !(first && kinds.length); });
+      const label = form.querySelector("[data-first-label]");
+      if (label) label.textContent = code === "ACT" ? "First home, or no property owned in the last five years?" : "Is it your first home?";
       if (!(v > 0)) return empty(panel, "Enter the purchase price");
       ready(panel);
-      let duty, basis;
-      if (!home || !eligible) {
-        duty = dutyGeneral(v);
-        basis = !home ? "General transfer duty rates (investment)" : "General rates (home concessions need Australian citizenship, permanent residency or a specified exception)";
-      } else if (first && (kind === "new" || kind === "land")) {
-        duty = 0;
-        basis = kind === "new" ? "First home (new home) concession: duty reduced to nil" : "First home vacant land concession: duty reduced to nil";
-      } else if (kind === "land") {
-        duty = dutyGeneral(v);
-        basis = "General rates (the home concession doesn't apply to vacant land unless it's for your first home)";
-      } else if (first) {
-        duty = Math.max(0, dutyHome(v) - firstHomeDeduction(v));
-        basis = "First home concession (established home)";
-      } else {
-        duty = dutyHome(v);
-        basis = "Home concession rates";
-      }
+      const res = dutyFor(code, v, { home, first, kind, eligible });
       const others = ["legal", "inspections", "lender", "other"].reduce((t, n) => t + (num(form.elements[n]) || 0), 0);
-      setOut(panel, "main", money(duty));
-      setOut(panel, "sub", "estimated Queensland transfer duty");
-      setOut(panel, "basis", basis);
-      setOut(panel, "general", money(dutyGeneral(v)));
+      setOut(panel, "main", money(res.duty));
+      setOut(panel, "sub", `estimated ${S.name} ${S.term}`);
+      setOut(panel, "basis", res.basis);
+      setOut(panel, "general", money(res.general));
       setOut(panel, "others", money(others));
-      setOut(panel, "total", money(duty + others));
-      show(panel, "fhog", first && kind === "new" && v < RULES.fhog.cap && eligible);
+      setOut(panel, "total", money(res.duty + others));
+      const note = panel.querySelector('[data-out="note"]');
+      const page = `/calculators/stamp-duty/${S.slug}`;
+      if (note) {
+        note.hidden = location.pathname === page;
+        note.innerHTML = `<a href="${page}" style="color:#fff">${S.short} rates and concessions in full</a>`;
+      }
+      const grant = first && eligible && kind === "new" && !!S.grant && v < RULES.fhog.cap;
+      setOut(panel, "grant", S.grant || "");
+      show(panel, "grant", grant);
       cta(panel, first ? "Buy my first home" : home ? "Buy my next home" : "Buy an investment property", band(v * 0.8));
     },
 
@@ -271,5 +313,5 @@
   });
 
   // Exposed for tests (tests/check.py checks the duty and tax maths against published examples).
-  window.GCW_CALC = { dutyGeneral, dutyHome, firstHomeDeduction, incomeTax, pmt };
+  window.GCW_CALC = { duty: (code, v, o) => dutyFor(code, v, o).duty, schedule, firstHomeDeduction, incomeTax, pmt };
 })();

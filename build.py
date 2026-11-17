@@ -42,6 +42,7 @@ for _need in NEEDS:
     for _slug in _need["people"]:
         assert _slug in BROKERS, f"team.json need '{_need['key']}' names '{_slug}', who isn't a client-facing broker"
 REVIEWS = json.loads((ROOT / "data" / "reviews.json").read_text())
+DUTY = json.loads((ROOT / "data" / "stamp-duty.json").read_text())  # stamp duty for every state: tables, state pages and calculator
 SITE = B["site"]
 ORG_ID = SITE + "/#organization"
 
@@ -61,14 +62,14 @@ NAV = [
         ("Commercial property loans", "/business-finance/commercial-property"),
         ("Business loans", "/business-finance/business-loans"),
         ("Asset and equipment finance", "/business-finance/asset-finance"),
+        ("SMSF commercial property", "/smsf-loans"),
     ]),
-    ("smsf", "SMSF loans", "/smsf-loans", []),
     ("calculators", "Calculators", "/calculators", [
         ("Borrowing power", "/calculators/borrowing-power"),
         ("Repayments", "/calculators/repayments"),
         ("Extra repayments and offset", "/calculators/extra-repayments"),
         ("Refinance", "/calculators/refinance"),
-        ("QLD stamp duty and costs", "/calculators/stamp-duty"),
+        ("Stamp duty (all states)", "/calculators/stamp-duty"),
         ("Deposit planner", "/calculators/deposit"),
         ("RBA cash rate and lending rules", "/rba-cash-rate"),
     ]),
@@ -110,6 +111,144 @@ def strip_tags(text):
     return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", text)).split())
 
 
+def _dollars(n):
+    return f"${n:,.0f}"
+
+
+def _rate(rate, unit):
+    return f"{rate:g}%" if unit == "pct" else f"${rate:.2f} per $100"
+
+
+def duty_rows(brackets, unit):
+    """Plain-English rows for a rate schedule, e.g. ('$103,001 to $387,000', '$1,662 plus $3.50 per $100 over $103,000')."""
+    rows, prev = [], 0
+    for b in brackets:
+        band = (f"Up to {_dollars(b['to'])}" if prev == 0 else
+                f"{_dollars(prev + 1)} to {_dollars(b['to'])}" if b["to"] else f"Over {_dollars(prev)}")
+        if b.get("formula") == "nt":
+            text = "(0.06571441 × V²) + 15V, where V is the value in thousands of dollars"
+        elif "flat" in b:
+            text = f"{b['flat']:g}% of the total value"
+        elif b["rate"] == 0:
+            text = _dollars(b["base"]) if b["base"] else "Nil"
+        else:
+            per = _rate(b["rate"], unit)
+            text = (per + (f" (minimum {_dollars(b['min'])})" if b.get("min") else "")) if not b["base"] and not b["over"] else \
+                   f"{_dollars(b['base'])} plus {per} over {_dollars(b['over'])}" if b["base"] else f"{per} over {_dollars(b['over'])}"
+        rows.append((band, text))
+        prev = b["to"] or prev
+    return rows
+
+
+def duty_table(code):
+    st = DUTY["states"][code]
+    out = []
+    tables = [("General rates" if st.get("owner") else "Rates", st["general"], st.get("general_note", ""))]
+    if st.get("owner"):
+        tables.append((st["owner_title"], st["owner"], ""))
+    for title, brackets, note in tables:
+        rows = "".join(f"<tr><td>{html.escape(a)}</td><td>{html.escape(b)}</td></tr>" for a, b in duty_rows(brackets, st["unit"]))
+        out.append(f"""<div class="table-wrap"><table class="rate-table duty-table">
+        <caption>{html.escape(title)}{(' <span>' + html.escape(note) + '</span>') if note else ''}</caption>
+        <thead><tr><th scope="col">Dutiable value</th><th scope="col">Duty</th></tr></thead>
+        <tbody>{rows}</tbody></table></div>""")
+    if st["round"] == "part":
+        out.append('<p class="hint">Each rate applies per $100, or part of $100.</p>')
+    return "\n".join(out)
+
+
+def duty_states(current=None):
+    items = []
+    for code in DUTY["order"]:
+        st = DUTY["states"][code]
+        if code == current:
+            continue
+        items.append(f'<li><a href="/calculators/stamp-duty/{st["slug"]}"><b>{html.escape(st["name"])}</b>'
+                     f'<span>First home buyers: {html.escape(st["fhb_short"])}</span></a></li>')
+    return '<ul class="duty-states">' + "".join(items) + "</ul>"
+
+
+def duty_calc(default):
+    """The stamp duty calculator form and results. Rates come from data/stamp-duty.json, embedded for the script."""
+    options = "".join(f'<option value="{c}"{" selected" if c == default else ""}>{html.escape(DUTY["states"][c]["name"])}</option>'
+                      for c in DUTY["order"])
+    keep = ("name", "short", "term", "round", "general", "owner", "owner_max", "owner_needs_residency", "kinds", "fhb", "grant", "slug")
+    data = {"checked": DUTY["checked"], "states": {c: {k: v for k, v in st.items() if k in keep} for c, st in DUTY["states"].items()}}
+    payload = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
+    return f"""<form class="calc-form" data-calc="stamp-duty" data-results="results" novalidate>
+      <div class="field full">
+        <label for="c-state">State or territory</label>
+        <select class="input" id="c-state" name="state">{options}</select>
+      </div>
+      <div class="field full">
+        <label for="c-price">Purchase price</label>
+        <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-price" name="price" inputmode="decimal" value="750,000"></div>
+      </div>
+      <fieldset class="full">
+        <legend>What's it for?</legend>
+        <div class="seg">
+          <label><input type="radio" name="purpose" value="home" checked><span>A home I'll live in</span></label>
+          <label><input type="radio" name="purpose" value="investment"><span>An investment</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="full" data-home-only>
+        <legend data-first-label>Is it your first home?</legend>
+        <div class="seg">
+          <label><input type="radio" name="first" value="yes" checked><span>Yes</span></label>
+          <label><input type="radio" name="first" value="no"><span>No</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="full" data-kind-only>
+        <legend>What are you buying?</legend>
+        <div class="seg">
+          <label><input type="radio" name="kind" value="established" checked><span>An established home</span></label>
+          <label><input type="radio" name="kind" value="new"><span>A new home</span></label>
+          <label data-kind="land"><input type="radio" name="kind" value="land"><span>Land to build on</span></label>
+        </div>
+      </fieldset>
+      <label class="consent full" for="c-res" data-home-only>
+        <input id="c-res" name="resident" type="checkbox" checked>
+        <span>I'm an Australian citizen or permanent resident</span>
+      </label>
+      <details class="full more-costs">
+        <summary>Add your other upfront costs <span class="muted">(optional)</span></summary>
+        <div class="more-costs-grid">
+          <div class="field">
+            <label for="c-legal">Conveyancing or legal</label>
+            <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-legal" name="legal" inputmode="decimal" value="0"></div>
+          </div>
+          <div class="field">
+            <label for="c-insp">Building and pest</label>
+            <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-insp" name="inspections" inputmode="decimal" value="0"></div>
+          </div>
+          <div class="field">
+            <label for="c-lender">Lender fees</label>
+            <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-lender" name="lender" inputmode="decimal" value="0"></div>
+          </div>
+          <div class="field">
+            <label for="c-other">Registration and other</label>
+            <div class="input-wrap"><span class="unit pre">$</span><input class="input" id="c-other" name="other" inputmode="decimal" value="0"></div>
+          </div>
+        </div>
+      </details>
+    </form>
+    <aside class="results" id="results" aria-labelledby="results-title">
+      <h2 id="results-title">Your upfront costs</h2>
+      <div class="result-main" data-out="main" aria-live="polite"></div>
+      <div class="result-sub" data-out="sub" data-detail></div>
+      <ul class="result-list" data-detail>
+        <li>Calculated using <b data-out="basis" style="max-width:60%"></b></li>
+        <li>Duty at standard rates, for comparison <b data-out="general"></b></li>
+        <li>Your other costs <b data-out="others"></b></li>
+        <li>Total upfront <b data-out="total"></b></li>
+      </ul>
+      <p class="result-note" data-out="note" data-detail hidden></p>
+      <p class="result-note" data-show="grant" hidden><span data-out="grant"></span> <a href="/home-loans/first-home-buyers" style="color:#fff">How it works</a>.</p>
+      <a class="btn btn-light" data-cta href="/get-started">Talk to a broker about this</a>
+    </aside>
+    <script type="application/json" id="duty-data">{payload}</script>"""
+
+
 def fill(text):
     """Replace {{key}} and {{key.sub}} with values from brand.json."""
     ctx = dict(B, rates=RATES)
@@ -126,6 +265,9 @@ def fill(text):
     text = text.replace("<!--team-behind-->", behind_cards())
     text = text.replace("<!--team-matcher-->", team_matcher())
     text = text.replace("<!--broker-names-->", html.escape(json.dumps({k: v["name"] for k, v in BROKERS.items()}, ensure_ascii=False)))
+    text = re.sub(r"<!--duty-calc:(\w+)-->", lambda m: duty_calc(m.group(1)), text)
+    text = re.sub(r"<!--duty-table:(\w+)-->", lambda m: duty_table(m.group(1)), text)
+    text = re.sub(r"<!--duty-states(?::(\w+))?-->", lambda m: duty_states(m.group(1)), text)
     text = text.replace("<!--featured-->", "".join(f"<li>{html.escape(n)}</li>" for n in B["featured_in"]))
     return re.sub(r"\{\{([\w.]+)\}\}", get, text)
 
@@ -312,6 +454,18 @@ def structured_data(meta, body, pages):
             "provider": {"@type": "FinancialService", "@id": ORG_ID, "name": B["name"]},
             "areaServed": {"@type": "Country", "name": "Australia"},
         })
+    if meta.get("schema") == "calculator":
+        blocks.append({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": meta.get("h1") or meta["title"].split("|")[0].strip(),
+            "description": meta["description"],
+            "url": SITE + path,
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Any",
+            "isAccessibleForFree": True,
+            "provider": {"@type": "FinancialService", "@id": ORG_ID, "name": B["name"]},
+        })
     if meta.get("person") in TEAM:
         p = TEAM[meta["person"]]
         blocks.append({
@@ -488,7 +642,7 @@ def footer(show_bar):
       </div>
       <nav class="footer-cols" aria-label="Footer">
 {col(home[1], home[3])}
-{col(biz[1], biz[3] + [("SMSF loans", "/smsf-loans")])}
+{col(biz[1], biz[3])}
 {col("Calculators", next(n for n in NAV if n[0] == "calculators")[3])}
 {col("Company", [("About us", "/about"), ("Our team", "/team"), ("Referral partners", "/partners"), ("Loan health check", "/loan-health-check"), ("First home buyer guide", "/first-home-buyer-guide"), ("Contact", "/contact"), ("Get started", "/get-started")])}
         <div>
@@ -546,8 +700,21 @@ def parse(text):
 
 
 def build():
-    sources = sorted(p for p in PAGES.rglob("*.html") if "partials" not in p.parts)
+    sources = sorted(p for p in PAGES.rglob("*.html") if "partials" not in p.parts and "_templates" not in p.parts)
     parsed = [(src, *parse(src.read_text())) for src in sources]
+    # Stamp duty: one page per state or territory, from pages/_templates/stamp-duty-state.html and data/stamp-duty.json.
+    template = PAGES / "_templates" / "stamp-duty-state.html"
+    for code in DUTY["order"]:
+        st = DUTY["states"][code]
+        surcharge = (f"<li>{html.escape(st['surcharge'])}.</li>" if st.get("surcharge") else "")
+        page = template.read_text()
+        for key, value in {"code": code, "name": html.escape(st["name"]), "short": st["short"], "slug": st["slug"],
+                           "term": st["term"], "office": html.escape(st["office"]), "source": st["source"],
+                           "fhb_text": html.escape(st["fhb_text"]), "surcharge": surcharge,
+                           "surcharge_none": (f"<p>{html.escape(st['surcharge_none'])}</p>" if st.get("surcharge_none") else ""),
+                           "checked": DUTY["checked"]}.items():
+            page = page.replace("[[" + key + "]]", value)
+        parsed.append((template, *parse(page)))
     pages = {meta["path"]: meta for _, meta, _, _ in parsed}
     urls = []
     for src, meta, body, extra_head in parsed:
