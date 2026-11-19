@@ -6,22 +6,23 @@
       "name": "Brooke Juracic",
       "role": "Co-founder and Managing Director",
       "credit_rep": "491220",
-      "phone": "0422 740 697",
-      "phone_tel": "+61422740697",
+      "phone": "0494 438 042",
+      "phone_tel": "+61494438042",
       "photo": "brooke-juracic",
-      "summary": "Brooke has more than a decade of broking experience, from first home buyers to commercial deals and high-net-worth portfolios.",
+      "summary": "Brooke takes a structure-first, education-driven approach to lending, with a focus on SMSF loans and complex structures from pre-approval to settlement.",
       "bio": [
-        "Brooke co-founded GC Wealth in 2024. She has more than a decade of finance broking experience, working with clients from first home buyers to commercial deals and high-net-worth portfolios.",
-        "She believes finance is about what a transaction makes possible: the home, the business or the next step it leads to."
+        "As co-founder and Managing Director of GC Wealth, Brooke Juracic brings a strategic, education-driven approach to finance broking that prioritises structure, clarity and long-term wealth creation. Overseeing a diverse portfolio ranging from everyday personal lending to large-scale developments, Brooke and her team are dedicated to taking the complexity out of borrowing. Her industry background spans more than a decade across financial advisory administration, executive brokerage operations, residential construction, and owning and operating mortgage broking franchises. That gives her a 360-degree view of how lenders assess risk, how properties are built and valued, and how complex loans are structured from pre-approval through to settlement.",
+        "A core pillar of Brooke's practice is self-managed super fund (SMSF) lending. She works closely with existing SMSF property investors to review and restructure their current loans, helping keep debt reduction on track so properties can be paid off before retirement. With the recent changes restricting new SMSF borrowing to business real property, Brooke also helps business owners and investors buy commercial property within their super funds with confidence and compliance.",
+        "Above all, Brooke is driven by a genuine passion for financial literacy. She believes understanding how money and lending work shouldn't be reserved for seasoned investors, and makes it her mission to explain the mechanics of every client's financial structure so they can build lasting wealth. From seasoned portfolio builders to young people taking their first steps into finance, Brooke is committed to giving people the practical knowledge and habits to set themselves up for lifelong financial success."
       ],
       "credentials": [
         "MFAA accredited",
         "Credit Representative 491220, authorised under Australian Credit Licence 389328"
       ],
       "focus": [
-        "First home buyers",
-        "Commercial lending",
-        "High-net-worth portfolios"
+        "SMSF lending",
+        "Complex loan structuring",
+        "Commercial property"
       ],
       "linkedin": "https://au.linkedin.com/in/brooke-juracic",
       "reviews": [
@@ -68,7 +69,7 @@
       "phone_tel": "+61483780534",
       "email": "kirisome@gcwealth.com.au",
       "credentials": [
-        "MFAA accredited",
+        "FBAA accredited",
         "Credit Representative 576212, authorised under Australian Credit Licence 389328"
       ],
       "focus": [
@@ -78,7 +79,7 @@
       ],
       "linkedin": "https://au.linkedin.com/in/kirisome-auva-a-79ab14233",
       "reviews": [],
-      "instagram": "https://www.instagram.com/kirisomeauvaa23/"
+      "instagram": "https://www.instagram.com/gcwfinancebroker/"
     },
     {
       "slug": "kim-edwards",
@@ -86,21 +87,26 @@
       "role": "Finance Specialist",
       "credit_rep": "56632",
       "photo": "kim-edwards",
-      "summary": "Kim specialises in complex finance for business owners.",
+      "summary": "Kim draws on senior lending roles at two major banks to help property investors, self-employed borrowers and developers with lending that sits outside the standard box.",
       "phone": "0432 022 161",
       "phone_tel": "+61432022161",
       "email": "kim@gcwealth.com.au",
       "credentials": [
-        "MFAA accredited",
+        "FBAA accredited",
         "Credit Representative 56632, authorised under Australian Credit Licence 389328"
       ],
       "focus": [
-        "Business owners",
-        "Complex finance",
-        "Business lending"
+        "Property investors",
+        "Self-employed and low doc",
+        "Developer finance"
       ],
       "linkedin": "https://au.linkedin.com/in/kim-edwards-3b955267",
-      "reviews": []
+      "reviews": [],
+      "bio": [
+        "With a finance career dating back to 2011, Kim Edwards brings extensive industry insight and deep institutional knowledge to her clients. Having held senior roles as a Lending Specialist and Home Finance Manager at two major Australian banks, alongside broad experience with several other major banks, Kim understands how lenders assess applications from the inside out. She uses that background to help property investors refinance, unlock equity and structure their lending for sustainable portfolio growth.",
+        "Kim also works through complex financial structures for self-employed borrowers, business owners and corporate entities. With deep expertise in alt doc and low doc lending, she takes the friction out of borrowing for clients whose finances sit outside standard lending criteria, making sure their business revenue and broader financial picture are accurately represented to lenders.",
+        "Beyond residential and investment lending, Kim has a specialised niche in low doc lending for property developers. This includes structuring funding for land acquisitions before a development application (DA) is lodged, giving developers the agility to secure sites and move projects forward with confidence."
+      ]
     },
     {
       "slug": "matthew-klein",
@@ -113,7 +119,7 @@
       "phone_tel": "+61452356955",
       "email": "matthew@gcwealth.com.au",
       "credentials": [
-        "MFAA accredited",
+        "FBAA accredited",
         "Credit Representative 561059, authorised under Australian Credit Licence 389328"
       ],
       "focus": [
@@ -137,10 +143,10 @@
     {
       "slug": "nikki-maidment",
       "name": "Nikki Maidment",
-      "role": "Customer Support Specialist",
+      "role": "Customer Support Specialist and Social Media Manager",
       "client_facing": false,
       "photo": "nikki-maidment",
-      "summary": "Nikki looks after customer support and GC Wealth's social media.",
+      "summary": "As GC Wealth's Customer Support Specialist and Social Media Manager, Nikki keeps both our operations and our online community thriving. Wearing two hats with ease, she keeps everything running smoothly behind the scenes while bringing the GC Wealth brand to life online, turning financial concepts and team updates into engaging, approachable content that keeps everyone connected and in the know.",
       "linkedin": ""
     }
   ],
@@ -169,6 +175,7 @@
       "label": "Investing in property",
       "goal": "Buy an investment property",
       "people": [
+        "kim-edwards",
         "steven-shaw",
         "kirisome-auvaa"
       ]
@@ -178,8 +185,8 @@
       "label": "A home loan while self-employed",
       "goal": "",
       "people": [
-        "steven-shaw",
-        "kim-edwards"
+        "kim-edwards",
+        "steven-shaw"
       ]
     },
     {
@@ -213,8 +220,8 @@
       "label": "Business premises through my SMSF",
       "goal": "Borrow through my SMSF",
       "people": [
-        "steven-shaw",
-        "brooke-juracic"
+        "brooke-juracic",
+        "steven-shaw"
       ]
     },
     {
@@ -223,7 +230,7 @@
       "goal": "",
       "people": [
         "brooke-juracic",
-        "steven-shaw"
+        "kim-edwards"
       ]
     }
   ]

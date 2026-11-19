@@ -8,7 +8,7 @@ where it appears, and the evidence. Update this file whenever a claim changes, a
 | Access to 70+ lenders on our panel | Home, About, hubs, service pages, Get started | Connective panel size, confirmed by Lachlan | 17 Nov 2026 |
 | Lender names listed (CBA, Westpac, ANZ …) | Home | Taken from the previous gcwealth.com.au lender panel. **Confirm GCW brokers are accredited with each one** (Connective: only show lenders you're accredited with) | To confirm |
 | Rated 5.0 from 17 Google reviews | Home, About, proof bar | Google Business Profile, viewed 17 Nov 2026 (update `reviews` in brand.json when it changes) | 17 Nov 2026 |
-| Every broker is MFAA accredited | Home, About | Confirmed by Lachlan | 17 Nov 2026 |
+| Every broker is MFAA or FBAA accredited: Brooke and Steven MFAA; Kirisome, Kim and Matthew FBAA (Kim transferring to MFAA) | Home, About, Team, profiles | Brooke, 19 Nov 2026 | 19 Nov 2026 |
 | Founded in 2024 | About | ABR: Gold Coast Wealth Pty Ltd registered 21 May 2024; confirmed by Lachlan | 17 Nov 2026 |
 | As featured in COHORT, Gold Coast Bulletin, realestate.com.au, The Australian, ABC News, The Mercury | Home, About | Confirmed by Lachlan. Keep links or copies of each feature on file | 17 Nov 2026 |
 | Offices in Southport QLD and Hampton VIC; hours Mon–Fri 8am–5pm (Qld time) | Footer, Contact, About | Confirmed by Lachlan | 17 Nov 2026 |
@@ -46,3 +46,7 @@ where it appears, and the evidence. Update this file whenever a claim changes, a
 No interest rates or repayment figures are advertised anywhere on the site. Calculators never pre-fill a rate: visitors enter
 their own (tests/check.py fails if a rate is pre-filled). If any are added (including calculator defaults),
 a comparison rate and Connective's comparison rate warning must appear with equal prominence.
+
+| Head office phone 0494 438 042 is the number for everyone; Brooke's profile uses it too | Site-wide, guide PDF | Brooke, 19 Nov 2026 | 19 Nov 2026 |
+| Brooke's bio (SMSF lending, background in financial advisory administration, brokerage operations, residential construction and broking franchises), Kim's bio (finance career since 2011; Lending Specialist and Home Finance Manager at two major banks; investors, alt/low doc, developer land finance) and Nikki's role (Customer Support Specialist and Social Media Manager) | /team, profiles | Supplied by Brooke 19 Nov 2026; Brooke's "founder" kept as co-founder, US spellings changed to Australian, minor punctuation and wording edits ("ensuring ... paid off" softened to "helping keep ... can be paid off") | 19 Nov 2026 |
+| Kirisome's Instagram is @gcwfinancebroker | /team/kirisome-auvaa | Brooke, 19 Nov 2026 | 19 Nov 2026 |
