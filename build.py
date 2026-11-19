@@ -716,9 +716,9 @@ def header(active, path):
       <ul class="nav-links" id="nav-links">
         {nav_items}
         <li class="nav-menu-extra"><a class="btn" href="/get-started">Get started</a></li>
-        <li class="nav-menu-extra"><a href="tel:{B['phone_tel']}">{ICON['phone']} {B['phone']}</a></li>
+        <li class="nav-menu-extra"><a href="tel:{B['phone_tel']}" aria-label="Call GC Wealth on {B['phone']}">{ICON['phone']} Call GC Wealth</a></li>
       </ul>
-      <a class="nav-phone" href="tel:{B['phone_tel']}">{ICON['phone']}<span>{B['phone']}</span></a>
+      <a class="nav-phone" href="tel:{B['phone_tel']}" title="{B['phone']}" aria-label="Call GC Wealth on {B['phone']}">{ICON['phone']}<span>Call GC Wealth</span></a>
       <a class="btn nav-cta" href="/get-started">Get started</a>
       <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav-links">
         <span class="menu-icon" aria-hidden="true"></span><span class="menu-label">Menu</span>
